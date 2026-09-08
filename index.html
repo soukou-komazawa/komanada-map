@@ -16,7 +16,7 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
-  <!-- PapaParse (CSV解析ライブラリ) -->
+  <!-- PapaParse -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <style>
@@ -53,9 +53,9 @@
       border: 1px solid var(--border-light);
       border-radius: 40px;
       padding: 8px 16px;
-      display: flex; align-items: center; gap: 12px;
+      display: flex; align-items: center; gap: 10px;
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-      max-width: 90vw;
+      max-width: 95vw;
       overflow-x: auto;
     }
 
@@ -72,8 +72,8 @@
 
     .filter-btn {
       border: 1px solid transparent;
-      padding: 6px 14px; border-radius: 20px;
-      cursor: pointer; font-size: 13px; font-weight: 500;
+      padding: 6px 12px; border-radius: 20px;
+      cursor: pointer; font-size: 12px; font-weight: 500;
       transition: all 0.25s ease;
       background: rgba(255, 255, 255, 0.05);
       color: var(--text-sub); white-space: nowrap;
@@ -82,11 +82,13 @@
     .filter-btn:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
     .filter-btn.active { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
 
+    /* サークル別アクティブカラー */
     .filter-btn[data-circle="all"].active { background: #334155; }
-    .filter-btn[data-circle="art"].active { background: #e11d48; }
-    .filter-btn[data-circle="calligraphy"].active { background: #475569; }
-    .filter-btn[data-circle="photo"].active { background: #0284c7; }
-    .filter-btn[data-circle="literature"].active { background: #059669; }
+    .filter-btn[data-circle="geography"].active { background: #d97706; }   /* 地理学研究会: アンバー・金 */
+    .filter-btn[data-circle="art"].active { background: #e11d48; }          /* 美術: ローズ */
+    .filter-btn[data-circle="calligraphy"].active { background: #475569; }   /* 書道: スレート */
+    .filter-btn[data-circle="photo"].active { background: #0284c7; }         /* 写真: スカイ */
+    .filter-btn[data-circle="literature"].active { background: #059669; }    /* 文芸: エメラルド */
 
     /* 座標インフォ（左下） */
     .coord-info {
@@ -97,7 +99,7 @@
       font-family: monospace; font-size: 12px; pointer-events: none;
     }
 
-    /* ポップアップデザイン */
+    /* ポップアップ */
     .leaflet-popup-content-wrapper {
       background: rgba(15, 23, 42, 0.95) !important;
       backdrop-filter: blur(10px);
@@ -112,6 +114,7 @@
       font-size: 10px; font-weight: 700; text-transform: uppercase;
       padding: 2px 8px; border-radius: 10px; display: inline-block; margin-bottom: 6px;
     }
+    .badge-geography { background: rgba(217, 119, 6, 0.25); color: #fcd34d; border: 1px solid rgba(217, 119, 6, 0.5); }
     .badge-art { background: rgba(225, 29, 72, 0.2); color: #fda4af; border: 1px solid rgba(225, 29, 72, 0.4); }
     .badge-calligraphy { background: rgba(100, 116, 139, 0.2); color: #cbd5e1; border: 1px solid rgba(100, 116, 139, 0.4); }
     .badge-photo { background: rgba(2, 132, 199, 0.2); color: #7dd3fc; border: 1px solid rgba(2, 132, 199, 0.4); }
@@ -152,12 +155,34 @@
     .modal-image-wrapper img { max-width: 100%; max-height: 420px; object-fit: contain; }
     .modal-body-text { font-size: 15px; line-height: 1.9; color: #e2e8f0; white-space: pre-wrap; }
 
-    /* ピンデザイン */
-    .custom-pin {
-      width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff;
+    /* ピンデザイン区分 */
+    /* ① 通常スポット（小さな丸ピン） */
+    .custom-pin-spot {
+      width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff;
       box-shadow: 0 0 10px rgba(0,0,0,0.5); transition: transform 0.2s;
     }
-    .custom-pin:hover { transform: scale(1.2); }
+    .custom-pin-spot:hover { transform: scale(1.25); }
+
+    /* ② 公式モニュメント（大きなダイヤ型ゴールドピン） */
+    .custom-pin-official {
+      width: 32px; height: 32px;
+      background: #f59e0b;
+      border: 2px solid #fff;
+      border-radius: 6px;
+      transform: rotate(45px);
+      box-shadow: 0 0 15px rgba(245, 158, 11, 0.8);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.2s;
+    }
+    .custom-pin-official::after {
+      content: '🏛️';
+      font-size: 16px;
+      transform: rotate(-45px);
+    }
+    .custom-pin-official:hover { transform: rotate(45px) scale(1.2); }
+
+    /* 各サークルのピンカラー（通常スポット用） */
+    .pin-geography { background: #d97706; }
     .pin-art { background: #e11d48; }
     .pin-calligraphy { background: #64748b; }
     .pin-photo { background: #0284c7; }
@@ -170,6 +195,7 @@
     <div class="app-title">KOUYOU CITY</div>
     <div class="filter-group">
       <button class="filter-btn active" data-circle="all">すべて</button>
+      <button class="filter-btn" data-circle="geography">🗺️ 地理学研究会</button>
       <button class="filter-btn" data-circle="art">🎨 美術</button>
       <button class="filter-btn" data-circle="calligraphy">🖌️ 書道</button>
       <button class="filter-btn" data-circle="photo">📷 写真</button>
@@ -213,18 +239,19 @@
 
     let globalWorksData = [];
 
-    // 日本語のサークル名を内部IDに正規化する関数
+    // サークルID正規化
     function normalizeCircle(input) {
-      if (!input) return "art";
+      if (!input) return "geography";
       const str = input.toString();
+      if (str.includes("地理")) return "geography";
       if (str.includes("美術")) return "art";
       if (str.includes("書道")) return "calligraphy";
       if (str.includes("写真")) return "photo";
       if (str.includes("文芸")) return "literature";
-      return "art";
+      return "geography";
     }
 
-    // Googleドライブの共有リンクを直接画像表示用URLに変換する関数
+    // Googleドライブ画像URL変換
     function formatImageUrl(url) {
       if (!url) return "";
       if (url.includes("drive.google.com")) {
@@ -236,20 +263,31 @@
       return url;
     }
 
-    function createCustomIcon(circleKey) {
-      return L.divIcon({
-        className: 'custom-pin-container',
-        html: `<div class="custom-pin pin-${circleKey}"></div>`,
-        iconSize: [24, 24], iconAnchor: [12, 12]
-      });
+    // ピンアイコン生成（公式モニュメント vs 通常スポット）
+    function createCustomIcon(circleKey, facilityType) {
+      const isOfficial = facilityType && (facilityType.includes("公式") || facilityType.includes("official"));
+
+      if (isOfficial) {
+        return L.divIcon({
+          className: 'custom-pin-container',
+          html: `<div class="custom-pin-official" title="公式モニュメント"></div>`,
+          iconSize: [32, 32], iconAnchor: [16, 16]
+        });
+      } else {
+        return L.divIcon({
+          className: 'custom-pin-container',
+          html: `<div class="custom-pin-spot pin-${circleKey}"></div>`,
+          iconSize: [22, 22], iconAnchor: [11, 11]
+        });
+      }
     }
 
     function loadDataFromSpreadsheet() {
       if (!SPREADSHEET_CSV_URL || SPREADSHEET_CSV_URL.includes("ここに")) {
         console.warn("スプレッドシートURL未設定のためデモデータで動作中");
         globalWorksData = [
-          { circle: "美術部", title: "駒洋の朝焼け", author: "駒沢 太郎", posY: 750, posX: 1000, shortDesc: "駅前広場の絵", imageUrl: "https://picsum.photos/id/1015/600/400", fullContent: "早朝の駅前風景。" },
-          { circle: "文芸部", title: "駒洋市怪異譚", author: "文芸 太郎", posY: 748, posX: 995, shortDesc: "短編小説", imageUrl: "", fullContent: "奇妙な踏切の物語。" }
+          { circle: "地理学研究会", title: "駒洋市役所 本庁舎", author: "地理学研究会", posY: 750, posX: 1000, facilityType: "公式モニュメント", shortDesc: "昭和初期に建設された歴史的近代建築。", imageUrl: "", fullContent: "駒洋市の行政の中心地。重厚な石造りの本館は市指定文化財となっている。" },
+          { circle: "美術部", title: "駅前カフェ『駒草』", author: "駒沢 太郎", posY: 720, posX: 1050, facilityType: "通常スポット", shortDesc: "作中に登場する老舗喫茶店。", imageUrl: "https://picsum.photos/id/1015/600/400", fullContent: "文士たちが集ったとされるジャズ喫茶。" }
         ];
         renderMarkers("all");
         return;
@@ -289,14 +327,14 @@
           </div>
         `;
 
-        const marker = L.marker([y, x], { icon: createCustomIcon(circleKey) });
+        const marker = L.marker([y, x], { icon: createCustomIcon(circleKey, work.facilityType) });
         marker.bindPopup(popupContent);
         markersGroup.addLayer(marker);
       });
     }
 
     function getCircleName(circleKey) {
-      const names = { art: "美術部", calligraphy: "書道部", photo: "写真部", literature: "文芸部" };
+      const names = { geography: "地理学研究会", art: "美術部", calligraphy: "書道部", photo: "写真部", literature: "文芸部" };
       return names[circleKey] || circleKey;
     }
 
