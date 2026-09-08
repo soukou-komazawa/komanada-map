@@ -22,6 +22,7 @@
   <style>
     :root {
       --bg-dark: rgba(18, 22, 28, 0.85);
+      --bg-card: rgba(30, 41, 59, 0.95);
       --border-light: rgba(255, 255, 255, 0.15);
       --text-main: #f3f4f6;
       --text-sub: #9ca3af;
@@ -82,13 +83,94 @@
     .filter-btn:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
     .filter-btn.active { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
 
-    /* サークル別アクティブカラー */
     .filter-btn[data-circle="all"].active { background: #334155; }
-    .filter-btn[data-circle="geography"].active { background: #d97706; }   /* 地理学研究会: アンバー・金 */
-    .filter-btn[data-circle="art"].active { background: #e11d48; }          /* 美術: ローズ */
-    .filter-btn[data-circle="calligraphy"].active { background: #475569; }   /* 書道: スレート */
-    .filter-btn[data-circle="photo"].active { background: #0284c7; }         /* 写真: スカイ */
-    .filter-btn[data-circle="literature"].active { background: #059669; }    /* 文芸: エメラルド */
+    .filter-btn[data-circle="geography"].active { background: #d97706; }
+    .filter-btn[data-circle="art"].active { background: #e11d48; }
+    .filter-btn[data-circle="calligraphy"].active { background: #475569; }
+    .filter-btn[data-circle="photo"].active { background: #0284c7; }
+    .filter-btn[data-circle="literature"].active { background: #059669; }
+
+    /* サイドバー開閉ボタン */
+    .sidebar-toggle-btn {
+      background: var(--bg-dark);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-light);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .sidebar-toggle-btn:hover { background: rgba(255,255,255,0.25); }
+
+    /* スライドイン・サイドバー */
+    .sidebar {
+      position: fixed;
+      top: 0; left: -360px;
+      width: 340px; height: 100%;
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border-right: 1px solid var(--border-light);
+      z-index: 1500;
+      transition: left 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex; flex-direction: column;
+      box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+    }
+    .sidebar.open { left: 0; }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-light);
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .sidebar-title { font-size: 18px; font-weight: 700; color: #fff; margin: 0; }
+    .sidebar-close {
+      border: none; background: rgba(255,255,255,0.05);
+      width: 32px; height: 32px; border-radius: 50%;
+      color: var(--text-sub); cursor: pointer; font-size: 18px;
+    }
+    .sidebar-close:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+    .sidebar-search {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .sidebar-search input {
+      width: 100%;
+      padding: 8px 12px;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      outline: none;
+    }
+
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+
+    .work-item-card {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .work-item-card:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.25);
+      transform: translateX(4px);
+    }
+    .work-item-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+    .work-item-author { font-size: 12px; color: var(--text-sub); margin-bottom: 6px; }
 
     /* 座標インフォ（左下） */
     .coord-info {
@@ -155,33 +237,22 @@
     .modal-image-wrapper img { max-width: 100%; max-height: 420px; object-fit: contain; }
     .modal-body-text { font-size: 15px; line-height: 1.9; color: #e2e8f0; white-space: pre-wrap; }
 
-    /* ピンデザイン区分 */
-    /* ① 通常スポット（小さな丸ピン） */
+    /* ピンデザイン */
     .custom-pin-spot {
       width: 22px; height: 22px; border-radius: 50%; border: 2px solid #fff;
       box-shadow: 0 0 10px rgba(0,0,0,0.5); transition: transform 0.2s;
     }
     .custom-pin-spot:hover { transform: scale(1.25); }
 
-    /* ② 公式モニュメント（大きなダイヤ型ゴールドピン） */
     .custom-pin-official {
-      width: 32px; height: 32px;
-      background: #f59e0b;
-      border: 2px solid #fff;
-      border-radius: 6px;
-      transform: rotate(45px);
+      width: 34px; height: 34px; background: #f59e0b; border: 2px solid #fff;
+      border-radius: 6px; transform: rotate(45px);
       box-shadow: 0 0 15px rgba(245, 158, 11, 0.8);
-      display: flex; align-items: center; justify-content: center;
-      transition: transform 0.2s;
+      display: flex; align-items: center; justify-content: center; transition: transform 0.2s;
     }
-    .custom-pin-official::after {
-      content: '🏛️';
-      font-size: 16px;
-      transform: rotate(-45px);
-    }
+    .custom-pin-official::after { content: '🏛️'; font-size: 18px; transform: rotate(-45px); }
     .custom-pin-official:hover { transform: rotate(45px) scale(1.2); }
 
-    /* 各サークルのピンカラー（通常スポット用） */
     .pin-geography { background: #d97706; }
     .pin-art { background: #e11d48; }
     .pin-calligraphy { background: #64748b; }
@@ -192,6 +263,7 @@
 <body>
 
   <header class="app-header">
+    <button class="sidebar-toggle-btn" id="sidebarToggleBtn">📋 作品目次</button>
     <div class="app-title">KOUYOU CITY</div>
     <div class="filter-group">
       <button class="filter-btn active" data-circle="all">すべて</button>
@@ -202,6 +274,20 @@
       <button class="filter-btn" data-circle="literature">📚 文芸</button>
     </div>
   </header>
+
+  <!-- 作品一覧サイドバー -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3 class="sidebar-title">作品・スポット目次</h3>
+      <button class="sidebar-close" id="sidebarCloseBtn">&times;</button>
+    </div>
+    <div class="sidebar-search">
+      <input type="text" id="sidebarSearchInput" placeholder="タイトルや作者名で検索...">
+    </div>
+    <div class="sidebar-content" id="sidebarListContent">
+      <!-- 作品カードがJavaScriptで動的に生成されます -->
+    </div>
+  </aside>
 
   <div class="coord-info" id="coordDisplay">地図上をクリックすると座標を取得できます</div>
   <div id="map"></div>
@@ -217,7 +303,7 @@
       </div>
       <div class="modal-body-text" id="modalBody">本文</div>
     </div>
-  </div>
+  </header>
 
   <script>
     // ★★★ここにWebに公開したCSVのURLを貼り付けます★★★
@@ -231,15 +317,22 @@
       crs: L.CRS.Simple, minZoom: -2, maxZoom: 2, zoomControl: false
     });
 
-    L.imageOverlay('komanada-map.jpg', bounds).addTo(map);
+    L.imageOverlay('komanada-map.png', bounds).addTo(map);
     map.fitBounds(bounds);
 
-    const markersGroup = L.markerClusterGroup({ disableClusteringAtZoom: 1, spiderfyOnMaxZoom: true });
-    map.addLayer(markersGroup);
+    const markersClusterGroup = L.markerClusterGroup({
+      disableClusteringAtZoom: 1,
+      spiderfyOnMaxZoom: true,
+      showCoverageOnHover: false,
+      maxClusterRadius: 30
+    });
+    map.addLayer(markersClusterGroup);
+
+    const officialMarkersLayer = L.layerGroup().addTo(map);
 
     let globalWorksData = [];
+    let currentFilterCircle = "all";
 
-    // サークルID正規化
     function normalizeCircle(input) {
       if (!input) return "geography";
       const str = input.toString();
@@ -251,7 +344,6 @@
       return "geography";
     }
 
-    // Googleドライブ画像URL変換
     function formatImageUrl(url) {
       if (!url) return "";
       if (url.includes("drive.google.com")) {
@@ -263,15 +355,12 @@
       return url;
     }
 
-    // ピンアイコン生成（公式モニュメント vs 通常スポット）
-    function createCustomIcon(circleKey, facilityType) {
-      const isOfficial = facilityType && (facilityType.includes("公式") || facilityType.includes("official"));
-
+    function createCustomIcon(circleKey, isOfficial) {
       if (isOfficial) {
         return L.divIcon({
           className: 'custom-pin-container',
           html: `<div class="custom-pin-official" title="公式モニュメント"></div>`,
-          iconSize: [32, 32], iconAnchor: [16, 16]
+          iconSize: [34, 34], iconAnchor: [17, 17]
         });
       } else {
         return L.divIcon({
@@ -286,8 +375,9 @@
       if (!SPREADSHEET_CSV_URL || SPREADSHEET_CSV_URL.includes("ここに")) {
         console.warn("スプレッドシートURL未設定のためデモデータで動作中");
         globalWorksData = [
-          { circle: "地理学研究会", title: "駒洋市役所 本庁舎", author: "地理学研究会", posY: 750, posX: 1000, facilityType: "公式モニュメント", shortDesc: "昭和初期に建設された歴史的近代建築。", imageUrl: "", fullContent: "駒洋市の行政の中心地。重厚な石造りの本館は市指定文化財となっている。" },
-          { circle: "美術部", title: "駅前カフェ『駒草』", author: "駒沢 太郎", posY: 720, posX: 1050, facilityType: "通常スポット", shortDesc: "作中に登場する老舗喫茶店。", imageUrl: "https://picsum.photos/id/1015/600/400", fullContent: "文士たちが集ったとされるジャズ喫茶。" }
+          { circle: "地理学研究会", title: "駒洋市役所 本庁舎", author: "地理学研究会", posY: 750, posX: 1000, facilityType: "公式モニュメント", shortDesc: "昭和初期に建設された歴史的近代建築。", imageUrl: "", fullContent: "駒洋市の行政の中心地。" },
+          { circle: "美術部", title: "市役所前広場『駒草』", author: "駒沢 太郎", posY: 720, posX: 1050, facilityType: "通常スポット", shortDesc: "作中に登場するモニュメント。", imageUrl: "https://picsum.photos/id/1015/600/400", fullContent: "絵画作品。" },
+          { circle: "文芸部", title: "駒洋市怪異譚 - 開かずの踏切", author: "文芸 太郎", posY: 748, posX: 995, facilityType: "通常スポット", shortDesc: "駅近くの都市伝説短編小説。", imageUrl: "", fullContent: "踏切の怪異を描く。" }
         ];
         renderMarkers("all");
         return;
@@ -304,7 +394,9 @@
     }
 
     function renderMarkers(selectedCircle = "all") {
-      markersGroup.clearLayers();
+      currentFilterCircle = selectedCircle;
+      markersClusterGroup.clearLayers();
+      officialMarkersLayer.clearLayers();
 
       globalWorksData.forEach((work, idx) => {
         const circleKey = normalizeCircle(work.circle);
@@ -317,6 +409,8 @@
         const circleName = getCircleName(circleKey);
         const workId = work.timestamp || idx;
 
+        const isOfficial = work.facilityType && (work.facilityType.includes("公式") || work.facilityType.includes("official"));
+
         const popupContent = `
           <div>
             <span class="popup-badge badge-${circleKey}">${circleName}</span>
@@ -327,10 +421,71 @@
           </div>
         `;
 
-        const marker = L.marker([y, x], { icon: createCustomIcon(circleKey, work.facilityType) });
+        const marker = L.marker([y, x], {
+          icon: createCustomIcon(circleKey, isOfficial),
+          zIndexOffset: isOfficial ? 1000 : 0
+        });
         marker.bindPopup(popupContent);
-        markersGroup.addLayer(marker);
+
+        if (isOfficial) {
+          officialMarkersLayer.addLayer(marker);
+        } else {
+          markersClusterGroup.addLayer(marker);
+        }
       });
+
+      // サイドバーの内容も更新
+      updateSidebarList();
+    }
+
+    // サイドバーのリスト生成・検索処理
+    function updateSidebarList() {
+      const listContainer = document.getElementById('sidebarListContent');
+      const searchText = document.getElementById('sidebarSearchInput').value.toLowerCase();
+      listContainer.innerHTML = "";
+
+      globalWorksData.forEach((work, idx) => {
+        const circleKey = normalizeCircle(work.circle);
+        if (currentFilterCircle !== "all" && circleKey !== currentFilterCircle) return;
+
+        const title = work.title || "";
+        const author = work.author || "";
+        if (searchText && !title.toLowerCase().includes(searchText) && !author.toLowerCase().includes(searchText)) {
+          return;
+        }
+
+        const workId = work.timestamp || idx;
+        const circleName = getCircleName(circleKey);
+
+        const card = document.createElement('div');
+        card.className = 'work-item-card';
+        card.innerHTML = `
+          <span class="popup-badge badge-${circleKey}">${circleName}</span>
+          <div class="work-item-title">${title}</div>
+          <div class="work-item-author">by ${author}</div>
+          <div style="font-size: 11px; color: var(--text-sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${work.shortDesc || ''}</div>
+        `;
+
+        // リストクリック時：その場所へ移動してモーダル表示
+        card.addEventListener('click', () => {
+          focusAndOpenWork(work, workId);
+        });
+
+        listContainer.appendChild(card);
+      });
+    }
+
+    // 特定の作品へフォーカスして開く処理
+    function focusAndOpenWork(work, workId) {
+      const y = parseFloat(work.posY);
+      const x = parseFloat(work.posX);
+      if (!isNaN(y) && !isNaN(x)) {
+        map.flyTo([y, x], 1, { duration: 1.2 }); // 滑らかに移動・ズーム
+      }
+      openModal(workId);
+      if (window.innerWidth < 768) {
+        document.getElementById('sidebar').classList.remove('open'); // モバイルでは選択時にサイドバーを閉じる
+      }
     }
 
     function getCircleName(circleKey) {
@@ -369,6 +524,12 @@
 
     document.getElementById('modalClose').addEventListener('click', () => modal.classList.remove('open'));
     modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+
+    // サイドバー開閉イベント
+    const sidebar = document.getElementById('sidebar');
+    document.getElementById('sidebarToggleBtn').addEventListener('click', () => sidebar.classList.toggle('open'));
+    document.getElementById('sidebarCloseBtn').addEventListener('click', () => sidebar.classList.remove('open'));
+    document.getElementById('sidebarSearchInput').addEventListener('input', updateSidebarList);
 
     map.on('click', function(e) {
       const y = Math.round(e.latlng.lat);
