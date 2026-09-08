@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>架空都市「駒洋市」作品アーカイブマップ</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet & MarkerCluster -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+  <!-- PapaParse (CSV解析ライブラリ) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
+  <style>
+    :root {
+      --bg-dark: rgba(18, 22, 28, 0.85);
+      --border-light: rgba(255, 255, 255, 0.15);
+      --text-main: #f3f4f6;
+      --text-sub: #9ca3af;
+      --font-family: 'Noto Sans JP', sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body, html {
+      margin: 0; padding: 0;
+      width: 100%; height: 100%;
+      overflow: hidden;
+      font-family: var(--font-family);
+      background-color: #0f172a;
+      color: var(--text-main);
+    }
+
+    #map { width: 100%; height: 100%; background-color: #111827; }
+
+    /* ヘッダー・フィルターバー */
+    .app-header {
+      position: absolute;
+      top: 20px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      background: var(--bg-dark);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-light);
+      border-radius: 40px;
+      padding: 8px 16px;
+      display: flex; align-items: center; gap: 12px;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      max-width: 90vw;
+      overflow-x: auto;
+    }
+
+    .app-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; font-weight: 600;
+      letter-spacing: 1px;
+      padding-right: 12px;
+      border-right: 1px solid var(--border-light);
+      white-space: nowrap; color: #fff;
+    }
+
+    .filter-group { display: flex; gap: 6px; align-items: center; }
+
+    .filter-btn {
+      border: 1px solid transparent;
+      padding: 6px 14px; border-radius: 20px;
+      cursor: pointer; font-size: 13px; font-weight: 500;
+      transition: all 0.25s ease;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-sub); white-space: nowrap;
+    }
+
+    .filter-btn:hover { background: rgba(255, 255, 255, 0.15); color: #fff; }
+    .filter-btn.active { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
+
+    .filter-btn[data-circle="all"].active { background: #334155; }
+    .filter-btn[data-circle="art"].active { background: #e11d48; }
+    .filter-btn[data-circle="calligraphy"].active { background: #475569; }
+    .filter-btn[data-circle="photo"].active { background: #0284c7; }
+    .filter-btn[data-circle="literature"].active { background: #059669; }
+
+    /* 座標インフォ（左下） */
+    .coord-info {
+      position: absolute; bottom: 20px; left: 20px; z-index: 1000;
+      background: var(--bg-dark); backdrop-filter: blur(8px);
+      border: 1px solid var(--border-light);
+      color: var(--text-sub); padding: 8px 14px; border-radius: 20px;
+      font-family: monospace; font-size: 12px; pointer-events: none;
+    }
+
+    /* ポップアップデザイン */
+    .leaflet-popup-content-wrapper {
+      background: rgba(15, 23, 42, 0.95) !important;
+      backdrop-filter: blur(10px);
+      color: #fff !important;
+      border: 1px solid var(--border-light);
+      border-radius: 12px !important;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    }
+    .leaflet-popup-tip { background: rgba(15, 23, 42, 0.95) !important; }
+
+    .popup-badge {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      padding: 2px 8px; border-radius: 10px; display: inline-block; margin-bottom: 6px;
+    }
+    .badge-art { background: rgba(225, 29, 72, 0.2); color: #fda4af; border: 1px solid rgba(225, 29, 72, 0.4); }
+    .badge-calligraphy { background: rgba(100, 116, 139, 0.2); color: #cbd5e1; border: 1px solid rgba(100, 116, 139, 0.4); }
+    .badge-photo { background: rgba(2, 132, 199, 0.2); color: #7dd3fc; border: 1px solid rgba(2, 132, 199, 0.4); }
+    .badge-literature { background: rgba(5, 150, 105, 0.2); color: #6ee7b7; border: 1px solid rgba(5, 150, 105, 0.4); }
+
+    .popup-title { font-size: 15px; font-weight: 700; margin: 0 0 4px 0; color: #fff; }
+    .popup-author { font-size: 12px; color: var(--text-sub); margin-bottom: 8px; }
+    .popup-btn {
+      width: 100%; padding: 6px 0; margin-top: 8px;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 6px; color: #fff; font-size: 12px; cursor: pointer; transition: background 0.2s;
+    }
+    .popup-btn:hover { background: rgba(255,255,255,0.25); }
+
+    /* モーダル */
+    .modal-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px);
+      z-index: 2000; justify-content: center; align-items: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-card {
+      background: #1e293b; border: 1px solid var(--border-light);
+      width: 100%; max-width: 720px; max-height: 85vh;
+      border-radius: 16px; overflow-y: auto; padding: 32px;
+      position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+    .modal-close {
+      position: absolute; top: 20px; right: 20px; border: none;
+      background: rgba(255,255,255,0.05); width: 36px; height: 36px;
+      border-radius: 50%; color: var(--text-sub); font-size: 20px; cursor: pointer;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.2); color: #fff; }
+    .modal-image-wrapper {
+      width: 100%; margin: 16px 0 24px 0; background: #0f172a;
+      border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); text-align: center;
+    }
+    .modal-image-wrapper img { max-width: 100%; max-height: 420px; object-fit: contain; }
+    .modal-body-text { font-size: 15px; line-height: 1.9; color: #e2e8f0; white-space: pre-wrap; }
+
+    /* ピンデザイン */
+    .custom-pin {
+      width: 24px; height: 24px; border-radius: 50%; border: 2px solid #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5); transition: transform 0.2s;
+    }
+    .custom-pin:hover { transform: scale(1.2); }
+    .pin-art { background: #e11d48; }
+    .pin-calligraphy { background: #64748b; }
+    .pin-photo { background: #0284c7; }
+    .pin-literature { background: #059669; }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="app-title">KOUYOU CITY</div>
+    <div class="filter-group">
+      <button class="filter-btn active" data-circle="all">すべて</button>
+      <button class="filter-btn" data-circle="art">🎨 美術</button>
+      <button class="filter-btn" data-circle="calligraphy">🖌️ 書道</button>
+      <button class="filter-btn" data-circle="photo">📷 写真</button>
+      <button class="filter-btn" data-circle="literature">📚 文芸</button>
+    </div>
+  </header>
+
+  <div class="coord-info" id="coordDisplay">地図上をクリックすると座標を取得できます</div>
+  <div id="map"></div>
+
+  <div class="modal-overlay" id="workModal">
+    <div class="modal-card">
+      <button class="modal-close" id="modalClose">&times;</button>
+      <div id="modalBadge" class="popup-badge">CIRCLE</div>
+      <h2 id="modalTitle" style="font-size: 24px; margin: 8px 0 4px 0; color:#fff;">タイトル</h2>
+      <div id="modalAuthor" style="font-size: 14px; color: var(--text-sub); margin-bottom: 16px;">作者名</div>
+      <div class="modal-image-wrapper" id="modalImageWrapper" style="display: none;">
+        <img id="modalImage" src="" alt="作品画像">
+      </div>
+      <div class="modal-body-text" id="modalBody">本文</div>
+    </div>
+  </div>
+
+  <script>
+    // ★★★ここにWebに公開したCSVのURLを貼り付けます★★★
+    const SPREADSHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCkO4YnsI6F-tTZ1B2fCSSokJjqD_vWaNjWN0T5455EyKbRjJIrI7Lrd45wduE4HIKBHl_ND5G-017/pub?gid=105479515&single=true&output=csv";
+
+    const imageWidth = 2300;
+    const imageHeight = 1300;
+    const bounds = [[0, 0], [imageHeight, imageWidth]];
+
+    const map = L.map('map', {
+      crs: L.CRS.Simple, minZoom: -2, maxZoom: 2, zoomControl: false
+    });
+
+    L.imageOverlay('komanada-map.jpg', bounds).addTo(map);
+    map.fitBounds(bounds);
+
+    const markersGroup = L.markerClusterGroup({ disableClusteringAtZoom: 1, spiderfyOnMaxZoom: true });
+    map.addLayer(markersGroup);
+
+    let globalWorksData = [];
+
+    // 日本語のサークル名を内部IDに正規化する関数
+    function normalizeCircle(input) {
+      if (!input) return "art";
+      const str = input.toString();
+      if (str.includes("美術")) return "art";
+      if (str.includes("書道")) return "calligraphy";
+      if (str.includes("写真")) return "photo";
+      if (str.includes("文芸")) return "literature";
+      return "art";
+    }
+
+    // Googleドライブの共有リンクを直接画像表示用URLに変換する関数
+    function formatImageUrl(url) {
+      if (!url) return "";
+      if (url.includes("drive.google.com")) {
+        const fileIdMatch = url.match(/\/d\/([^\/]+)/) || url.match(/id=([^&]+)/);
+        if (fileIdMatch && fileIdMatch[1]) {
+          return `https://lh3.googleusercontent.com/d/${fileIdMatch[1]}`;
+        }
+      }
+      return url;
+    }
+
+    function createCustomIcon(circleKey) {
+      return L.divIcon({
+        className: 'custom-pin-container',
+        html: `<div class="custom-pin pin-${circleKey}"></div>`,
+        iconSize: [24, 24], iconAnchor: [12, 12]
+      });
+    }
+
+    function loadDataFromSpreadsheet() {
+      if (!SPREADSHEET_CSV_URL || SPREADSHEET_CSV_URL.includes("ここに")) {
+        console.warn("スプレッドシートURL未設定のためデモデータで動作中");
+        globalWorksData = [
+          { circle: "美術部", title: "駒洋の朝焼け", author: "駒沢 太郎", posY: 750, posX: 1000, shortDesc: "駅前広場の絵", imageUrl: "https://picsum.photos/id/1015/600/400", fullContent: "早朝の駅前風景。" },
+          { circle: "文芸部", title: "駒洋市怪異譚", author: "文芸 太郎", posY: 748, posX: 995, shortDesc: "短編小説", imageUrl: "", fullContent: "奇妙な踏切の物語。" }
+        ];
+        renderMarkers("all");
+        return;
+      }
+
+      Papa.parse(SPREADSHEET_CSV_URL, {
+        download: true,
+        header: true,
+        complete: function(results) {
+          globalWorksData = results.data.filter(row => row.title);
+          renderMarkers("all");
+        }
+      });
+    }
+
+    function renderMarkers(selectedCircle = "all") {
+      markersGroup.clearLayers();
+
+      globalWorksData.forEach((work, idx) => {
+        const circleKey = normalizeCircle(work.circle);
+        if (selectedCircle !== "all" && circleKey !== selectedCircle) return;
+
+        const y = parseFloat(work.posY);
+        const x = parseFloat(work.posX);
+        if (isNaN(y) || isNaN(x)) return;
+
+        const circleName = getCircleName(circleKey);
+        const workId = work.timestamp || idx;
+
+        const popupContent = `
+          <div>
+            <span class="popup-badge badge-${circleKey}">${circleName}</span>
+            <div class="popup-title">${work.title}</div>
+            <div class="popup-author">by ${work.author}</div>
+            <div style="font-size: 12px; color: #cbd5e1;">${work.shortDesc || ''}</div>
+            <button class="popup-btn" onclick="openModal('${workId}')">📖 詳細を閲覧</button>
+          </div>
+        `;
+
+        const marker = L.marker([y, x], { icon: createCustomIcon(circleKey) });
+        marker.bindPopup(popupContent);
+        markersGroup.addLayer(marker);
+      });
+    }
+
+    function getCircleName(circleKey) {
+      const names = { art: "美術部", calligraphy: "書道部", photo: "写真部", literature: "文芸部" };
+      return names[circleKey] || circleKey;
+    }
+
+    const modal = document.getElementById('workModal');
+    function openModal(workId) {
+      const work = globalWorksData.find((w, idx) => String(w.timestamp || idx) === String(workId));
+      if (!work) return;
+
+      const circleKey = normalizeCircle(work.circle);
+      const badge = document.getElementById('modalBadge');
+      badge.innerText = getCircleName(circleKey);
+      badge.className = `popup-badge badge-${circleKey}`;
+
+      document.getElementById('modalTitle').innerText = work.title;
+      document.getElementById('modalAuthor').innerText = `作者: ${work.author}`;
+      document.getElementById('modalBody').innerText = work.fullContent || work.shortDesc;
+
+      const imgWrapper = document.getElementById('modalImageWrapper');
+      const img = document.getElementById('modalImage');
+      const formattedImgUrl = formatImageUrl(work.imageUrl);
+
+      if (formattedImgUrl && formattedImgUrl.trim() !== "") {
+        img.src = formattedImgUrl;
+        imgWrapper.style.display = "block";
+      } else {
+        imgWrapper.style.display = "none";
+        img.src = "";
+      }
+
+      modal.classList.add('open');
+    }
+
+    document.getElementById('modalClose').addEventListener('click', () => modal.classList.remove('open'));
+    modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
+
+    map.on('click', function(e) {
+      const y = Math.round(e.latlng.lat);
+      const x = Math.round(e.latlng.lng);
+      document.getElementById('coordDisplay').innerHTML = `クリック位置: posY: <b>${y}</b> / posX: <b>${x}</b>`;
+    });
+
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        renderMarkers(e.target.getAttribute('data-circle'));
+      });
+    });
+
+    loadDataFromSpreadsheet();
+  </script>
+</body>
+</html>
