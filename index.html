@@ -186,7 +186,65 @@
       z-index: 10;
     }
 
-    /* 駒洋市 概要モーダル専用スタイル */
+    /* ★改善ポイント: モーダル内画像の適正表示＆サムネイル化 */
+    .modal-image-wrapper {
+      position: relative;
+      width: 100%;
+      margin: 14px 0 20px 0;
+      background: #0f172a;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+      text-align: center;
+      cursor: zoom-in;
+    }
+    .modal-image-wrapper img {
+      max-width: 100%;
+      max-height: 280px; /* 画像が大きくなりすぎないよう制限 */
+      object-fit: contain;
+      vertical-align: middle;
+      transition: transform 0.2s ease;
+    }
+    .modal-image-wrapper:hover img {
+      transform: scale(1.02);
+    }
+    .image-zoom-hint {
+      position: absolute;
+      bottom: 8px; right: 10px;
+      background: rgba(0,0,0,0.65);
+      color: #fff; font-size: 11px; font-weight: 500;
+      padding: 3px 8px; border-radius: 12px;
+      pointer-events: none;
+      backdrop-filter: blur(4px);
+    }
+
+    /* ★全画面ライトボックス（画像拡大表示） */
+    .lightbox-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.92);
+      backdrop-filter: blur(12px);
+      z-index: 3000;
+      justify-content: center; align-items: center;
+      padding: 20px;
+      cursor: zoom-out;
+    }
+    .lightbox-overlay.open { display: flex; }
+    .lightbox-image {
+      max-width: 95vw;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      animation: lightboxFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes lightboxFade {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-body-text { font-size: 15px; line-height: 1.9; color: #e2e8f0; white-space: pre-wrap; }
+
+    /* 概要モーダル */
     .city-about-nav {
       display: flex; gap: 8px; margin-bottom: 20px;
       border-bottom: 1px solid var(--border-light); padding-bottom: 12px;
@@ -201,7 +259,6 @@
     .city-tab-content { display: none; }
     .city-tab-content.active { display: block; }
 
-    /* プロローグ枠 */
     .about-prologue {
       background: rgba(15, 23, 42, 0.6);
       border-left: 4px solid var(--accent-gold);
@@ -210,7 +267,6 @@
       margin-bottom: 24px;
     }
 
-    /* 歴史タイムライン */
     .timeline-container { position: relative; padding-left: 20px; margin-top: 16px; }
     .timeline-container::before {
       content: ''; position: absolute; left: 6px; top: 0; bottom: 0;
@@ -224,7 +280,6 @@
     }
     .timeline-text { font-size: 14px; line-height: 1.7; color: #e2e8f0; }
 
-    /* モニュメントガイドカード */
     .monument-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
     .monument-card {
       background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08);
@@ -254,6 +309,7 @@
       .filter-btn, .header-action-btn { font-size: 12px; padding: 6px 12px; }
       .coord-info { top: 12px; bottom: auto; left: 12px; font-size: 10px; }
       .modal-card { padding: 20px; border-radius: 16px; max-height: 85vh; }
+      .modal-image-wrapper img { max-height: 200px; } /* スマホではコンパクトに */
     }
   </style>
 </head>
@@ -273,7 +329,6 @@
     </div>
   </header>
 
-  <!-- サイドバー目次 -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h3 class="sidebar-title">作品・スポット目次</h3>
@@ -295,47 +350,46 @@
       <div id="modalBadge" class="popup-badge">CIRCLE</div>
       <h2 id="modalTitle" style="font-size: 22px; margin: 6px 0 4px 0; color:#fff;">タイトル</h2>
       <div id="modalAuthor" style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px;">作者名</div>
+      
+      <!-- モーダル内画像（クリックで拡大可能） -->
       <div class="modal-image-wrapper" id="modalImageWrapper" style="display: none;">
         <img id="modalImage" src="" alt="作品画像">
+        <div class="image-zoom-hint">🔍 タップで拡大</div>
       </div>
+      
       <div class="modal-body-text" id="modalBody">本文</div>
     </div>
   </div>
 
-  <!-- ★新設: 駒洋市 概要モーダル -->
+  <!-- ★全画面拡大表示用ライトボックス -->
+  <div class="lightbox-overlay" id="lightboxOverlay">
+    <img class="lightbox-image" id="lightboxImage" src="" alt="作品拡大画像">
+  </div>
+
+  <!-- 駒洋市 概要モーダル -->
   <div class="modal-overlay" id="cityAboutModal">
     <div class="modal-card">
       <button class="modal-close" id="cityAboutClose">&times;</button>
       <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #fcd34d; margin: 0 0 16px 0;">KOMANADA CITY GUIDE</h2>
       
       <div class="city-about-nav">
-        <button class="city-tab-btn active" data-tab="tab-overview">都市概要・沿革</button>
-        <button class="city-tab-btn" data-tab="tab-monuments">主要モニュメント</button>
+        <button class="city-tab-btn active" data-tab="tab-overview">🗺️ 都市概要・沿革</button>
+        <button class="city-tab-btn" data-tab="tab-monuments">🏛️ 主要モニュメント</button>
       </div>
 
-      <!-- タブ1: 概要・年表 -->
       <div class="city-tab-content active" id="tab-overview">
-        <div class="about-prologue" id="aboutPrologueText">
-          （読み込み中...）
-        </div>
+        <div class="about-prologue" id="aboutPrologueText">（読み込み中...）</div>
         <h4 style="font-size: 16px; color: #fcd34d; margin: 20px 0 12px 0;">歴史・沿革</h4>
-        <div class="timeline-container" id="aboutTimeline">
-          <!-- スプレッドシートから動的に生成 -->
-        </div>
+        <div class="timeline-container" id="aboutTimeline"></div>
       </div>
 
-      <!-- タブ2: モニュメントガイド -->
       <div class="city-tab-content" id="tab-monuments">
-        <div class="monument-grid" id="aboutMonuments">
-          <!-- スプレッドシートから動的に生成 -->
-        </div>
+        <div class="monument-grid" id="aboutMonuments"></div>
       </div>
     </div>
   </div>
 
   <script>
-    // ★CSV URLの設定（スプレッドシートのWeb公開URL）
-    // ※スプレッドシート全体の公開URLを設定すると、シート名を指定して自動取得します
     const SPREADSHEET_WORKS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCkO4YnsI6F-tTZ1B2fCSSokJjqD_vWaNjWN0T5455EyKbRjJIrI7Lrd45wduE4HIKBHl_ND5G-017/pub?gid=105479515&single=true&output=csv";
     const SPREADSHEET_ABOUT_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCkO4YnsI6F-tTZ1B2fCSSokJjqD_vWaNjWN0T5455EyKbRjJIrI7Lrd45wduE4HIKBHl_ND5G-017/pub?gid=1745810155&single=true&output=csv";
 
@@ -347,7 +401,7 @@
       crs: L.CRS.Simple, minZoom: -2, maxZoom: 2, zoomControl: false, tap: true
     });
 
-    L.imageOverlay('komanada-map.jpg', bounds).addTo(map);
+    L.imageOverlay('komadana-map.jpg', bounds).addTo(map);
     map.fitBounds(bounds);
 
     const markersClusterGroup = L.markerClusterGroup({
@@ -403,7 +457,7 @@
         console.warn("スプレッドシートURL未設定のためデモデータで動作中");
         globalWorksData = [
           { circle: "地理学研究会", title: "駒洋市役所 本庁舎", author: "地理学研究会", posY: 750, posX: 1000, facilityType: "公式モニュメント", shortDesc: "歴史的近代建築。", imageUrl: "", fullContent: "駒洋市の行政の中心地。" },
-          { circle: "美術部", title: "市役所前広場『駒草』", author: "駒沢 太郎", posY: 720, posX: 1050, facilityType: "通常スポット", shortDesc: "絵画作品。", imageUrl: "https://picsum.photos/id/1015/600/400", fullContent: "絵画作品の長文説明。" }
+          { circle: "美術部", title: "市役所前広場『駒草』", author: "駒沢 太郎", posY: 720, posX: 1050, facilityType: "通常スポット", shortDesc: "絵画作品。", imageUrl: "https://picsum.photos/id/1015/1200/800", fullContent: "絵画作品の長文説明。" }
         ];
         renderMarkers("all");
         renderDemoAboutData();
@@ -418,22 +472,18 @@
         }
       });
 
-      // aboutシートの読み込み
       if (SPREADSHEET_ABOUT_CSV_URL && !SPREADSHEET_ABOUT_CSV_URL.includes("ここに")) {
         Papa.parse(SPREADSHEET_ABOUT_CSV_URL, {
           download: true, header: true,
-          complete: function(results) {
-            parseAndRenderAboutData(results.data);
-          }
+          complete: function(results) { parseAndRenderAboutData(results.data); }
         });
       } else {
         renderDemoAboutData();
       }
     }
 
-    // デモ用概要データ
     function renderDemoAboutData() {
-      document.getElementById('aboutPrologueText').innerText = "駒洋市（こうなだし）は、旧市街の重厚な歴史と、川沿いの穏やかな自然、そして近代的な駅前風景が共存する架空の都市です。地理学研究会が設定したこの都市を舞台に、各文化系サークルが作品を展開しています。";
+      document.getElementById('aboutPrologueText').innerText = "駒洋市（こうようし）は、旧市街の重厚な歴史と、川沿いの穏やかな自然、そして近代的な駅前風景が共存する架空の都市です。地理学研究会が設定したこの都市を舞台に、各文化系サークルが作品を展開しています。";
       document.getElementById('aboutTimeline').innerHTML = `
         <div class="timeline-item"><div class="timeline-text"><b>【1920年】駒洋電鉄の開通</b><br>駅周辺の開発が進み、商業の都市として発展を始める。</div></div>
         <div class="timeline-item"><div class="timeline-text"><b>【1955年】駒洋川護岸整備と公園造成</b><br>市民の憩いの場として川沿いが整備され、文化人が集うエリアに。</div></div>
@@ -444,7 +494,6 @@
       `;
     }
 
-    // スプレッドシートからの概要データパース
     function parseAndRenderAboutData(data) {
       let prologue = "";
       let timelineHtml = "";
@@ -453,14 +502,9 @@
       data.forEach(row => {
         const key = (row.key || "").trim();
         const val = row.value || "";
-
-        if (key === "overview") {
-          prologue = val;
-        } else if (key.startsWith("history")) {
-          timelineHtml += `<div class="timeline-item"><div class="timeline-text">${val}</div></div>`;
-        } else if (key.startsWith("monument")) {
-          monumentsHtml += `<div class="monument-card"><div class="monument-card-desc">${val}</div></div>`;
-        }
+        if (key === "overview") prologue = val;
+        else if (key.startsWith("history")) timelineHtml += `<div class="timeline-item"><div class="timeline-text">${val}</div></div>`;
+        else if (key.startsWith("monument")) monumentsHtml += `<div class="monument-card"><div class="monument-card-desc">${val}</div></div>`;
       });
 
       if (prologue) document.getElementById('aboutPrologueText').innerText = prologue;
@@ -483,7 +527,6 @@
 
         const circleName = getCircleName(circleKey);
         const workId = work.timestamp || idx;
-
         const isOfficial = work.facilityType && (work.facilityType.includes("公式") || work.facilityType.includes("official"));
 
         const popupContent = `
@@ -502,11 +545,8 @@
         });
         marker.bindPopup(popupContent);
 
-        if (isOfficial) {
-          officialMarkersLayer.addLayer(marker);
-        } else {
-          markersClusterGroup.addLayer(marker);
-        }
+        if (isOfficial) officialMarkersLayer.addLayer(marker);
+        else markersClusterGroup.addLayer(marker);
       });
 
       updateSidebarList();
@@ -547,13 +587,9 @@
     function focusAndOpenWork(work, workId) {
       const y = parseFloat(work.posY);
       const x = parseFloat(work.posX);
-      if (!isNaN(y) && !isNaN(x)) {
-        map.flyTo([y, x], 1, { duration: 1.2 });
-      }
+      if (!isNaN(y) && !isNaN(x)) map.flyTo([y, x], 1, { duration: 1.2 });
       openModal(workId);
-      if (window.innerWidth <= 768) {
-        document.getElementById('sidebar').classList.remove('open');
-      }
+      if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
     }
 
     function getCircleName(circleKey) {
@@ -563,6 +599,9 @@
 
     // 作品詳細モーダル
     const modal = document.getElementById('workModal');
+    const modalImageWrapper = document.getElementById('modalImageWrapper');
+    const modalImage = document.getElementById('modalImage');
+
     function openModal(workId) {
       const work = globalWorksData.find((w, idx) => String(w.timestamp || idx) === String(workId));
       if (!work) return;
@@ -576,16 +615,13 @@
       document.getElementById('modalAuthor').innerText = `作者: ${work.author}`;
       document.getElementById('modalBody').innerText = work.fullContent || work.shortDesc;
 
-      const imgWrapper = document.getElementById('modalImageWrapper');
-      const img = document.getElementById('modalImage');
       const formattedImgUrl = formatImageUrl(work.imageUrl);
-
       if (formattedImgUrl && formattedImgUrl.trim() !== "") {
-        img.src = formattedImgUrl;
-        imgWrapper.style.display = "block";
+        modalImage.src = formattedImgUrl;
+        modalImageWrapper.style.display = "block";
       } else {
-        imgWrapper.style.display = "none";
-        img.src = "";
+        modalImageWrapper.style.display = "none";
+        modalImage.src = "";
       }
 
       modal.classList.add('open');
@@ -594,13 +630,27 @@
     document.getElementById('modalClose').addEventListener('click', () => modal.classList.remove('open'));
     modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
 
+    // ★ライトボックス（画像拡大表示）処理
+    const lightboxOverlay = document.getElementById('lightboxOverlay');
+    const lightboxImage = document.getElementById('lightboxImage');
+
+    modalImageWrapper.addEventListener('click', () => {
+      if (modalImage.src) {
+        lightboxImage.src = modalImage.src;
+        lightboxOverlay.classList.add('open');
+      }
+    });
+
+    lightboxOverlay.addEventListener('click', () => {
+      lightboxOverlay.classList.remove('open');
+    });
+
     // 駒洋市 概要モーダル制御
     const cityAboutModal = document.getElementById('cityAboutModal');
     document.getElementById('cityAboutBtn').addEventListener('click', () => cityAboutModal.classList.add('open'));
     document.getElementById('cityAboutClose').addEventListener('click', () => cityAboutModal.classList.remove('open'));
     cityAboutModal.addEventListener('click', (e) => { if (e.target === cityAboutModal) cityAboutModal.classList.remove('open'); });
 
-    // 概要モーダル内タブ切り替え
     document.querySelectorAll('.city-tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         document.querySelectorAll('.city-tab-btn').forEach(b => b.classList.remove('active'));
