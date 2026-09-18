@@ -306,11 +306,11 @@
   <div class="modal-overlay" id="cityAboutModal">
     <div class="modal-card">
       <button class="modal-close" id="cityAboutClose">&times;</button>
-      <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #fcd34d; margin: 0 0 16px 0;">KOUYOU CITY GUIDE</h2>
+      <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #fcd34d; margin: 0 0 16px 0;">KOMANADA CITY GUIDE</h2>
       
       <div class="city-about-nav">
-        <button class="city-tab-btn active" data-tab="tab-overview">🗺️ 都市概要・沿革</button>
-        <button class="city-tab-btn" data-tab="tab-monuments">🏛️ 主要モニュメント</button>
+        <button class="city-tab-btn active" data-tab="tab-overview">都市概要・沿革</button>
+        <button class="city-tab-btn" data-tab="tab-monuments">主要モニュメント</button>
       </div>
 
       <!-- タブ1: 概要・年表 -->
@@ -336,8 +336,8 @@
   <script>
     // ★CSV URLの設定（スプレッドシートのWeb公開URL）
     // ※スプレッドシート全体の公開URLを設定すると、シート名を指定して自動取得します
-    const SPREADSHEET_WORKS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCkO4YnsI6F-tTZ1B2fCSSokJjqD_vWaNjWN0T5455EyKbRjJIrI7Lrd45wduE4HIKBHl_ND5G-017/pub?gid=105479515&single=true&output=csv";
-    const SPREADSHEET_ABOUT_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCkO4YnsI6F-tTZ1B2fCSSokJjqD_vWaNjWN0T5455EyKbRjJIrI7Lrd45wduE4HIKBHl_ND5G-017/pub?gid=1745810155&single=true&output=csv";
+    const SPREADSHEET_WORKS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCkO4YnsI6F-tTZ1B2fCSSokJjqD_vWaNjWN0T5455EyKbRjJIrI7Lrd45wduE4HIKBHl_ND5G-017/pub?output=csv";
+    const SPREADSHEET_ABOUT_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCkO4YnsI6F-tTZ1B2fCSSokJjqD_vWaNjWN0T5455EyKbRjJIrI7Lrd45wduE4HIKBHl_ND5G-017/pub?output=csv";
 
     const imageWidth = 2300;
     const imageHeight = 1300;
@@ -433,7 +433,7 @@
 
     // デモ用概要データ
     function renderDemoAboutData() {
-      document.getElementById('aboutPrologueText').innerText = "駒洋市（こうようし）は、旧市街の重厚な歴史と、川沿いの穏やかな自然、そして近代的な駅前風景が共存する架空の都市です。地理学研究会が設定したこの都市を舞台に、各文化系サークルが作品を展開しています。";
+      document.getElementById('aboutPrologueText').innerText = "駒洋市（こうなだし）は、旧市街の重厚な歴史と、川沿いの穏やかな自然、そして近代的な駅前風景が共存する架空の都市です。地理学研究会が設定したこの都市を舞台に、各文化系サークルが作品を展開しています。";
       document.getElementById('aboutTimeline').innerHTML = `
         <div class="timeline-item"><div class="timeline-text"><b>【1920年】駒洋電鉄の開通</b><br>駅周辺の開発が進み、商業の都市として発展を始める。</div></div>
         <div class="timeline-item"><div class="timeline-text"><b>【1955年】駒洋川護岸整備と公園造成</b><br>市民の憩いの場として川沿いが整備され、文化人が集うエリアに。</div></div>
