@@ -186,7 +186,6 @@
       z-index: 10;
     }
 
-    /* ★改善ポイント: モーダル内画像の適正表示＆サムネイル化 */
     .modal-image-wrapper {
       position: relative;
       width: 100%;
@@ -200,46 +199,39 @@
     }
     .modal-image-wrapper img {
       max-width: 100%;
-      max-height: 280px; /* 画像が大きくなりすぎないよう制限 */
+      max-height: 280px;
       object-fit: contain;
       vertical-align: middle;
       transition: transform 0.2s ease;
     }
-    .modal-image-wrapper:hover img {
-      transform: scale(1.02);
-    }
+    .modal-image-wrapper:hover img { transform: scale(1.02); }
     .image-zoom-hint {
-      position: absolute;
-      bottom: 8px; right: 10px;
-      background: rgba(0,0,0,0.65);
-      color: #fff; font-size: 11px; font-weight: 500;
-      padding: 3px 8px; border-radius: 12px;
-      pointer-events: none;
-      backdrop-filter: blur(4px);
+      position: absolute; bottom: 8px; right: 10px;
+      background: rgba(0,0,0,0.65); color: #fff; font-size: 11px; font-weight: 500;
+      padding: 3px 8px; border-radius: 12px; pointer-events: none; backdrop-filter: blur(4px);
     }
 
-    /* ★全画面ライトボックス（画像拡大表示） */
+    /* URLコピーボタン */
+    .share-url-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(255,255,255,0.08); border: 1px solid var(--border-light);
+      color: var(--text-sub); font-size: 12px; font-weight: 600;
+      padding: 6px 12px; border-radius: 16px; cursor: pointer;
+      margin-top: 12px; transition: all 0.2s ease;
+    }
+    .share-url-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+    /* 全画面ライトボックス */
     .lightbox-overlay {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.92);
-      backdrop-filter: blur(12px);
-      z-index: 3000;
-      justify-content: center; align-items: center;
-      padding: 20px;
-      cursor: zoom-out;
+      background: rgba(0, 0, 0, 0.92); backdrop-filter: blur(12px);
+      z-index: 3000; justify-content: center; align-items: center; padding: 20px; cursor: zoom-out;
     }
     .lightbox-overlay.open { display: flex; }
     .lightbox-image {
-      max-width: 95vw;
-      max-height: 90vh;
-      object-fit: contain;
-      border-radius: 8px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      max-width: 95vw; max-height: 90vh; object-fit: contain;
+      border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
       animation: lightboxFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-    @keyframes lightboxFade {
-      from { opacity: 0; transform: scale(0.95); }
-      to { opacity: 1; transform: scale(1); }
     }
 
     .modal-body-text { font-size: 15px; line-height: 1.9; color: #e2e8f0; white-space: pre-wrap; }
@@ -309,7 +301,7 @@
       .filter-btn, .header-action-btn { font-size: 12px; padding: 6px 12px; }
       .coord-info { top: 12px; bottom: auto; left: 12px; font-size: 10px; }
       .modal-card { padding: 20px; border-radius: 16px; max-height: 85vh; }
-      .modal-image-wrapper img { max-height: 200px; } /* スマホではコンパクトに */
+      .modal-image-wrapper img { max-height: 200px; }
     }
   </style>
 </head>
@@ -321,7 +313,7 @@
     <div class="app-title">駒洋市</div>
     <div class="filter-group">
       <button class="filter-btn active" data-circle="all">すべて</button>
-      <button class="filter-btn" data-circle="geography">🗺️ 地理研</button>
+      <button class="filter-btn" data-circle="geography">🏛️ モニュメント</button>
       <button class="filter-btn" data-circle="art">🎨 美術</button>
       <button class="filter-btn" data-circle="calligraphy">🖌️ 書道</button>
       <button class="filter-btn" data-circle="photo">📷 写真</button>
@@ -349,9 +341,11 @@
       <button class="modal-close" id="modalClose">&times;</button>
       <div id="modalBadge" class="popup-badge">CIRCLE</div>
       <h2 id="modalTitle" style="font-size: 22px; margin: 6px 0 4px 0; color:#fff;">タイトル</h2>
-      <div id="modalAuthor" style="font-size: 13px; color: var(--text-sub); margin-bottom: 12px;">作者名</div>
+      <div id="modalAuthor" style="font-size: 13px; color: var(--text-sub); margin-bottom: 4px;">作者名</div>
       
-      <!-- モーダル内画像（クリックで拡大可能） -->
+      <!-- NFC・共有用URLコピーボタン -->
+      <button class="share-url-btn" id="shareUrlBtn">🔗 URLをコピー</button>
+
       <div class="modal-image-wrapper" id="modalImageWrapper" style="display: none;">
         <img id="modalImage" src="" alt="作品画像">
         <div class="image-zoom-hint">🔍 タップで拡大</div>
@@ -361,12 +355,10 @@
     </div>
   </div>
 
-  <!-- ★全画面拡大表示用ライトボックス -->
   <div class="lightbox-overlay" id="lightboxOverlay">
     <img class="lightbox-image" id="lightboxImage" src="" alt="作品拡大画像">
   </div>
 
-  <!-- 駒洋市 概要モーダル -->
   <div class="modal-overlay" id="cityAboutModal">
     <div class="modal-card">
       <button class="modal-close" id="cityAboutClose">&times;</button>
@@ -413,6 +405,7 @@
 
     let globalWorksData = [];
     let currentFilterCircle = "all";
+    let currentWorkId = null;
 
     function normalizeCircle(input) {
       if (!input) return "geography";
@@ -456,11 +449,12 @@
       if (!SPREADSHEET_WORKS_CSV_URL || SPREADSHEET_WORKS_CSV_URL.includes("ここに")) {
         console.warn("スプレッドシートURL未設定のためデモデータで動作中");
         globalWorksData = [
-          { circle: "地理学研究会", title: "駒洋市役所 本庁舎", author: "地理学研究会", posY: 750, posX: 1000, facilityType: "公式モニュメント", shortDesc: "歴史的近代建築。", imageUrl: "", fullContent: "駒洋市の行政の中心地。" },
-          { circle: "美術部", title: "市役所前広場『駒草』", author: "駒沢 太郎", posY: 720, posX: 1050, facilityType: "通常スポット", shortDesc: "絵画作品。", imageUrl: "https://picsum.photos/id/1015/1200/800", fullContent: "絵画作品の長文説明。" }
+          { timestamp: "1", circle: "地理学研究会", title: "駒洋市役所 本庁舎", author: "地理学研究会", posY: 750, posX: 1000, facilityType: "公式モニュメント", shortDesc: "歴史的近代建築。", imageUrl: "", fullContent: "駒洋市の行政の中心地。" },
+          { timestamp: "2", circle: "美術部", title: "市役所前広場『駒草』", author: "駒沢 太郎", posY: 720, posX: 1050, facilityType: "通常スポット", shortDesc: "絵画作品。", imageUrl: "https://picsum.photos/id/1015/1200/800", fullContent: "絵画作品の長文説明。" }
         ];
         renderMarkers("all");
         renderDemoAboutData();
+        checkUrlParamAndOpenWork();
         return;
       }
 
@@ -469,6 +463,7 @@
         complete: function(results) {
           globalWorksData = results.data.filter(row => row.title);
           renderMarkers("all");
+          checkUrlParamAndOpenWork(); // データ読み込み後にURLパラメータをチェック
         }
       });
 
@@ -479,6 +474,20 @@
         });
       } else {
         renderDemoAboutData();
+      }
+    }
+
+    // URLパラメータ (?id=xxx) をチェックして特定の作品へ自動移動・表示する処理
+    function checkUrlParamAndOpenWork() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const targetId = urlParams.get('id');
+      if (!targetId) return;
+
+      const work = globalWorksData.find((w, idx) => String(w.timestamp || w.id || (idx + 1)) === String(targetId));
+      if (work) {
+        setTimeout(() => {
+          focusAndOpenWork(work, targetId);
+        }, 500);
       }
     }
 
@@ -526,7 +535,7 @@
         if (isNaN(y) || isNaN(x)) return;
 
         const circleName = getCircleName(circleKey);
-        const workId = work.timestamp || idx;
+        const workId = work.timestamp || work.id || (idx + 1);
         const isOfficial = work.facilityType && (work.facilityType.includes("公式") || work.facilityType.includes("official"));
 
         const popupContent = `
@@ -567,7 +576,7 @@
           return;
         }
 
-        const workId = work.timestamp || idx;
+        const workId = work.timestamp || work.id || (idx + 1);
         const circleName = getCircleName(circleKey);
 
         const card = document.createElement('div');
@@ -603,8 +612,10 @@
     const modalImage = document.getElementById('modalImage');
 
     function openModal(workId) {
-      const work = globalWorksData.find((w, idx) => String(w.timestamp || idx) === String(workId));
+      const work = globalWorksData.find((w, idx) => String(w.timestamp || w.id || (idx + 1)) === String(workId));
       if (!work) return;
+
+      currentWorkId = work.timestamp || work.id || (globalWorksData.indexOf(work) + 1);
 
       const circleKey = normalizeCircle(work.circle);
       const badge = document.getElementById('modalBadge');
@@ -627,10 +638,25 @@
       modal.classList.add('open');
     }
 
+    // URLコピー処理
+    document.getElementById('shareUrlBtn').addEventListener('click', () => {
+      if (!currentWorkId) return;
+      const baseUrl = window.location.origin + window.location.pathname;
+      const shareUrl = `${baseUrl}?id=${encodeURIComponent(currentWorkId)}`;
+
+      navigator.clipboard.writeText(shareUrl).then(() => {
+        const btn = document.getElementById('shareUrlBtn');
+        btn.innerText = "✅ コピーしました！";
+        setTimeout(() => { btn.innerText = "作品のURLをコピー"; }, 2000);
+      }).catch(err => {
+        prompt("コピーしたURLをSNS等で共有:", shareUrl);
+      });
+    });
+
     document.getElementById('modalClose').addEventListener('click', () => modal.classList.remove('open'));
     modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
 
-    // ★ライトボックス（画像拡大表示）処理
+    // ライトボックス
     const lightboxOverlay = document.getElementById('lightboxOverlay');
     const lightboxImage = document.getElementById('lightboxImage');
 
