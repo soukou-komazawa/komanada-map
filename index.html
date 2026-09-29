@@ -21,14 +21,15 @@
 
   <style>
     :root {
-      --bg-dark: rgba(18, 22, 28, 0.88);
+      --bg-dark: rgba(15, 23, 42, 0.92);
       --bg-card: rgba(30, 41, 59, 0.96);
       --border-light: rgba(255, 255, 255, 0.15);
       --accent-gold: #f59e0b;
-      --text-main: #f3f4f6;
-      --text-sub: #9ca3af;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
       --font-family: 'Noto Sans JP', sans-serif;
       --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-area-top: env(safe-area-inset-top, 0px);
     }
 
     * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -45,20 +46,20 @@
 
     #map { width: 100%; height: 100%; background-color: #111827; }
 
-    /* PC / タブレット用ヘッダー */
+    /* ヘッダーバー */
     .app-header {
       position: absolute;
-      top: 16px; left: 50%;
+      top: calc(12px + var(--safe-area-top)); left: 50%;
       transform: translateX(-50%);
       z-index: 1000;
       background: var(--bg-dark);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--border-light);
       border-radius: 40px;
-      padding: 8px 16px;
-      display: flex; align-items: center; gap: 10px;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      padding: 6px 14px;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
       max-width: 95vw;
       overflow-x: auto;
       scrollbar-width: none;
@@ -67,8 +68,8 @@
 
     .app-title {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 18px; font-weight: 600;
-      letter-spacing: 1px;
+      font-size: 18px; font-weight: 700;
+      letter-spacing: 1.5px;
       padding-right: 12px;
       border-right: 1px solid var(--border-light);
       white-space: nowrap; color: #fff;
@@ -79,21 +80,21 @@
     .filter-btn, .header-action-btn {
       border: 1px solid transparent;
       padding: 8px 14px; border-radius: 20px;
-      cursor: pointer; font-size: 13px; font-weight: 500;
-      transition: all 0.2s ease;
+      cursor: pointer; font-size: 13px; font-weight: 600;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       background: rgba(255, 255, 255, 0.08);
       color: var(--text-sub); white-space: nowrap;
+      min-height: 38px; display: inline-flex; align-items: center; justify-content: center;
     }
 
     .header-action-btn {
       background: rgba(245, 158, 11, 0.15);
       color: #fcd34d;
       border: 1px solid rgba(245, 158, 11, 0.3);
-      font-weight: 600;
     }
-    .header-action-btn:hover { background: rgba(245, 158, 11, 0.3); }
+    .header-action-btn:hover, .header-action-btn:active { background: rgba(245, 158, 11, 0.3); }
 
-    .filter-btn:active { transform: scale(0.96); }
+    .filter-btn:active { transform: scale(0.95); }
     .filter-btn.active { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
 
     .filter-btn[data-circle="all"].active { background: #334155; }
@@ -107,40 +108,40 @@
     .sidebar {
       position: fixed;
       top: 0; left: -100%;
-      width: 100%; max-width: 360px; height: 100%;
+      width: 100%; max-width: 380px; height: 100%;
       background: var(--bg-card);
-      backdrop-filter: blur(16px);
+      backdrop-filter: blur(20px);
       border-right: 1px solid var(--border-light);
       z-index: 1500;
       transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       display: flex; flex-direction: column;
-      box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+      box-shadow: 10px 0 40px rgba(0,0,0,0.6);
     }
     .sidebar.open { left: 0; }
 
     .sidebar-header {
-      padding: 16px 20px;
+      padding: 18px 20px;
       border-bottom: 1px solid var(--border-light);
       display: flex; justify-content: space-between; align-items: center;
     }
     .sidebar-title { font-size: 18px; font-weight: 700; color: #fff; margin: 0; }
     .sidebar-close {
       border: none; background: rgba(255,255,255,0.1);
-      width: 36px; height: 36px; border-radius: 50%;
-      color: #fff; cursor: pointer; font-size: 20px;
+      width: 40px; height: 40px; border-radius: 50%;
+      color: #fff; cursor: pointer; font-size: 22px;
       display: flex; align-items: center; justify-content: center;
     }
 
-    .sidebar-search { padding: 12px 16px; border-bottom: 1px solid var(--border-light); }
+    .sidebar-search { padding: 14px 18px; border-bottom: 1px solid var(--border-light); }
     .sidebar-search input {
-      width: 100%; padding: 10px 14px;
-      background: rgba(15, 23, 42, 0.7);
+      width: 100%; padding: 12px 16px;
+      background: rgba(15, 23, 42, 0.8);
       border: 1px solid var(--border-light);
-      border-radius: 10px; color: #fff; font-size: 14px; outline: none;
+      border-radius: 12px; color: #fff; font-size: 14px; outline: none;
     }
 
     .sidebar-content {
-      flex: 1; overflow-y: auto; padding: 12px 16px;
+      flex: 1; overflow-y: auto; padding: 14px 18px;
       display: flex; flex-direction: column; gap: 10px;
       -webkit-overflow-scrolling: touch;
     }
@@ -148,7 +149,8 @@
     .work-item-card {
       background: rgba(15, 23, 42, 0.6);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px; padding: 14px; cursor: pointer;
+      border-radius: 14px; padding: 14px; cursor: pointer;
+      transition: background 0.15s ease;
     }
     .work-item-card:active { background: rgba(255,255,255,0.15); }
     .work-item-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 3px; }
@@ -159,135 +161,78 @@
       position: absolute; bottom: 20px; left: 20px; z-index: 1000;
       background: var(--bg-dark); backdrop-filter: blur(8px);
       border: 1px solid var(--border-light);
-      color: var(--text-sub); padding: 6px 12px; border-radius: 20px;
+      color: var(--text-sub); padding: 6px 14px; border-radius: 20px;
       font-family: monospace; font-size: 11px; pointer-events: none;
     }
 
-    /* 共通モーダルデザイン */
+    /* モーダル */
     .modal-overlay {
       display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       z-index: 2000; justify-content: center; align-items: center; padding: 16px;
     }
     .modal-overlay.open { display: flex; }
+    
     .modal-card {
       background: #1e293b; border: 1px solid var(--border-light);
       width: 100%; max-width: 720px; max-height: 88vh;
-      border-radius: 20px; overflow-y: auto; padding: 28px;
-      position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+      border-radius: 24px; overflow-y: auto; padding: 28px;
+      position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
       -webkit-overflow-scrolling: touch;
     }
+
     .modal-close {
-      position: absolute; top: 16px; right: 16px; border: none;
-      background: rgba(255,255,255,0.1); width: 38px; height: 38px;
-      border-radius: 50%; color: #fff; font-size: 22px; cursor: pointer;
+      position: absolute; top: 18px; right: 18px; border: none;
+      background: rgba(255,255,255,0.12); width: 42px; height: 42px;
+      border-radius: 50%; color: #fff; font-size: 24px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       z-index: 10;
     }
 
     .modal-image-wrapper {
-      position: relative;
-      width: 100%;
-      margin: 14px 0 20px 0;
-      background: #0f172a;
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid rgba(255,255,255,0.08);
-      text-align: center;
-      cursor: zoom-in;
+      position: relative; width: 100%; margin: 16px 0 20px 0;
+      background: #0f172a; border-radius: 14px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08); text-align: center; cursor: zoom-in;
     }
     .modal-image-wrapper img {
-      max-width: 100%;
-      max-height: 280px;
-      object-fit: contain;
-      vertical-align: middle;
-      transition: transform 0.2s ease;
+      max-width: 100%; max-height: 300px; object-fit: contain;
+      vertical-align: middle; transition: transform 0.2s ease;
     }
-    .modal-image-wrapper:hover img { transform: scale(1.02); }
     .image-zoom-hint {
-      position: absolute; bottom: 8px; right: 10px;
-      background: rgba(0,0,0,0.65); color: #fff; font-size: 11px; font-weight: 500;
-      padding: 3px 8px; border-radius: 12px; pointer-events: none; backdrop-filter: blur(4px);
+      position: absolute; bottom: 10px; right: 12px;
+      background: rgba(0,0,0,0.7); color: #fff; font-size: 11px; font-weight: 500;
+      padding: 4px 10px; border-radius: 14px; pointer-events: none; backdrop-filter: blur(4px);
     }
 
-    /* URLコピーボタン */
     .share-url-btn {
       display: inline-flex; align-items: center; gap: 6px;
       background: rgba(255,255,255,0.08); border: 1px solid var(--border-light);
-      color: var(--text-sub); font-size: 12px; font-weight: 600;
-      padding: 6px 12px; border-radius: 16px; cursor: pointer;
-      margin-top: 12px; transition: all 0.2s ease;
+      color: var(--text-sub); font-size: 13px; font-weight: 600;
+      padding: 8px 16px; border-radius: 20px; cursor: pointer;
+      margin-top: 12px; transition: all 0.2s ease; min-height: 40px;
     }
-    .share-url-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+    .share-url-btn:active { background: rgba(255,255,255,0.2); color: #fff; }
 
-    /* 全画面ライトボックス */
-    .lightbox-overlay {
-      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.92); backdrop-filter: blur(12px);
-      z-index: 3000; justify-content: center; align-items: center; padding: 20px; cursor: zoom-out;
+    /* ピン設定 */
+    .leaflet-marker-icon, .leaflet-marker-shadow, .custom-pin-spot, .custom-pin-official, .custom-pin-shop {
+      opacity: 1 !important; filter: none !important;
     }
-    .lightbox-overlay.open { display: flex; }
-    .lightbox-image {
-      max-width: 95vw; max-height: 90vh; object-fit: contain;
-      border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-      animation: lightboxFade 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .modal-body-text { font-size: 15px; line-height: 1.9; color: #e2e8f0; white-space: pre-wrap; }
-
-    /* 概要モーダル */
-    .city-about-nav {
-      display: flex; gap: 8px; margin-bottom: 20px;
-      border-bottom: 1px solid var(--border-light); padding-bottom: 12px;
-    }
-    .city-tab-btn {
-      background: none; border: none; color: var(--text-sub);
-      font-size: 14px; font-weight: 700; padding: 8px 14px;
-      border-radius: 8px; cursor: pointer; transition: all 0.2s;
-    }
-    .city-tab-btn.active { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
-
-    .city-tab-content { display: none; }
-    .city-tab-content.active { display: block; }
-
-    .about-prologue {
-      background: rgba(15, 23, 42, 0.6);
-      border-left: 4px solid var(--accent-gold);
-      padding: 16px; border-radius: 0 12px 12px 0;
-      font-size: 15px; line-height: 1.8; color: #f3f4f6;
-      margin-bottom: 24px;
-    }
-
-    .timeline-container { position: relative; padding-left: 20px; margin-top: 16px; }
-    .timeline-container::before {
-      content: ''; position: absolute; left: 6px; top: 0; bottom: 0;
-      width: 2px; background: rgba(255,255,255,0.15);
-    }
-    .timeline-item { position: relative; margin-bottom: 20px; }
-    .timeline-item::before {
-      content: ''; position: absolute; left: -18px; top: 6px;
-      width: 10px; height: 10px; border-radius: 50%;
-      background: var(--accent-gold); box-shadow: 0 0 10px var(--accent-gold);
-    }
-    .timeline-text { font-size: 14px; line-height: 1.7; color: #e2e8f0; }
-
-    .monument-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
-    .monument-card {
-      background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px; padding: 16px;
-    }
-    .monument-card-title { font-size: 15px; font-weight: 700; color: #fcd34d; margin-bottom: 6px; }
-    .monument-card-desc { font-size: 13px; line-height: 1.6; color: #cbd5e1; }
-
-    /* ピンデザイン */
-    .custom-pin-spot { width: 26px; height: 26px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 12px rgba(0,0,0,0.6); }
+    .custom-pin-spot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 12px rgba(0,0,0,0.6); opacity: 1 !important; }
+    
     .custom-pin-official {
-      width: 36px; height: 36px; background: #f59e0b; border: 2px solid #fff;
-      border-radius: 8px; transform: rotate(45px); box-shadow: 0 0 18px rgba(245, 158, 11, 0.9);
-      display: flex; align-items: center; justify-content: center;
+      width: 38px; height: 38px; background: #f59e0b; border: 2px solid #fff;
+      border-radius: 10px; transform: rotate(45px); box-shadow: 0 0 18px rgba(245, 158, 11, 0.9);
+      display: flex; align-items: center; justify-content: center; opacity: 1 !important;
     }
     .custom-pin-official::after { content: '🏛️'; font-size: 20px; transform: rotate(-45px); }
+
+    .custom-pin-shop {
+      width: 32px; height: 32px; background: #10b981; border: 2px solid #fff;
+      border-radius: 50%; box-shadow: 0 0 14px rgba(16, 185, 129, 0.8);
+      display: flex; align-items: center; justify-content: center; opacity: 1 !important;
+    }
+    .custom-pin-shop::after { content: '☕'; font-size: 16px; }
 
     .pin-geography { background: #d97706; }
     .pin-art { background: #e11d48; }
@@ -295,13 +240,85 @@
     .pin-photo { background: #0284c7; }
     .pin-literature { background: #059669; }
 
+    /* モーダルタブ */
+    .city-about-nav { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--border-light); padding-bottom: 12px; overflow-x: auto; scrollbar-width: none; }
+    .city-about-nav::-webkit-scrollbar { display: none; }
+    .city-tab-btn { background: none; border: none; color: var(--text-sub); font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 10px; cursor: pointer; transition: all 0.2s; white-space: nowrap; min-height: 38px; }
+    .city-tab-btn.active { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+
+    .city-tab-content { display: none; }
+    .city-tab-content.active { display: block; }
+
+    .about-prologue { background: rgba(15, 23, 42, 0.6); border-left: 4px solid var(--accent-gold); padding: 16px; border-radius: 0 14px 14px 0; font-size: 15px; line-height: 1.8; color: #f3f4f6; margin-bottom: 24px; }
+
+    .timeline-container { position: relative; padding-left: 20px; margin-top: 16px; }
+    .timeline-container::before { content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 2px; background: rgba(255,255,255,0.15); }
+    .timeline-item { position: relative; margin-bottom: 20px; }
+    .timeline-item::before { content: ''; position: absolute; left: -18px; top: 6px; width: 10px; height: 10px; border-radius: 50%; background: var(--accent-gold); box-shadow: 0 0 10px var(--accent-gold); }
+    .timeline-text { font-size: 14px; line-height: 1.7; color: #e2e8f0; }
+
+    .monument-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+    .monument-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; }
+    .monument-card-title { font-size: 15px; font-weight: 700; color: #fcd34d; margin-bottom: 6px; }
+    .monument-card-desc { font-size: 13px; line-height: 1.6; color: #cbd5e1; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+    .stat-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 14px; text-align: center; }
+    .stat-label { font-size: 12px; color: var(--text-sub); margin-bottom: 4px; }
+    .stat-value { font-size: 18px; font-weight: 700; color: #fcd34d; }
+
+    .specialty-box { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px; font-size: 14px; line-height: 1.8; color: #e2e8f0; }
+
+    /* ★サークル一覧・画像アイコンスタイル */
+    .circle-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 16px; }
+    .circle-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; }
+    .circle-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .circle-avatar-wrapper { width: 44px; height: 44px; border-radius: 12px; overflow: hidden; background: rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid var(--border-light); }
+    .circle-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+    .circle-avatar-emoji { font-size: 24px; }
+    .circle-card-title { font-size: 16px; font-weight: 700; color: #fff; }
+    .circle-card-desc { font-size: 13px; line-height: 1.6; color: #cbd5e1; margin-bottom: 14px; }
+    .circle-links { display: flex; gap: 8px; flex-wrap: wrap; }
+    .circle-link-btn { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; padding: 6px 12px; border-radius: 14px; background: rgba(255,255,255,0.08); color: var(--text-sub); text-decoration: none; border: 1px solid rgba(255,255,255,0.15); transition: all 0.2s ease; min-height: 36px; }
+    .circle-link-btn:active { background: rgba(255,255,255,0.25); color: #fff; }
+
+    .terms-box { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 20px; font-size: 14px; line-height: 1.8; color: #e2e8f0; margin-top: 12px; }
+    .terms-section-title { font-size: 15px; font-weight: 700; color: #fcd34d; margin: 16px 0 6px 0; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 4px; }
+    .terms-section-title:first-child { margin-top: 0; }
+
+    .lightbox-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.94); backdrop-filter: blur(16px); z-index: 3000; justify-content: center; align-items: center; padding: 20px; cursor: zoom-out; }
+    .lightbox-overlay.open { display: flex; }
+    .lightbox-image { max-width: 95vw; max-height: 90vh; object-fit: contain; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.8); }
+    .modal-body-text { font-size: 15px; line-height: 1.9; color: #e2e8f0; white-space: pre-wrap; }
+
     @media (max-width: 768px) {
-      .app-header { top: auto; bottom: calc(12px + var(--safe-area-bottom)); border-radius: 30px; padding: 6px 12px; width: 92vw; }
+      .app-header {
+        top: auto;
+        bottom: calc(10px + var(--safe-area-bottom));
+        border-radius: 36px;
+        padding: 6px 10px;
+        width: 94vw;
+        max-width: 94vw;
+        justify-content: flex-start;
+      }
       .app-title { font-size: 15px; padding-right: 8px; }
-      .filter-btn, .header-action-btn { font-size: 12px; padding: 6px 12px; }
-      .coord-info { top: 12px; bottom: auto; left: 12px; font-size: 10px; }
-      .modal-card { padding: 20px; border-radius: 16px; max-height: 85vh; }
-      .modal-image-wrapper img { max-height: 200px; }
+      .filter-btn, .header-action-btn { font-size: 12px; padding: 6px 12px; min-height: 36px; }
+
+      .modal-overlay { align-items: flex-end; padding: 0; }
+      .modal-card {
+        border-radius: 28px 28px 0 0;
+        max-height: 85vh;
+        padding: 22px 20px calc(20px + var(--safe-area-bottom)) 20px;
+        border-bottom: none;
+        animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      }
+      @keyframes slideUp {
+        from { transform: translateY(100%); }
+        to { transform: translateY(0); }
+      }
+      .modal-close { top: 16px; right: 16px; width: 38px; height: 38px; font-size: 20px; }
+      .coord-info { top: calc(12px + var(--safe-area-top)); bottom: auto; left: 12px; font-size: 10px; padding: 4px 10px; }
+      .modal-image-wrapper img { max-height: 220px; }
     }
   </style>
 </head>
@@ -309,11 +326,13 @@
 
   <header class="app-header">
     <button class="header-action-btn" id="cityAboutBtn">ℹ️ 駒洋市とは</button>
+    <button class="header-action-btn" id="circleListBtn" style="background: rgba(255,255,255,0.08); color: var(--text-sub); border-color: transparent;">🎨 サークル</button>
+    <button class="header-action-btn" id="termsBtn" style="background: rgba(255,255,255,0.08); color: var(--text-sub); border-color: transparent;">⚖️ 規約</button>
     <button class="header-action-btn" id="sidebarToggleBtn" style="background: rgba(255,255,255,0.08); color: var(--text-sub); border-color: transparent;">📋 目次</button>
     <div class="app-title">駒洋市</div>
     <div class="filter-group">
       <button class="filter-btn active" data-circle="all">すべて</button>
-      <button class="filter-btn" data-circle="geography">🏛️ モニュメント</button>
+      <button class="filter-btn" data-circle="geography">🗺️ 地理研</button>
       <button class="filter-btn" data-circle="art">🎨 美術</button>
       <button class="filter-btn" data-circle="calligraphy">🖌️ 書道</button>
       <button class="filter-btn" data-circle="photo">📷 写真</button>
@@ -343,7 +362,6 @@
       <h2 id="modalTitle" style="font-size: 22px; margin: 6px 0 4px 0; color:#fff;">タイトル</h2>
       <div id="modalAuthor" style="font-size: 13px; color: var(--text-sub); margin-bottom: 4px;">作者名</div>
       
-      <!-- NFC・共有用URLコピーボタン -->
       <button class="share-url-btn" id="shareUrlBtn">🔗 URLをコピー</button>
 
       <div class="modal-image-wrapper" id="modalImageWrapper" style="display: none;">
@@ -359,6 +377,7 @@
     <img class="lightbox-image" id="lightboxImage" src="" alt="作品拡大画像">
   </div>
 
+  <!-- 駒洋市 概要モーダル -->
   <div class="modal-overlay" id="cityAboutModal">
     <div class="modal-card">
       <button class="modal-close" id="cityAboutClose">&times;</button>
@@ -366,7 +385,8 @@
       
       <div class="city-about-nav">
         <button class="city-tab-btn active" data-tab="tab-overview">🗺️ 都市概要・沿革</button>
-        <button class="city-tab-btn" data-tab="tab-monuments">🏛️ 主要モニュメント</button>
+        <button class="city-tab-btn" data-tab="tab-stats">📊 人口・特産・風土</button>
+        <button class="city-tab-btn" data-tab="tab-monuments">🏛️ スポット・モニュメント</button>
       </div>
 
       <div class="city-tab-content active" id="tab-overview">
@@ -375,8 +395,47 @@
         <div class="timeline-container" id="aboutTimeline"></div>
       </div>
 
+      <div class="city-tab-content" id="tab-stats">
+        <h4 style="font-size: 16px; color: #fcd34d; margin: 0 0 12px 0;">都市データ</h4>
+        <div class="stats-grid" id="aboutStatsGrid">
+          <div class="stat-card"><div class="stat-label">推定人口</div><div class="stat-value" id="statPop">約 12.8 万人</div></div>
+          <div class="stat-card"><div class="stat-label">市域面積</div><div class="stat-value" id="statArea">42.15 km²</div></div>
+          <div class="stat-card"><div class="stat-label">市の花</div><div class="stat-value" id="statFlower">駒草（コマクサ）</div></div>
+        </div>
+
+        <h4 style="font-size: 16px; color: #fcd34d; margin: 20px 0 12px 0;">名物・特産品・風土</h4>
+        <div class="specialty-box" id="aboutSpecialty">（読み込み中...）</div>
+      </div>
+
       <div class="city-tab-content" id="tab-monuments">
         <div class="monument-grid" id="aboutMonuments"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="circleListModal">
+    <div class="modal-card">
+      <button class="modal-close" id="circleListClose">&times;</button>
+      <h2 style="font-size: 22px; color: #fff; margin: 0 0 6px 0;">参加サークル一覧</h2>
+      <p style="font-size: 13px; color: var(--text-sub); margin: 0 0 16px 0;">「空想地図」プロジェクトに参加している各サークルのご紹介です。</p>
+      <div class="circle-grid" id="circleGridContent"></div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="termsModal">
+    <div class="modal-card">
+      <button class="modal-close" id="termsClose">&times;</button>
+      <h2 style="font-size: 20px; color: #fff; margin: 0 0 4px 0;">権利・二次利用規約</h2>
+      <p style="font-size: 12px; color: var(--text-sub); margin: 0 0 12px 0;">本サイトをご利用・ご鑑賞いただく際のガイドラインです。</p>
+      <div class="terms-box">
+        <div class="terms-section-title">1. 掲載作品の著作権について</div>
+        本サイトに掲載されている全ての作品（絵画・イラスト・写真・書道・文章・各種データ等）の著作権は、それぞれの制作者本人および各参加サークルに帰属します。
+        <div class="terms-section-title">2. 二次利用および転載の禁止</div>
+        権利者の事前の許諾なく、掲載コンテンツを複製、転載、改変、再配布、頒布、公衆送信、ならびに生成AI等の機械学習データとして使用することを固く禁じます。
+        <div class="terms-section-title">3. SNS等での共有・ご紹介</div>
+        本サイトのURL、各作品の共有リンク（NFCリンク等）のSNSやWeb上でのご紹介・レビュー投稿は歓迎いたします。
+        <div class="terms-section-title">4. 架空都市「駒洋市」の設定について</div>
+        本サイトにおける地図、地理情報、歴史、モニュメント等の設定は、参加サークルが共同で制作したフィクション（空想）です。
       </div>
     </div>
   </div>
@@ -384,6 +443,8 @@
   <script>
     const SPREADSHEET_WORKS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCkO4YnsI6F-tTZ1B2fCSSokJjqD_vWaNjWN0T5455EyKbRjJIrI7Lrd45wduE4HIKBHl_ND5G-017/pub?gid=1530227665&single=true&output=csv";
     const SPREADSHEET_ABOUT_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCkO4YnsI6F-tTZ1B2fCSSokJjqD_vWaNjWN0T5455EyKbRjJIrI7Lrd45wduE4HIKBHl_ND5G-017/pub?output=csv";
+
+    const SPREADSHEET_CIRCLES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCkO4YnsI6F-tTZ1B2fCSSokJjqD_vWaNjWN0T5455EyKbRjJIrI7Lrd45wduE4HIKBHl_ND5G-017/pub?gid=632470426&single=true&output=csv";
 
     const imageWidth = 2300;
     const imageHeight = 1300;
@@ -397,11 +458,9 @@
     map.fitBounds(bounds);
 
     const markersClusterGroup = L.markerClusterGroup({
-      disableClusteringAtZoom: 1, spiderfyOnMaxZoom: true, showCoverageOnHover: false, maxClusterRadius: 35
+      disableClusteringAtZoom: 1, spiderfyOnMaxZoom: true, spiderfyDistanceMultiplier: 1.5, showCoverageOnHover: false, maxClusterRadius: 40
     });
     map.addLayer(markersClusterGroup);
-
-    const officialMarkersLayer = L.layerGroup().addTo(map);
 
     let globalWorksData = [];
     let currentFilterCircle = "all";
@@ -429,18 +488,26 @@
       return url;
     }
 
-    function createCustomIcon(circleKey, isOfficial) {
-      if (isOfficial) {
+    // 分類・ピン生成の柔軟化（新旧の表記表記に対応）
+    function createCustomIcon(circleKey, facilityType) {
+      const typeStr = (facilityType || "").toString().toLowerCase();
+      if (typeStr.includes("公式") || typeStr.includes("official")) {
         return L.divIcon({
           className: 'custom-pin-container',
-          html: `<div class="custom-pin-official" title="公式モニュメント"></div>`,
-          iconSize: [36, 36], iconAnchor: [18, 18]
+          html: `<div class="custom-pin-official" title="市の公式施設・ランドマーク"></div>`,
+          iconSize: [38, 38], iconAnchor: [19, 19]
+        });
+      } else if (typeStr.includes("店舗") || typeStr.includes("店") || typeStr.includes("カフェ") || typeStr.includes("shop") || typeStr.includes("小スポット")) {
+        return L.divIcon({
+          className: 'custom-pin-container',
+          html: `<div class="custom-pin-shop" title="まちの店舗・スポット"></div>`,
+          iconSize: [32, 32], iconAnchor: [16, 16]
         });
       } else {
         return L.divIcon({
           className: 'custom-pin-container',
-          html: `<div class="custom-pin-spot pin-${circleKey}"></div>`,
-          iconSize: [26, 26], iconAnchor: [13, 13]
+          html: `<div class="custom-pin-spot pin-${circleKey}" title="サークル作品"></div>`,
+          iconSize: [28, 28], iconAnchor: [14, 14]
         });
       }
     }
@@ -449,11 +516,13 @@
       if (!SPREADSHEET_WORKS_CSV_URL || SPREADSHEET_WORKS_CSV_URL.includes("ここに")) {
         console.warn("スプレッドシートURL未設定のためデモデータで動作中");
         globalWorksData = [
-          { timestamp: "1", circle: "地理学研究会", title: "駒洋市役所 本庁舎", author: "地理学研究会", posY: 750, posX: 1000, facilityType: "公式モニュメント", shortDesc: "歴史的近代建築。", imageUrl: "", fullContent: "駒洋市の行政の中心地。" },
-          { timestamp: "2", circle: "美術部", title: "市役所前広場『駒草』", author: "駒沢 太郎", posY: 720, posX: 1050, facilityType: "通常スポット", shortDesc: "絵画作品。", imageUrl: "https://picsum.photos/id/1015/1200/800", fullContent: "絵画作品の長文説明。" }
+          { timestamp: "1", circle: "地理学研究会", title: "駒洋市役所 本庁舎", author: "地理学研究会", posY: 750, posX: 1000, facilityType: "公式", shortDesc: "歴史的近代建築。", imageUrl: "", fullContent: "駒洋市の行政の中心地。" },
+          { timestamp: "2", circle: "文芸部", title: "純喫茶「駒草」", author: "文芸 太郎", posY: 740, posX: 980, facilityType: "店舗", shortDesc: "昭和レトロなネルドリップ珈琲の店。", imageUrl: "", fullContent: "旧市街の路地裏にひっそりと佇む喫茶店。" },
+          { timestamp: "3", circle: "美術部", title: "市役所前広場『駒草』", author: "駒沢 太郎", posY: 750, posX: 1000, facilityType: "作品", shortDesc: "絵画作品。", imageUrl: "https://picsum.photos/id/1015/1200/800", fullContent: "同じ座標に置かれたテスト用絵画作品。" }
         ];
         renderMarkers("all");
         renderDemoAboutData();
+        renderDemoCirclesData();
         checkUrlParamAndOpenWork();
         return;
       }
@@ -463,7 +532,7 @@
         complete: function(results) {
           globalWorksData = results.data.filter(row => row.title);
           renderMarkers("all");
-          checkUrlParamAndOpenWork(); // データ読み込み後にURLパラメータをチェック
+          checkUrlParamAndOpenWork();
         }
       });
 
@@ -475,9 +544,17 @@
       } else {
         renderDemoAboutData();
       }
+
+      if (SPREADSHEET_CIRCLES_CSV_URL && !SPREADSHEET_CIRCLES_CSV_URL.includes("ここに")) {
+        Papa.parse(SPREADSHEET_CIRCLES_CSV_URL, {
+          download: true, header: true,
+          complete: function(results) { parseAndRenderCirclesData(results.data); }
+        });
+      } else {
+        renderDemoCirclesData();
+      }
     }
 
-    // URLパラメータ (?id=xxx) をチェックして特定の作品へ自動移動・表示する処理
     function checkUrlParamAndOpenWork() {
       const urlParams = new URLSearchParams(window.location.search);
       const targetId = urlParams.get('id');
@@ -485,9 +562,7 @@
 
       const work = globalWorksData.find((w, idx) => String(w.timestamp || w.id || (idx + 1)) === String(targetId));
       if (work) {
-        setTimeout(() => {
-          focusAndOpenWork(work, targetId);
-        }, 500);
+        setTimeout(() => { focusAndOpenWork(work, targetId); }, 500);
       }
     }
 
@@ -499,7 +574,12 @@
       `;
       document.getElementById('aboutMonuments').innerHTML = `
         <div class="monument-card"><div class="monument-card-title">🏛️ 駒洋市役所 旧本庁舎</div><div class="monument-card-desc">昭和初期に建てられた石造りの近代建築。街のシンボル。</div></div>
-        <div class="monument-card"><div class="monument-card-title">🌉 駒洋大橋</div><div class="monument-card-desc">旧市街と新市街を繋ぐ赤レンガ作りの橋。</div></div>
+        <div class="monument-card"><div class="monument-card-title">☕ 喫茶「駒草」</div><div class="monument-card-desc">旧市街の路地裏にあるレトロな喫茶店。名物は駒草ブレンド。</div></div>
+      `;
+      document.getElementById('aboutSpecialty').innerHTML = `
+        <b>・名物「駒草せんべい」</b><br>旧市街の老舗和菓子店で作られるほんのり甘い伝統煎餅。<br><br>
+        <b>・駒洋川の鮎料理</b><br>清流・駒洋川の上流で獲れる新鮮な鮎の塩焼きや甘露煮。<br><br>
+        <b>・駒洋藍染（伝統工芸）</b><br>明治時代から川沿いの紺屋街で育まれた落ち着いた青色が特徴の藍染織物。
       `;
     }
 
@@ -507,11 +587,17 @@
       let prologue = "";
       let timelineHtml = "";
       let monumentsHtml = "";
+      let specialtyHtml = "";
 
       data.forEach(row => {
         const key = (row.key || "").trim();
         const val = row.value || "";
+
         if (key === "overview") prologue = val;
+        else if (key === "stat_population") document.getElementById('statPop').innerText = val;
+        else if (key === "stat_area") document.getElementById('statArea').innerText = val;
+        else if (key === "stat_flower") document.getElementById('statFlower').innerText = val;
+        else if (key === "stat_specialty") specialtyHtml = val;
         else if (key.startsWith("history")) timelineHtml += `<div class="timeline-item"><div class="timeline-text">${val}</div></div>`;
         else if (key.startsWith("monument")) monumentsHtml += `<div class="monument-card"><div class="monument-card-desc">${val}</div></div>`;
       });
@@ -519,12 +605,59 @@
       if (prologue) document.getElementById('aboutPrologueText').innerText = prologue;
       if (timelineHtml) document.getElementById('aboutTimeline').innerHTML = timelineHtml;
       if (monumentsHtml) document.getElementById('aboutMonuments').innerHTML = monumentsHtml;
+      if (specialtyHtml) document.getElementById('aboutSpecialty').innerHTML = specialtyHtml;
+    }
+
+    function renderDemoCirclesData() {
+      const demoCircles = [
+        { icon: "🗺️", iconUrl: "", name: "地理学研究会", desc: "架空都市「駒洋市」の地理・歴史・モニュメント群の設定とマップ作成を担当。", xUrl: "https://x.com", webUrl: "#" },
+        { icon: "🎨", iconUrl: "", name: "美術部", desc: "駒洋市の景観や日常の一瞬を切り取った絵画・イラスト作品の展示。", xUrl: "https://x.com", instaUrl: "https://instagram.com" },
+        { icon: "🖌️", iconUrl: "", name: "書道部", desc: "駒洋市のモニュメントや言葉を力強い墨書表現で展開。", xUrl: "" },
+        { icon: "📷", iconUrl: "", name: "写真部", desc: "光と影が交差する駒洋市の情緒溢れるフォトグラフィー。", instaUrl: "https://instagram.com" },
+        { icon: "📚", iconUrl: "", name: "文芸部", desc: "駒洋市を舞台に紡がれる短編小説、詩、都市伝説集。", xUrl: "https://x.com" }
+      ];
+      parseAndRenderCirclesData(demoCircles);
+    }
+
+    // ★サークル一覧のアイコン画像読み込み対応
+    function parseAndRenderCirclesData(data) {
+      let html = "";
+      data.forEach(c => {
+        if (!c.name) return;
+        
+        let avatarHtml = "";
+        const formattedIconUrl = formatImageUrl(c.iconUrl);
+
+        if (formattedIconUrl && formattedIconUrl.trim() !== "") {
+          avatarHtml = `<img src="${formattedIconUrl}" class="circle-avatar-img" alt="${c.name} icon" onerror="this.onerror=null; this.parentNode.innerHTML='<span class=\'circle-avatar-emoji\'>${c.icon || '🎨'}</span>';">`;
+        } else {
+          avatarHtml = `<span class="circle-avatar-emoji">${c.icon || '🎨'}</span>`;
+        }
+
+        let linksHtml = "";
+        if (c.xUrl) linksHtml += `<a href="${c.xUrl}" target="_blank" class="circle-link-btn">𝕏 / Twitter</a>`;
+        if (c.instaUrl) linksHtml += `<a href="${c.instaUrl}" target="_blank" class="circle-link-btn">📷 Instagram</a>`;
+        if (c.webUrl) linksHtml += `<a href="${c.webUrl}" target="_blank" class="circle-link-btn">🌐 Webサイト</a>`;
+
+        html += `
+          <div class="circle-card">
+            <div>
+              <div class="circle-card-header">
+                <div class="circle-avatar-wrapper">${avatarHtml}</div>
+                <div class="circle-card-title">${c.name}</div>
+              </div>
+              <div class="circle-card-desc">${c.desc || ''}</div>
+            </div>
+            <div class="circle-links">${linksHtml}</div>
+          </div>
+        `;
+      });
+      document.getElementById('circleGridContent').innerHTML = html;
     }
 
     function renderMarkers(selectedCircle = "all") {
       currentFilterCircle = selectedCircle;
       markersClusterGroup.clearLayers();
-      officialMarkersLayer.clearLayers();
 
       globalWorksData.forEach((work, idx) => {
         const circleKey = normalizeCircle(work.circle);
@@ -536,7 +669,6 @@
 
         const circleName = getCircleName(circleKey);
         const workId = work.timestamp || work.id || (idx + 1);
-        const isOfficial = work.facilityType && (work.facilityType.includes("公式") || work.facilityType.includes("official"));
 
         const popupContent = `
           <div style="padding: 4px;">
@@ -548,14 +680,14 @@
           </div>
         `;
 
+        const isOfficial = (work.facilityType || "").includes("公式");
         const marker = L.marker([y, x], {
-          icon: createCustomIcon(circleKey, isOfficial),
+          icon: createCustomIcon(circleKey, work.facilityType),
           zIndexOffset: isOfficial ? 1000 : 0
         });
         marker.bindPopup(popupContent);
 
-        if (isOfficial) officialMarkersLayer.addLayer(marker);
-        else markersClusterGroup.addLayer(marker);
+        markersClusterGroup.addLayer(marker);
       });
 
       updateSidebarList();
@@ -606,7 +738,6 @@
       return names[circleKey] || circleKey;
     }
 
-    // 作品詳細モーダル
     const modal = document.getElementById('workModal');
     const modalImageWrapper = document.getElementById('modalImageWrapper');
     const modalImage = document.getElementById('modalImage');
@@ -638,7 +769,6 @@
       modal.classList.add('open');
     }
 
-    // URLコピー処理
     document.getElementById('shareUrlBtn').addEventListener('click', () => {
       if (!currentWorkId) return;
       const baseUrl = window.location.origin + window.location.pathname;
@@ -647,16 +777,15 @@
       navigator.clipboard.writeText(shareUrl).then(() => {
         const btn = document.getElementById('shareUrlBtn');
         btn.innerText = "✅ コピーしました！";
-        setTimeout(() => { btn.innerText = "作品のURLをコピー"; }, 2000);
+        setTimeout(() => { btn.innerText = "🔗 NFC用URLをコピー"; }, 2000);
       }).catch(err => {
-        prompt("コピーしたURLをSNS等で共有:", shareUrl);
+        prompt("以下のURLをコピーしてNFCタグに書き込んでください:", shareUrl);
       });
     });
 
     document.getElementById('modalClose').addEventListener('click', () => modal.classList.remove('open'));
     modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('open'); });
 
-    // ライトボックス
     const lightboxOverlay = document.getElementById('lightboxOverlay');
     const lightboxImage = document.getElementById('lightboxImage');
 
@@ -667,15 +796,23 @@
       }
     });
 
-    lightboxOverlay.addEventListener('click', () => {
-      lightboxOverlay.classList.remove('open');
-    });
+    lightboxOverlay.addEventListener('click', () => { lightboxOverlay.classList.remove('open'); });
 
-    // 駒洋市 概要モーダル制御
+    // モーダル制御
     const cityAboutModal = document.getElementById('cityAboutModal');
     document.getElementById('cityAboutBtn').addEventListener('click', () => cityAboutModal.classList.add('open'));
     document.getElementById('cityAboutClose').addEventListener('click', () => cityAboutModal.classList.remove('open'));
     cityAboutModal.addEventListener('click', (e) => { if (e.target === cityAboutModal) cityAboutModal.classList.remove('open'); });
+
+    const circleListModal = document.getElementById('circleListModal');
+    document.getElementById('circleListBtn').addEventListener('click', () => circleListModal.classList.add('open'));
+    document.getElementById('circleListClose').addEventListener('click', () => circleListModal.classList.remove('open'));
+    circleListModal.addEventListener('click', (e) => { if (e.target === circleListModal) circleListModal.classList.remove('open'); });
+
+    const termsModal = document.getElementById('termsModal');
+    document.getElementById('termsBtn').addEventListener('click', () => termsModal.classList.add('open'));
+    document.getElementById('termsClose').addEventListener('click', () => termsModal.classList.remove('open'));
+    termsModal.addEventListener('click', (e) => { if (e.target === termsModal) termsModal.classList.remove('open'); });
 
     document.querySelectorAll('.city-tab-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
