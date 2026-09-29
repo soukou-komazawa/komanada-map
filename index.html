@@ -10,10 +10,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 
-  <!-- Leaflet & MarkerCluster -->
+  <!-- Leaflet & MarkerCluster CSS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+
+  <!-- Leaflet & MarkerCluster JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
   <!-- PapaParse -->
@@ -45,6 +48,28 @@
     }
 
     #map { width: 100%; height: 100%; background-color: #111827; }
+
+    /* ★集まったピン（クラスタ）の完全修正スタイル */
+    .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
+      background: rgba(245, 158, 11, 0.3) !important;
+      border: 2px solid #fcd34d !important;
+      border-radius: 50% !important;
+      box-shadow: 0 0 16px rgba(245, 158, 11, 0.6) !important;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div {
+      background: rgba(15, 23, 42, 0.9) !important;
+      color: #fff !important;
+      font-weight: 700 !important;
+      font-size: 13px !important;
+      border-radius: 50% !important;
+      width: 30px !important;
+      height: 30px !important;
+      line-height: 30px !important;
+      text-align: center !important;
+      margin: 3px auto !important;
+    }
 
     /* ヘッダーバー */
     .app-header {
@@ -269,7 +294,6 @@
 
     .specialty-box { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px; font-size: 14px; line-height: 1.8; color: #e2e8f0; }
 
-    /* ★サークル一覧・画像アイコンスタイル */
     .circle-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 16px; }
     .circle-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; }
     .circle-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
@@ -362,7 +386,7 @@
       <h2 id="modalTitle" style="font-size: 22px; margin: 6px 0 4px 0; color:#fff;">タイトル</h2>
       <div id="modalAuthor" style="font-size: 13px; color: var(--text-sub); margin-bottom: 4px;">作者名</div>
       
-      <button class="share-url-btn" id="shareUrlBtn">🔗 URLをコピー</button>
+      <button class="share-url-btn" id="shareUrlBtn">🔗 NFC用URLをコピー</button>
 
       <div class="modal-image-wrapper" id="modalImageWrapper" style="display: none;">
         <img id="modalImage" src="" alt="作品画像">
@@ -488,7 +512,6 @@
       return url;
     }
 
-    // 分類・ピン生成の柔軟化（新旧の表記表記に対応）
     function createCustomIcon(circleKey, facilityType) {
       const typeStr = (facilityType || "").toString().toLowerCase();
       if (typeStr.includes("公式") || typeStr.includes("official")) {
@@ -619,7 +642,6 @@
       parseAndRenderCirclesData(demoCircles);
     }
 
-    // ★サークル一覧のアイコン画像読み込み対応
     function parseAndRenderCirclesData(data) {
       let html = "";
       data.forEach(c => {
