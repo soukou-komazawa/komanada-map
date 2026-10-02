@@ -49,7 +49,7 @@
 
     #map { width: 100%; height: 100%; background-color: #111827; }
 
-    /* ★集まったピン（クラスタ）の完全修正スタイル */
+    /* 集まったピン（クラスタ）スタイル */
     .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
       background: rgba(245, 158, 11, 0.3) !important;
       border: 2px solid #fcd34d !important;
@@ -128,6 +128,7 @@
     .filter-btn[data-circle="calligraphy"].active { background: #475569; }
     .filter-btn[data-circle="photo"].active { background: #0284c7; }
     .filter-btn[data-circle="literature"].active { background: #059669; }
+    .filter-btn[data-circle="manga"].active { background: #8b5cf6; }
 
     /* サイドバー */
     .sidebar {
@@ -215,13 +216,14 @@
       z-index: 10;
     }
 
+    /* ★マンガ・画像ビューアー拡張 */
     .modal-image-wrapper {
-      position: relative; width: 100%; margin: 16px 0 20px 0;
+      position: relative; width: 100%; margin: 16px 0 12px 0;
       background: #0f172a; border-radius: 14px; overflow: hidden;
       border: 1px solid rgba(255,255,255,0.08); text-align: center; cursor: zoom-in;
     }
     .modal-image-wrapper img {
-      max-width: 100%; max-height: 300px; object-fit: contain;
+      max-width: 100%; max-height: 360px; object-fit: contain;
       vertical-align: middle; transition: transform 0.2s ease;
     }
     .image-zoom-hint {
@@ -229,6 +231,20 @@
       background: rgba(0,0,0,0.7); color: #fff; font-size: 11px; font-weight: 500;
       padding: 4px 10px; border-radius: 14px; pointer-events: none; backdrop-filter: blur(4px);
     }
+
+    /* マンガナビゲーションバー */
+    .manga-nav-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-light);
+      border-radius: 14px; padding: 6px 12px; margin-bottom: 16px;
+    }
+    .manga-nav-btn {
+      background: rgba(255, 255, 255, 0.1); border: none; color: #fff;
+      font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 10px;
+      cursor: pointer; transition: all 0.2s; min-height: 36px;
+    }
+    .manga-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .manga-page-info { font-size: 13px; font-weight: 700; color: #fcd34d; font-family: monospace; }
 
     .share-url-btn {
       display: inline-flex; align-items: center; gap: 6px;
@@ -264,6 +280,16 @@
     .pin-calligraphy { background: #64748b; }
     .pin-photo { background: #0284c7; }
     .pin-literature { background: #059669; }
+    .pin-manga { background: #8b5cf6; }
+
+    /* バッジ */
+    .popup-badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; color: #fff; margin-bottom: 4px; }
+    .badge-geography { background: #d97706; }
+    .badge-art { background: #e11d48; }
+    .badge-calligraphy { background: #64748b; }
+    .badge-photo { background: #0284c7; }
+    .badge-literature { background: #059669; }
+    .badge-manga { background: #8b5cf6; }
 
     /* モーダルタブ */
     .city-about-nav { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid var(--border-light); padding-bottom: 12px; overflow-x: auto; scrollbar-width: none; }
@@ -294,6 +320,7 @@
 
     .specialty-box { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 18px; font-size: 14px; line-height: 1.8; color: #e2e8f0; }
 
+    /* サークルカード */
     .circle-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-top: 16px; }
     .circle-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between; }
     .circle-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
@@ -342,7 +369,7 @@
       }
       .modal-close { top: 16px; right: 16px; width: 38px; height: 38px; font-size: 20px; }
       .coord-info { top: calc(12px + var(--safe-area-top)); bottom: auto; left: 12px; font-size: 10px; padding: 4px 10px; }
-      .modal-image-wrapper img { max-height: 220px; }
+      .modal-image-wrapper img { max-height: 260px; }
     }
   </style>
 </head>
@@ -361,6 +388,7 @@
       <button class="filter-btn" data-circle="calligraphy">🖌️ 書道</button>
       <button class="filter-btn" data-circle="photo">📷 写真</button>
       <button class="filter-btn" data-circle="literature">📚 文芸</button>
+      <button class="filter-btn" data-circle="manga">🎨 漫画</button>
     </div>
   </header>
 
@@ -392,6 +420,13 @@
         <img id="modalImage" src="" alt="作品画像">
         <div class="image-zoom-hint">🔍 タップで拡大</div>
       </div>
+
+      <!-- マンガ・複数画像用ナビゲーション -->
+      <div class="manga-nav-bar" id="mangaNavBar" style="display: none;">
+        <button class="manga-nav-btn" id="mangaPrevBtn">◀ 前のページ</button>
+        <span class="manga-page-info" id="mangaPageInfo">1 / 1</span>
+        <button class="manga-nav-btn" id="mangaNextBtn">次のページ ▶</button>
+      </div>
       
       <div class="modal-body-text" id="modalBody">本文</div>
     </div>
@@ -405,7 +440,7 @@
   <div class="modal-overlay" id="cityAboutModal">
     <div class="modal-card">
       <button class="modal-close" id="cityAboutClose">&times;</button>
-      <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #fcd34d; margin: 0 0 16px 0;">KOMANADA CITY GUIDE</h2>
+      <h2 style="font-family: 'Cormorant Garamond', serif; font-size: 24px; color: #fcd34d; margin: 0 0 16px 0;">KOUYOU CITY GUIDE</h2>
       
       <div class="city-about-nav">
         <button class="city-tab-btn active" data-tab="tab-overview">🗺️ 都市概要・沿革</button>
@@ -490,6 +525,10 @@
     let currentFilterCircle = "all";
     let currentWorkId = null;
 
+    // マンガビューアー用グローバル変数
+    let currentImageUrls = [];
+    let currentImageIndex = 0;
+
     function normalizeCircle(input) {
       if (!input) return "geography";
       const str = input.toString();
@@ -498,18 +537,20 @@
       if (str.includes("書道")) return "calligraphy";
       if (str.includes("写真")) return "photo";
       if (str.includes("文芸")) return "literature";
+      if (str.includes("漫画") || str.includes("マンガ")) return "manga";
       return "geography";
     }
 
     function formatImageUrl(url) {
       if (!url) return "";
-      if (url.includes("drive.google.com")) {
-        const fileIdMatch = url.match(/\/d\/([^\/]+)/) || url.match(/id=([^&]+)/);
+      let cleanUrl = url.trim();
+      if (cleanUrl.includes("drive.google.com")) {
+        const fileIdMatch = cleanUrl.match(/\/d\/([^\/]+)/) || cleanUrl.match(/id=([^&]+)/);
         if (fileIdMatch && fileIdMatch[1]) {
           return `https://lh3.googleusercontent.com/d/${fileIdMatch[1]}`;
         }
       }
-      return url;
+      return cleanUrl;
     }
 
     function createCustomIcon(circleKey, facilityType) {
@@ -541,7 +582,7 @@
         globalWorksData = [
           { timestamp: "1", circle: "地理学研究会", title: "駒洋市役所 本庁舎", author: "地理学研究会", posY: 750, posX: 1000, facilityType: "公式", shortDesc: "歴史的近代建築。", imageUrl: "", fullContent: "駒洋市の行政の中心地。" },
           { timestamp: "2", circle: "文芸部", title: "純喫茶「駒草」", author: "文芸 太郎", posY: 740, posX: 980, facilityType: "店舗", shortDesc: "昭和レトロなネルドリップ珈琲の店。", imageUrl: "", fullContent: "旧市街の路地裏にひっそりと佇む喫茶店。" },
-          { timestamp: "3", circle: "美術部", title: "市役所前広場『駒草』", author: "駒沢 太郎", posY: 750, posX: 1000, facilityType: "作品", shortDesc: "絵画作品。", imageUrl: "https://picsum.photos/id/1015/1200/800", fullContent: "同じ座標に置かれたテスト用絵画作品。" }
+          { timestamp: "3", circle: "漫画倶楽部", title: "駒洋市あやかし日常記（1話）", author: "漫画 花子", posY: 730, posX: 960, facilityType: "作品", shortDesc: "旧市街が舞台のショートギャグ漫画です！", imageUrl: "https://picsum.photos/id/1025/1200/800, https://picsum.photos/id/1015/1200/800", fullContent: "複数ページの漫画作品テストです。" }
         ];
         renderMarkers("all");
         renderDemoAboutData();
@@ -590,7 +631,7 @@
     }
 
     function renderDemoAboutData() {
-      document.getElementById('aboutPrologueText').innerText = "駒洋市（こうようし）は、旧市街の重厚な歴史と、川沿いの穏やかな自然、そして近代的な駅前風景が共存する架空の都市です。地理学研究会が設定したこの都市を舞台に、各文化系サークルが作品を展開しています。";
+      document.getElementById('aboutPrologueText').innerText = "駒洋市（こまなだし）は、旧市街の重厚な歴史と、川沿いの穏やかな自然、そして近代的な駅前風景が共存する架空の都市です。地理学研究会が設定したこの都市を舞台に、各文化系サークルが作品を展開しています。";
       document.getElementById('aboutTimeline').innerHTML = `
         <div class="timeline-item"><div class="timeline-text"><b>【1920年】駒洋電鉄の開通</b><br>駅周辺の開発が進み、商業の都市として発展を始める。</div></div>
         <div class="timeline-item"><div class="timeline-text"><b>【1955年】駒洋川護岸整備と公園造成</b><br>市民の憩いの場として川沿いが整備され、文化人が集うエリアに。</div></div>
@@ -637,7 +678,8 @@
         { icon: "🎨", iconUrl: "", name: "美術部", desc: "駒洋市の景観や日常の一瞬を切り取った絵画・イラスト作品の展示。", xUrl: "https://x.com", instaUrl: "https://instagram.com" },
         { icon: "🖌️", iconUrl: "", name: "書道部", desc: "駒洋市のモニュメントや言葉を力強い墨書表現で展開。", xUrl: "" },
         { icon: "📷", iconUrl: "", name: "写真部", desc: "光と影が交差する駒洋市の情緒溢れるフォトグラフィー。", instaUrl: "https://instagram.com" },
-        { icon: "📚", iconUrl: "", name: "文芸部", desc: "駒洋市を舞台に紡がれる短編小説、詩、都市伝説集。", xUrl: "https://x.com" }
+        { icon: "📚", iconUrl: "", name: "文芸部", desc: "駒洋市を舞台に紡がれる短編小説、詩、都市伝説集。", xUrl: "https://x.com" },
+        { icon: "🎨", iconUrl: "", name: "漫画倶楽部", desc: "駒洋市の街並みや人々を躍動感あふれるコミック形式で表現。", xUrl: "https://x.com" }
       ];
       parseAndRenderCirclesData(demoCircles);
     }
@@ -756,13 +798,17 @@
     }
 
     function getCircleName(circleKey) {
-      const names = { geography: "地理研", art: "美術部", calligraphy: "書道部", photo: "写真部", literature: "文芸部" };
+      const names = { geography: "地理研", art: "美術部", calligraphy: "書道部", photo: "写真部", literature: "文芸部", manga: "漫画倶楽部" };
       return names[circleKey] || circleKey;
     }
 
     const modal = document.getElementById('workModal');
     const modalImageWrapper = document.getElementById('modalImageWrapper');
     const modalImage = document.getElementById('modalImage');
+    const mangaNavBar = document.getElementById('mangaNavBar');
+    const mangaPageInfo = document.getElementById('mangaPageInfo');
+    const mangaPrevBtn = document.getElementById('mangaPrevBtn');
+    const mangaNextBtn = document.getElementById('mangaNextBtn');
 
     function openModal(workId) {
       const work = globalWorksData.find((w, idx) => String(w.timestamp || w.id || (idx + 1)) === String(workId));
@@ -779,17 +825,53 @@
       document.getElementById('modalAuthor').innerText = `作者: ${work.author}`;
       document.getElementById('modalBody').innerText = work.fullContent || work.shortDesc;
 
-      const formattedImgUrl = formatImageUrl(work.imageUrl);
-      if (formattedImgUrl && formattedImgUrl.trim() !== "") {
-        modalImage.src = formattedImgUrl;
-        modalImageWrapper.style.display = "block";
+      // カンマ区切りの画像URLを取得（複数枚／マンガ対応）
+      const rawImageStr = work.imageUrl || "";
+      if (rawImageStr.trim() !== "") {
+        currentImageUrls = rawImageStr.split(',').map(url => formatImageUrl(url)).filter(url => url !== "");
       } else {
-        modalImageWrapper.style.display = "none";
-        modalImage.src = "";
+        currentImageUrls = [];
       }
+
+      currentImageIndex = 0;
+      updateMangaViewer();
 
       modal.classList.add('open');
     }
+
+    function updateMangaViewer() {
+      if (currentImageUrls.length > 0) {
+        modalImage.src = currentImageUrls[currentImageIndex];
+        modalImageWrapper.style.display = "block";
+
+        if (currentImageUrls.length > 1) {
+          mangaNavBar.style.display = "flex";
+          mangaPageInfo.innerText = `${currentImageIndex + 1} / ${currentImageUrls.length}`;
+          mangaPrevBtn.disabled = (currentImageIndex === 0);
+          mangaNextBtn.disabled = (currentImageIndex === currentImageUrls.length - 1);
+        } else {
+          mangaNavBar.style.display = "none";
+        }
+      } else {
+        modalImageWrapper.style.display = "none";
+        mangaNavBar.style.display = "none";
+        modalImage.src = "";
+      }
+    }
+
+    mangaPrevBtn.addEventListener('click', () => {
+      if (currentImageIndex > 0) {
+        currentImageIndex--;
+        updateMangaViewer();
+      }
+    });
+
+    mangaNextBtn.addEventListener('click', () => {
+      if (currentImageIndex < currentImageUrls.length - 1) {
+        currentImageIndex++;
+        updateMangaViewer();
+      }
+    });
 
     document.getElementById('shareUrlBtn').addEventListener('click', () => {
       if (!currentWorkId) return;
