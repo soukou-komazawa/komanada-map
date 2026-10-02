@@ -1809,15 +1809,15 @@
     // 前後の作品へ連続散策ナビ
     const modalPrevWorkBtn = document.getElementById('modalPrevWorkBtn');
     const modalNextWorkBtn = document.getElementById('modalNextWorkBtn');
-    if (prevWorkBtn && nextWorkBtn) {
-      prevWorkBtn.addEventListener('click', () => {
+    if (modalPrevWorkBtn && modalNextWorkBtn) {
+      modalPrevWorkBtn.addEventListener('click', () => {
         const idx = globalWorksData.findIndex(w => String(w.timestamp || w.id) === String(currentWorkId));
         if (idx > 0) {
           const prevWork = globalWorksData[idx - 1];
           focusAndOpenWork(prevWork, prevWork.timestamp || prevWork.id);
         }
       });
-      nextWorkBtn.addEventListener('click', () => {
+      modalNextWorkBtn.addEventListener('click', () => {
         const idx = globalWorksData.findIndex(w => String(w.timestamp || w.id) === String(currentWorkId));
         if (idx >= 0 && idx < globalWorksData.length - 1) {
           const nextWork = globalWorksData[idx + 1];
