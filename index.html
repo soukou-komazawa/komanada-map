@@ -325,19 +325,19 @@
     .leaflet-marker-icon, .leaflet-marker-shadow, .custom-pin-spot, .custom-pin-official, .custom-pin-shop {
       opacity: 1 !important; filter: none !important;
     }
-    .custom-pin-spot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 12px rgba(0,0,0,0.6); opacity: 1 !important; }
+    .custom-pin-spot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 12px rgba(0,0,0,0.6); opacity: 1 !important; position: relative; box-sizing: border-box; margin: 0 !important; flex-shrink: 0; }
     
     .custom-pin-official {
       width: 38px; height: 38px; background: #f59e0b; border: 2px solid #fff;
       border-radius: 10px; transform: rotate(45px); box-shadow: 0 0 18px rgba(245, 158, 11, 0.9);
-      display: flex; align-items: center; justify-content: center; opacity: 1 !important;
+      display: flex; align-items: center; justify-content: center; opacity: 1 !important; position: relative; box-sizing: border-box; margin: 0 !important; flex-shrink: 0;
     }
     .custom-pin-official::after { content: '🏛️'; font-size: 20px; transform: rotate(-45px); }
 
     .custom-pin-shop {
       width: 32px; height: 32px; background: #059669; border: 2px solid #fff;
       border-radius: 50%; box-shadow: 0 0 14px rgba(5, 150, 105, 0.8);
-      display: flex; align-items: center; justify-content: center; opacity: 1 !important;
+      display: flex; align-items: center; justify-content: center; opacity: 1 !important; position: relative; box-sizing: border-box; margin: 0 !important; flex-shrink: 0;
     }
     .custom-pin-shop::after { content: '📍'; font-size: 16px; }
 
@@ -349,7 +349,13 @@
     .pin-manga { background: #8b5cf6; }
 
     /* ピン右上の付随作品数バッジ */
-    .custom-pin-container { position: relative !important; }
+    .custom-pin-container {
+      background: transparent !important;
+      border: none !important;
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+    }
     .pin-count-badge {
       position: absolute;
       top: -6px; right: -6px;
@@ -959,7 +965,8 @@
       disableClusteringAtZoom: 0,
       spiderfyOnMaxZoom: false, // ★ スパイダー状の拡散を無効化（座標ズレを防止）
       showCoverageOnHover: false,
-      maxClusterRadius: 30
+      maxClusterRadius: 30,
+      animate: false
     });
     map.addLayer(markersClusterGroup);
 
@@ -1025,19 +1032,19 @@
         return L.divIcon({
           className: 'custom-pin-container',
           html: `<div class="custom-pin-official" title="市の公式施設・ランドマーク">${countBadgeHtml}</div>`,
-          iconSize: [38, 38], iconAnchor: [19, 19]
+          iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -28]
         });
       } else if (isLocalSpotWork({ facilityType })) {
         return L.divIcon({
           className: 'custom-pin-container',
           html: `<div class="custom-pin-shop" title="まちの舞台・小スポット">${countBadgeHtml}</div>`,
-          iconSize: [32, 32], iconAnchor: [16, 16]
+          iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -17]
         });
       } else {
         return L.divIcon({
           className: 'custom-pin-container',
           html: `<div class="custom-pin-spot pin-${circleKey}" title="サークル作品">${countBadgeHtml}</div>`,
-          iconSize: [28, 28], iconAnchor: [14, 14]
+          iconSize: [28, 28], iconAnchor: [14, 14], popupAnchor: [0, -15]
         });
       }
     }
@@ -1289,7 +1296,7 @@
         let activePrimary = matchingWorks.find(w => isAnchor(w)) || matchingWorks[0];
         const circleKey = normalizeCircle(activePrimary.circle);
         const circleName = getCircleName(circleKey);
-        const isCityHall = (activePrimary.title || "").includes("市役所") || (activePrimary.facilityType || "").includes("公式");
+        const isCityHall = (activePrimary.title || "").includes("市役所") || (activePrimary.facilityType || "").includes("市役所");
 
         // ポップアップ内の付随作品リスト
         let worksListHtml = '';
@@ -1489,7 +1496,7 @@
         modalLoreAccordion.style.display = 'none';
       }
 
-      const isCityHall = (work.title || "").includes("市役所") || (work.facilityType || "").includes("公式");
+      const isCityHall = (work.title || "").includes("市役所") || (work.facilityType || "").includes("市役所");
       const modalCityHallCard = document.getElementById('modalCityHallCard');
       if (modalCityHallCard) {
         modalCityHallCard.style.display = isCityHall ? "block" : "none";
