@@ -552,9 +552,25 @@
     .timeline-text { font-size: 14px; line-height: 1.7; color: #e2e8f0; }
 
     .monument-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
-    .monument-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 16px; }
-    .monument-card-title { font-size: 15px; font-weight: 700; color: #fcd34d; margin-bottom: 6px; }
-    .monument-card-desc { font-size: 13px; line-height: 1.6; color: #cbd5e1; }
+    .monument-card {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 14px;
+      padding: 14px 16px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .monument-card:hover, .monument-card:active {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(245, 158, 11, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+    }
+    .monument-card-title { font-size: 15px; font-weight: 700; color: #fcd34d; margin-bottom: 4px; }
+    .monument-card-desc { font-size: 12.5px; line-height: 1.6; color: #cbd5e1; }
 
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
     .stat-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 14px; text-align: center; }
@@ -946,7 +962,7 @@
 
   <script>
     const SPREADSHEET_WORKS_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCkO4YnsI6F-tTZ1B2fCSSokJjqD_vWaNjWN0T5455EyKbRjJIrI7Lrd45wduE4HIKBHl_ND5G-017/pub?output=csv";
-    const SPREADSHEET_ABOUT_CSV_URL = "";
+    const SPREADSHEET_ABOUT_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCkO4YnsI6F-tTZ1B2fCSSokJjqD_vWaNjWN0T5455EyKbRjJIrI7Lrd45wduE4HIKBHl_ND5G-017/pub?gid=1745810155&single=true&output=csv";
 
     const SPREADSHEET_CIRCLES_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSCkO4YnsI6F-tTZ1B2fCSSokJjqD_vWaNjWN0T5455EyKbRjJIrI7Lrd45wduE4HIKBHl_ND5G-017/pub?gid=632470426&single=true&output=csv";
 
@@ -1224,26 +1240,162 @@
     function parseAndRenderAboutData(data) {
       let prologue = "";
       let timelineHtml = "";
-      let monumentsHtml = "";
       let specialtyHtml = "";
 
       data.forEach(row => {
-        const key = (row.key || "").trim().toLowerCase();
-        const val = row.value || "";
+        const rawKey = (row.key || row['列 1'] || Object.values(row)[0] || "").trim();
+        const key = rawKey.toLowerCase();
+        const val = (row.value || row['列 2'] || Object.values(row)[1] || "").trim();
+        const note = (row['補足説明'] || row['列 3'] || Object.values(row)[2] || "").trim();
 
-        if (key === "overview") prologue = val;
-        else if (key === "stat_population") document.getElementById('statPop').innerText = val;
-        else if (key === "stat_area") document.getElementById('statArea').innerText = val;
-        else if (key === "stat_flower") document.getElementById('statFlower').innerText = val;
-        else if (key === "stat_specialty") specialtyHtml = val;
-        else if (key.startsWith("history")) timelineHtml += `<div class="timeline-item"><div class="timeline-text">${val}</div></div>`;
-        else if (key.startsWith("monument")) monumentsHtml += `<div class="monument-card"><div class="monument-card-desc">${val}</div></div>`;
+        if (!key || key === 'key' || key === '列 1' || (!val && !note)) return;
+
+        if (key === "overview" && val) {
+          prologue = val;
+        } else if (key === "stat_population" && val) {
+          const el = document.getElementById('statPop');
+          if (el) el.innerText = val;
+        } else if (key === "stat_area" && val) {
+          const el = document.getElementById('statArea');
+          if (el) el.innerText = val;
+        } else if (key === "stat_flower" && val) {
+          const el = document.getElementById('statFlower');
+          if (el) el.innerText = val;
+        } else if (key === "stat_specialty" && val) {
+          specialtyHtml = val;
+        } else if (key.startsWith("hist") || key.startsWith("year") || key.startsWith("沿革")) {
+          if (val && note && note !== '列 3') {
+            timelineHtml += `
+              <div class="timeline-item">
+                <div class="timeline-text">
+                  <b style="color: #fcd34d;">${escapeHtml(val)}</b><br>
+                  <span>${escapeHtml(note)}</span>
+                </div>
+              </div>
+            `;
+          } else if (val) {
+            timelineHtml += `
+              <div class="timeline-item">
+                <div class="timeline-text">${escapeHtml(val)}</div>
+              </div>
+            `;
+          }
+        }
       });
 
       if (prologue) document.getElementById('aboutPrologueText').innerText = prologue;
       if (timelineHtml) document.getElementById('aboutTimeline').innerHTML = timelineHtml;
-      if (monumentsHtml) document.getElementById('aboutMonuments').innerHTML = monumentsHtml;
       if (specialtyHtml) document.getElementById('aboutSpecialty').innerHTML = specialtyHtml;
+
+      renderAboutMonuments();
+    }
+
+    // 地図上の登録ピンからモニュメント・小スポット情報を自動生成
+    function renderAboutMonuments() {
+      const monumentContainer = document.getElementById('aboutMonuments');
+      if (!monumentContainer) return;
+
+      const spotWorks = globalWorksData.filter(w => isMonumentWork(w) || isLocalSpotWork(w));
+
+      if (spotWorks.length === 0) {
+        monumentContainer.innerHTML = `
+          <div style="grid-column: 1 / -1; padding: 28px; text-align: center; color: var(--text-sub); font-size: 13px;">
+            現在、地図上に登録されているモニュメント・スポット情報を読み込み中です...
+          </div>
+        `;
+        return;
+      }
+
+      const sortedSpots = [...spotWorks].sort((a, b) => {
+        const aMon = isMonumentWork(a);
+        const bMon = isMonumentWork(b);
+        if (aMon && !bMon) return -1;
+        if (!aMon && bMon) return 1;
+        return 0;
+      });
+
+      let html = "";
+      sortedSpots.forEach(work => {
+        const workId = work.timestamp || work.id;
+        const isMon = isMonumentWork(work);
+        const badgeClass = isMon ? 'badge-monument' : 'badge-spot-location';
+        const badgeLabel = isMon ? '🏛️ 指定ランドマーク' : '📍 まちの舞台・小スポット';
+
+        const rawImg = (work.imageUrl || "").split(',')[0].trim();
+        const thumbUrl = rawImg ? formatImageUrl(rawImg) : "";
+        const thumbHtml = thumbUrl
+          ? `<img src="${thumbUrl}" class="spot-card-thumb" style="width: 60px; height: 60px; border-radius: 10px; object-fit: cover; flex-shrink: 0;" alt="${escapeHtml(work.title)}">`
+          : `<div class="spot-card-thumb-placeholder" style="width: 60px; height: 60px; border-radius: 10px; font-size: 26px; flex-shrink: 0;">${isMon ? '🏛️' : '📍'}</div>`;
+
+        const desc = work.shortDesc || (work.fullContent ? (work.fullContent.length > 70 ? work.fullContent.slice(0, 70) + '...' : work.fullContent) : '（説明文準備中）');
+
+        html += `
+          <div class="monument-card" onclick="jumpToMapMonument('${workId}')" title="クリックして地図のピンへジャンプ">
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+              ${thumbHtml}
+              <div style="flex: 1; min-width: 0;">
+                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px; flex-wrap: wrap;">
+                  <span class="popup-badge ${badgeClass}" style="font-size: 9.5px; padding: 1.5px 6px; margin: 0;">${badgeLabel}</span>
+                  ${work.author ? `<span style="font-size: 11px; color: var(--text-sub); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">by ${escapeHtml(work.author)}</span>` : ''}
+                </div>
+                <div class="monument-card-title">${escapeHtml(work.title)}</div>
+                <div class="monument-card-desc">
+                  ${escapeHtml(desc)}
+                </div>
+              </div>
+            </div>
+            <div style="margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 10.5px; color: var(--text-sub);">📍 (${work.posX}, ${work.posY})</span>
+              <span style="font-size: 11px; color: #fcd34d; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+                地図で見る ▶
+              </span>
+            </div>
+          </div>
+        `;
+      });
+
+      monumentContainer.innerHTML = html;
+    }
+
+    // 市政資料室から地図上のピンへカメラ移動してポップアップを開く
+    function jumpToMapMonument(workId) {
+      if (cityAboutModal) cityAboutModal.classList.remove('open');
+
+      const work = globalWorksData.find((w, idx) => String(w.timestamp || w.id || (idx + 1)) === String(workId));
+      if (!work) return;
+
+      const y = parseFloat(work.posY);
+      const x = parseFloat(work.posX);
+
+      if (!isNaN(y) && !isNaN(x)) {
+        map.flyTo([y, x], 1, { duration: 1.0 });
+      }
+
+      setTimeout(() => {
+        let targetMarker = null;
+        markersClusterGroup.eachLayer(m => {
+          if (m.groupWorks && m.groupWorks.some(w => String(w.timestamp || w.id) === String(workId))) {
+            targetMarker = m;
+          } else if (m.workId && String(m.workId) === String(workId)) {
+            targetMarker = m;
+          }
+        });
+
+        if (!targetMarker && !isNaN(y) && !isNaN(x)) {
+          markersClusterGroup.eachLayer(m => {
+            const latlng = m.getLatLng();
+            if (Math.abs(latlng.lat - y) < 8 && Math.abs(latlng.lng - x) < 8) {
+              targetMarker = m;
+            }
+          });
+        }
+
+        if (targetMarker) {
+          targetMarker.openPopup();
+        } else {
+          openModal(workId);
+        }
+      }, 1050);
     }
 
     function renderDemoCirclesData() {
@@ -1367,10 +1519,14 @@
         });
         marker.bindPopup(popupContent);
 
+        marker.workId = activePrimary.timestamp || activePrimary.id;
+        marker.groupWorks = group.works;
+        marker.spotGroupId = group.id;
         markersClusterGroup.addLayer(marker);
       });
 
       updateSidebarList();
+      renderAboutMonuments();
     }
 
     function updateSidebarList() {
@@ -1887,6 +2043,7 @@
     // 市政資料室（旧駒洋市ガイド）モーダル制御
     const cityAboutModal = document.getElementById('cityAboutModal');
     function openCityAboutModal() {
+      renderAboutMonuments();
       if (cityAboutModal) cityAboutModal.classList.add('open');
     }
     document.getElementById('cityAboutClose').addEventListener('click', () => cityAboutModal.classList.remove('open'));
@@ -1894,7 +2051,7 @@
 
     // 市役所へジャンプ＆市政資料室を開く関数
     function focusCityHall() {
-      const cityHall = globalWorksData.find(w => (w.title || '').includes('市役所') || (w.facilityType || '').includes('公式'));
+      const cityHall = globalWorksData.find(w => (w.title || '').includes('市役所'));
       if (cityHall) {
         const y = parseFloat(cityHall.posY);
         const x = parseFloat(cityHall.posX);
