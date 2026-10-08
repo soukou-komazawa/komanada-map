@@ -677,6 +677,13 @@
       user-select: none;
     }
     .clap-btn:active { transform: scale(0.92); }
+    .clap-btn.maxed {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: #94a3b8;
+      box-shadow: none;
+    }
+    .clap-btn.maxed:active { transform: none; }
     .clap-feedback {
       font-size: 12px; color: #fcd34d; font-weight: 600;
       min-height: 18px; opacity: 0; transition: opacity 0.3s ease;
@@ -970,6 +977,8 @@
     // （GASをデプロイした後に発行されるウェブアプリURLをここに貼り付けてください）
     const GAS_LIKE_API_URL = "https://script.google.com/macros/s/AKfycbzjv80u0mvzcFg1eNA6FiWVjZtuClG3pCiwYrm5EWREpC74t-_TDhSBkYyT5NNiacQ8Zw/exec";
     const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1557596686757400697/_IZ1NSI38xee9exVqgYKTm2a1pq32LtDF8t3CW4p4Y9jr424LUzYsUPxoqeMSU-eIBYQ";
+    // 1つの作品に対して1ユーザー（端末）が送れるWeb拍手（スキ）の上限回数
+    const MAX_CLAPS_PER_WORK = 10;
 
     const imageWidth = 2300;
     const imageHeight = 1300;
@@ -1853,12 +1862,27 @@
         modalAfterwordBox.style.display = 'none';
       }
 
-      // Web拍手（スキ）の表示（サーバー集計値またはローカル保存値）
-      const modalClapCount = document.getElementById('modalClapCount');
+      // Web拍手（スキ）の表示（サーバー集計値またはローカル保存値） ＆ 連打上限（1作品あたりMAX_CLAPS_PER_WORK回）状態判定
+      const modalClapBtn = document.getElementById('modalClapBtn');
+      const modalClapFeedback = document.getElementById('modalClapFeedback');
       const savedClaps = localStorage.getItem('komanada_clap_' + currentWorkId);
       const serverCount = globalLikeCounts[currentWorkId];
       const displayCount = serverCount !== undefined ? serverCount : (savedClaps !== null ? savedClaps : '0');
-      modalClapCount.innerText = displayCount;
+      
+      const userClapKey = 'komanada_user_claps_' + currentWorkId;
+      const userClaps = parseInt(localStorage.getItem(userClapKey) || '0', 10);
+
+      if (modalClapBtn) {
+        if (userClaps >= MAX_CLAPS_PER_WORK) {
+          modalClapBtn.classList.add('maxed');
+          modalClapBtn.innerHTML = `<span>👏</span> <span>拍手送信済み</span> (<span id="modalClapCount">${displayCount}</span>)`;
+          if (modalClapFeedback) modalClapFeedback.innerText = "たくさんの拍手をありがとうございます！🌸";
+        } else {
+          modalClapBtn.classList.remove('maxed');
+          modalClapBtn.innerHTML = `<span>👏</span> <span>スキ・拍手を送る</span> (<span id="modalClapCount">${displayCount}</span>)`;
+          if (modalClapFeedback) modalClapFeedback.innerText = "🌸 拍手を届けました！";
+        }
+      }
 
       // 前後の作品ナビゲーションボタン更新
       const currentWorkIdx = globalWorksData.findIndex(w => String(w.timestamp || w.id) === String(currentWorkId));
@@ -2013,22 +2037,52 @@
       });
     }
 
-    // Web拍手（スキ）ボタン ＆ 連打まとめ送信（デバウンス）処理
+    // Web拍手（スキ）ボタン ＆ 連打上限（1作品あたりMAX_CLAPS_PER_WORK回）＆ 連打まとめ送信（デバウンス）処理
     const modalClapBtn = document.getElementById('modalClapBtn');
     const modalClapFeedback = document.getElementById('modalClapFeedback');
     if (modalClapBtn) {
       modalClapBtn.addEventListener('click', () => {
         if (!currentWorkId) return;
 
+        const userClapKey = 'komanada_user_claps_' + currentWorkId;
+        let userClaps = parseInt(localStorage.getItem(userClapKey) || '0', 10);
+
+        // 連打上限判定（1作品につき上限回数まで）
+        if (userClaps >= MAX_CLAPS_PER_WORK) {
+          if (modalClapFeedback) {
+            modalClapFeedback.innerText = `この作品への拍手は上限（${MAX_CLAPS_PER_WORK}回）に達しています。たくさんの応援ありがとうございます！🌸`;
+            modalClapFeedback.classList.add('show');
+            setTimeout(() => { modalClapFeedback.classList.remove('show'); }, 1800);
+          }
+          return;
+        }
+
+        userClaps++;
+        localStorage.setItem(userClapKey, userClaps);
+
         // 1. 即座に画面上のカウントを+1し、拍手アニメーションを表示
         const countSpan = document.getElementById('modalClapCount');
-        let currentCount = parseInt(countSpan.innerText || '0', 10) + 1;
-        countSpan.innerText = currentCount;
+        let currentCount = parseInt(countSpan ? countSpan.innerText || '0' : '0', 10) + 1;
+        if (countSpan) countSpan.innerText = currentCount;
         globalLikeCounts[currentWorkId] = currentCount;
         localStorage.setItem('komanada_clap_' + currentWorkId, currentCount);
 
-        modalClapFeedback.classList.add('show');
-        setTimeout(() => { modalClapFeedback.classList.remove('show'); }, 1200);
+        if (userClaps >= MAX_CLAPS_PER_WORK) {
+          modalClapBtn.classList.add('maxed');
+          modalClapBtn.innerHTML = `<span>👏</span> <span>拍手送信済み</span> (<span id="modalClapCount">${currentCount}</span>)`;
+          if (modalClapFeedback) {
+            modalClapFeedback.innerText = `たくさんの拍手をありがとうございます！🌸（上限${MAX_CLAPS_PER_WORK}回）`;
+          }
+        } else {
+          if (modalClapFeedback) {
+            modalClapFeedback.innerText = `🌸 拍手を届けました！ (${userClaps}/${MAX_CLAPS_PER_WORK})`;
+          }
+        }
+
+        if (modalClapFeedback) {
+          modalClapFeedback.classList.add('show');
+          setTimeout(() => { modalClapFeedback.classList.remove('show'); }, 1200);
+        }
 
         // 2. 連打まとめ送信のバッファリング
         const targetWork = globalWorksData.find(w => String(w.timestamp || w.id) === String(currentWorkId));
