@@ -975,8 +975,8 @@
 
     // ★ いいね（スキ・拍手）集計 ＆ Discord通知用 Google Apps Script Webhook URL
     // （GASをデプロイした後に発行されるウェブアプリURLをここに貼り付けてください）
-    const GAS_LIKE_API_URL = "https://script.google.com/macros/s/AKfycbzjv80u0mvzcFg1eNA6FiWVjZtuClG3pCiwYrm5EWREpC74t-_TDhSBkYyT5NNiacQ8Zw/exec";
-    const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1557596686757400697/_IZ1NSI38xee9exVqgYKTm2a1pq32LtDF8t3CW4p4Y9jr424LUzYsUPxoqeMSU-eIBYQ";
+    // ★ セキュリティ保護のため、DiscordのWebhook URLはブラウザ（公開HTML）には記載せず、GAS（サーバー側）から送信します
+    const DISCORD_WEBHOOK_URL = "";
     // 1つの作品に対して1ユーザー（端末）が送れるWeb拍手（スキ）の上限回数
     const MAX_CLAPS_PER_WORK = 10;
 
