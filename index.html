@@ -428,6 +428,159 @@
       box-shadow: 0 0 10px rgba(5, 150, 105, 0.3);
     }
 
+    /* Leaflet ポップアップ全体 ダークテーマ＆グラスモーフィズム */
+    .leaflet-popup-content-wrapper {
+      background: rgba(15, 23, 42, 0.96) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      color: #f8fafc !important;
+      border: 1px solid rgba(245, 158, 11, 0.45) !important;
+      border-radius: 16px !important;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6) !important;
+      padding: 0 !important;
+    }
+    .leaflet-popup-tip {
+      background: rgba(15, 23, 42, 0.96) !important;
+      border: 1px solid rgba(245, 158, 11, 0.45) !important;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4) !important;
+    }
+    .leaflet-popup-content {
+      margin: 14px 16px !important;
+      line-height: 1.5 !important;
+      min-width: 260px !important;
+      max-width: 320px !important;
+    }
+    .leaflet-container a.leaflet-popup-close-button {
+      color: #94a3b8 !important;
+      padding: 8px 8px 0 0 !important;
+      font-size: 18px !important;
+    }
+    .leaflet-container a.leaflet-popup-close-button:hover {
+      color: #fcd34d !important;
+    }
+
+    .popup-title {
+      font-size: 15px; font-weight: 700; color: #ffffff; margin: 3px 0 2px 0;
+      word-break: break-word; line-height: 1.35;
+    }
+    .popup-monument-title {
+      font-size: 16px; font-weight: 700; color: #fcd34d; margin: 3px 0 2px 0;
+      word-break: break-word; line-height: 1.35;
+      font-family: 'Cinzel', 'Noto Serif JP', serif;
+    }
+    .popup-author {
+      font-size: 11.5px; color: #94a3b8; margin-bottom: 6px;
+    }
+    .popup-desc {
+      font-size: 12px; color: #cbd5e1; margin-bottom: 8px; line-height: 1.5;
+    }
+
+    .popup-works-section {
+      margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.12);
+    }
+    .popup-works-section-title {
+      font-size: 11px; color: #fcd34d; font-weight: 700; margin-bottom: 6px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .popup-works-list {
+      display: flex; flex-direction: column; gap: 4px; max-height: 140px; overflow-y: auto;
+      padding-right: 2px;
+    }
+    .popup-work-row {
+      font-size: 11.5px; cursor: pointer; padding: 6px 8px; border-radius: 8px;
+      background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex; align-items: center; justify-content: space-between; gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .popup-work-row:hover {
+      background: rgba(245, 158, 11, 0.22);
+      border-color: rgba(245, 158, 11, 0.5);
+      transform: translateX(2px);
+    }
+    .popup-work-row.active {
+      background: rgba(245, 158, 11, 0.18);
+      border-color: rgba(245, 158, 11, 0.45);
+    }
+    .popup-work-row-left {
+      display: flex; align-items: center; gap: 6px; min-width: 0; flex: 1;
+    }
+    .popup-work-row-title {
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      color: #ffffff; font-weight: 700; font-size: 11.5px;
+    }
+    .popup-work-row-right {
+      display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+    }
+    .popup-work-row-author {
+      font-size: 10px; color: #94a3b8; max-width: 70px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .popup-work-row-arrow {
+      color: #fcd34d; font-size: 9px;
+    }
+
+    .popup-btn {
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fff; font-size: 12px; font-weight: 600;
+      padding: 6px 12px; border-radius: 8px; cursor: pointer;
+      transition: all 0.15s ease; display: inline-flex; align-items: center; gap: 5px;
+    }
+    .popup-btn:hover {
+      background: rgba(255, 255, 255, 0.22);
+      border-color: #fff;
+    }
+    .popup-btn-gold {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.35), rgba(217, 119, 6, 0.45));
+      border: 1px solid #f59e0b;
+      color: #fef3c7; font-weight: 700;
+    }
+    .popup-btn-gold:hover {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.5), rgba(217, 119, 6, 0.6));
+    }
+
+    /* モニュメント公認アーカイブ用プロフィールカード */
+    .monument-profile-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin: 10px 0 16px 0;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+    .monument-profile-header {
+      display: flex; justify-content: space-between; align-items: center;
+      border-bottom: 1px solid rgba(245, 158, 11, 0.2);
+      padding-bottom: 8px; margin-bottom: 10px;
+    }
+    .monument-profile-tag {
+      font-size: 13px; font-weight: 700; color: #fcd34d;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .monument-profile-sub {
+      font-size: 10px; color: #94a3b8; font-family: 'Cormorant Garamond', serif;
+      letter-spacing: 0.5px;
+    }
+    .monument-profile-meta-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px 12px;
+    }
+    .monument-meta-item {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .monument-meta-label {
+      font-size: 10.5px; color: #94a3b8; font-weight: 600;
+    }
+    .monument-meta-val {
+      font-size: 12.5px; color: #f8fafc; font-weight: 700;
+    }
+
+    /* 作品モーダル専用見出し */
+    .modal-section-heading {
+      font-size: 13px; font-weight: 700; color: #fcd34d;
+      margin: 16px 0 8px 0; display: flex; align-items: center; gap: 6px;
+      padding-bottom: 4px; border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
     /* モニュメント特別ヘッダー & スペック */
     .parent-spot-back-btn {
       display: inline-flex; align-items: center; gap: 6px;
@@ -808,6 +961,28 @@
       <h2 id="modalTitle" style="font-size: 22px; margin: 6px 0 4px 0; color:#fff;">タイトル</h2>
       <div id="modalAuthor" style="font-size: 13px; color: var(--text-sub); margin-bottom: 8px;">作者名</div>
 
+      <!-- モニュメント専用 銘板・登録情報カード（モニュメント閲覧時のみ表示） -->
+      <div id="monumentProfileCard" class="monument-profile-card" style="display: none;">
+        <div class="monument-profile-header">
+          <div class="monument-profile-tag">🏛️ 駒洋市 公認ランドマーク・歴史建造物</div>
+          <div class="monument-profile-sub">KOMANADA CIVIC HERITAGE & LANDMARK</div>
+        </div>
+        <div class="monument-profile-meta-grid">
+          <div class="monument-meta-item">
+            <span class="monument-meta-label">🏷️ 施設・モニュメント区分</span>
+            <span class="monument-meta-val" id="monumentMetaType">公式モニュメント</span>
+          </div>
+          <div class="monument-meta-item">
+            <span class="monument-meta-label">🛡️ 管理・維持組織</span>
+            <span class="monument-meta-val" id="monumentMetaAuthor">駒洋市</span>
+          </div>
+          <div class="monument-meta-item">
+            <span class="monument-meta-label">📍 市内地図座標</span>
+            <span class="monument-meta-val" id="monumentMetaCoords">Y: -, X: -</span>
+          </div>
+        </div>
+      </div>
+
       <!-- 同一スポットの付随作品切り替えバー（コンパクトピル） -->
       <div class="spot-works-bar" id="spotWorksBar" style="display: none;">
         <div class="spot-works-header">
@@ -840,6 +1015,9 @@
         </div>
       </div>
       
+      <!-- 本文セクション見出し（モニュメント解説 vs サークル作品本編） -->
+      <div class="modal-section-heading" id="modalBodyHeading" style="display: none;"></div>
+
       <div class="modal-body-text font-medium" id="modalBody">本文</div>
 
       <!-- 書道部向け釈文・読み下しアコーディオン -->
@@ -1508,44 +1686,91 @@
         const circleName = getCircleName(circleKey);
         const isCityHall = (activePrimary.title || "").includes("市役所") || (activePrimary.facilityType || "").includes("市役所");
 
+        const isPrimaryMon = isMonumentWork(activePrimary);
+        const isPrimarySpot = isLocalSpotWork(activePrimary);
+        const primaryId = activePrimary.timestamp || activePrimary.id;
+        const safePrimaryId = encodeURIComponent(String(primaryId));
+
         // ポップアップ内の付随作品リスト
         let worksListHtml = '';
         if (group.works.length > 1) {
+          const listTitle = isPrimaryMon
+            ? `🎨 このランドマークの関連作品・展示（全${group.works.length}件）`
+            : `📍 このスポットの展示・作品（全${group.works.length}件）`;
+
           worksListHtml = `
-            <div style="margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.15);">
-              <div style="font-size: 11px; color: #fcd34d; font-weight: 700; margin-bottom: 4px;">
-                📍 このスポットの展示（全${group.works.length}件）
-              </div>
-              <div style="display: flex; flex-direction: column; gap: 4px; max-height: 120px; overflow-y: auto;">
+            <div class="popup-works-section">
+              <div class="popup-works-section-title">${listTitle}</div>
+              <div class="popup-works-list">
           `;
           group.works.forEach(w => {
+            const wIsMon = isMonumentWork(w);
+            const wIsSpot = isLocalSpotWork(w);
             const wCircleKey = normalizeCircle(w.circle);
             const wCircleName = getCircleName(wCircleKey);
             const wId = w.timestamp || w.id;
+            const safeWId = encodeURIComponent(String(wId));
             const isCurrent = (w === activePrimary);
+
+            let badgeHtml = '';
+            if (wIsMon) {
+              badgeHtml = `<span class="popup-badge badge-monument" style="font-size: 9px; padding: 1.5px 5px; margin: 0;">🏛️ ランドマーク</span>`;
+            } else if (wIsSpot) {
+              badgeHtml = `<span class="popup-badge badge-spot-location" style="font-size: 9px; padding: 1.5px 5px; margin: 0;">📍 スポット</span>`;
+            } else {
+              badgeHtml = `<span class="popup-badge badge-${wCircleKey}" style="font-size: 9px; padding: 1.5px 5px; margin: 0;">${wCircleName}</span>`;
+            }
+
             worksListHtml += `
-              <div onclick="openModal('${wId}', '${group.id}')" style="font-size: 11px; cursor: pointer; padding: 4px 6px; border-radius: 6px; background: ${isCurrent ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.05)'}; display: flex; align-items: center; justify-content: space-between; gap: 4px;">
-                <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #fff;">
-                  <span class="popup-badge badge-${wCircleKey}" style="font-size: 9px; padding: 1px 4px;">${wCircleName}</span> ${w.title}
-                </span>
-                <span style="color: #94a3b8; font-size: 10px; flex-shrink: 0;">閲覧 ▶</span>
+              <div class="popup-work-row ${isCurrent ? 'active' : ''}" onclick="openModal(decodeURIComponent('${safeWId}'), '${group.id}')">
+                <div class="popup-work-row-left">
+                  ${badgeHtml}
+                  <span class="popup-work-row-title">${escapeHtml(w.title || '無題')}</span>
+                </div>
+                <div class="popup-work-row-right">
+                  <span class="popup-work-row-author">${escapeHtml(w.author ? (wIsMon ? w.author : 'by ' + w.author) : '')}</span>
+                  <span class="popup-work-row-arrow">▶</span>
+                </div>
               </div>
             `;
           });
           worksListHtml += `</div></div>`;
         }
 
-        let actionBtns = `<button class="popup-btn" onclick="openModal('${activePrimary.timestamp || activePrimary.id}', '${group.id}')">📖 作品・詳細を閲覧</button>`;
+        let actionBtns = '';
+        if (isPrimaryMon) {
+          actionBtns += `<button class="popup-btn popup-btn-gold" onclick="openModal(decodeURIComponent('${safePrimaryId}'), '${group.id}')">🏛️ ランドマーク詳細・伝承を見る</button>`;
+        } else {
+          actionBtns += `<button class="popup-btn" onclick="openModal(decodeURIComponent('${safePrimaryId}'), '${group.id}')">📖 作品・解説を鑑賞</button>`;
+        }
         if (isCityHall) {
           actionBtns += ` <button class="popup-btn" style="background: rgba(245, 158, 11, 0.25); border: 1px solid #f59e0b; color: #fcd34d; font-weight: 700;" onclick="openCityAboutModal()">🏛️ 市政資料室を開く</button>`;
         }
 
+        let headerBadge = '';
+        let titleHtml = '';
+        let authorHtml = '';
+
+        if (isPrimaryMon) {
+          headerBadge = `<span class="popup-badge badge-monument">🏛️ 駒洋市 指定ランドマーク</span>`;
+          titleHtml = `<div class="popup-monument-title">🏛️ ${escapeHtml(activePrimary.title || 'ランドマーク')}</div>`;
+          authorHtml = `<div class="popup-author">管理・区分: ${escapeHtml(activePrimary.author || '駒洋市 / 公式モニュメント')}</div>`;
+        } else if (isPrimarySpot) {
+          headerBadge = `<span class="popup-badge badge-spot-location">📍 街の舞台・スポット</span>`;
+          titleHtml = `<div class="popup-title">📍 ${escapeHtml(activePrimary.title || 'スポット')}</div>`;
+          authorHtml = `<div class="popup-author">ロケーション: ${escapeHtml(activePrimary.author || '駒洋市内')}</div>`;
+        } else {
+          headerBadge = `<span class="popup-badge badge-${circleKey}">${circleName}</span>`;
+          titleHtml = `<div class="popup-title">『${escapeHtml(activePrimary.title || '無題')}』</div>`;
+          authorHtml = `<div class="popup-author">作者: ${escapeHtml(activePrimary.author || '匿名')}</div>`;
+        }
+
         const popupContent = `
-          <div style="padding: 4px; min-width: 190px;">
-            <span class="popup-badge badge-${circleKey}">${circleName}</span>
-            <div class="popup-title">${activePrimary.title}</div>
-            <div class="popup-author">by ${activePrimary.author}</div>
-            <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 6px;">${activePrimary.shortDesc || ''}</div>
+          <div style="padding: 2px; min-width: 210px;">
+            ${headerBadge}
+            ${titleHtml}
+            ${authorHtml}
+            <div class="popup-desc">${escapeHtml(activePrimary.shortDesc || '')}</div>
             ${worksListHtml}
             <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">${actionBtns}</div>
           </div>
@@ -1661,34 +1886,75 @@
       const isMonument = isMonumentWork(work);
       const isLocalSpot = isLocalSpotWork(work);
 
-      // モニュメント / 小スポット / 一般作品 のヘッダー＆バッジ切り替え
+      // モニュメント / 小スポット / サークル創作作品 の専用ヘッダー・プロフィール切り替え
       const modalMonumentHeader = document.getElementById('modalMonumentHeader');
       const badge = document.getElementById('modalBadge');
+      const monumentProfileCard = document.getElementById('monumentProfileCard');
+      const modalBodyHeading = document.getElementById('modalBodyHeading');
+      const monumentMetaType = document.getElementById('monumentMetaType');
+      const monumentMetaAuthor = document.getElementById('monumentMetaAuthor');
+      const monumentMetaCoords = document.getElementById('monumentMetaCoords');
 
       if (isMonument) {
         modalMonumentHeader.style.display = 'block';
-        modalMonumentHeader.innerText = "KOMANADA DESIGNATED LANDMARK";
+        modalMonumentHeader.innerText = "KOMANADA CIVIC HERITAGE & LANDMARK";
         modalMonumentHeader.style.color = "#f59e0b";
         badge.innerText = "🏛️ 駒洋市 指定ランドマーク";
         badge.className = "popup-badge badge-monument";
-        document.getElementById('modalAuthor').innerText = `管理・設置: ${work.author || '駒洋市'}`;
+        document.getElementById('modalTitle').innerText = `🏛️ ${work.title}`;
+        document.getElementById('modalAuthor').innerText = `管理・維持組織: ${work.author || '駒洋市 / 地理学研究会'}`;
+
+        if (monumentProfileCard) {
+          monumentProfileCard.style.display = 'block';
+          if (monumentMetaType) monumentMetaType.innerText = work.facilityType || "公式モニュメント・歴史建造物";
+          if (monumentMetaAuthor) monumentMetaAuthor.innerText = work.author || "駒洋市 / 地理学研究会";
+          if (monumentMetaCoords) monumentMetaCoords.innerText = `Y: ${work.posY || '-'}, X: ${work.posX || '-'}`;
+        }
+        if (modalBodyHeading) {
+          modalBodyHeading.style.display = 'flex';
+          modalBodyHeading.innerHTML = `<span>📜</span> <span>施設・歴史建造物 解説（市政アーカイブ）</span>`;
+        }
       } else if (isLocalSpot) {
         modalMonumentHeader.style.display = 'block';
         modalMonumentHeader.innerText = "KOMANADA LOCAL SCENE & SPOT";
         modalMonumentHeader.style.color = "#34d399";
         badge.innerText = "📍 街の舞台・小スポット";
         badge.className = "popup-badge badge-spot-location";
+        document.getElementById('modalTitle').innerText = `📍 ${work.title}`;
         document.getElementById('modalAuthor').innerText = work.author ? `舞台・ロケーション: ${work.author}` : '舞台・ロケーション: 駒洋市内';
+
+        if (monumentProfileCard) {
+          monumentProfileCard.style.display = 'block';
+          if (monumentMetaType) monumentMetaType.innerText = "街の舞台・散策スポット";
+          if (monumentMetaAuthor) monumentMetaAuthor.innerText = work.author || "駒洋市内";
+          if (monumentMetaCoords) monumentMetaCoords.innerText = `Y: ${work.posY || '-'}, X: ${work.posX || '-'}`;
+        }
+        if (modalBodyHeading) {
+          modalBodyHeading.style.display = 'flex';
+          modalBodyHeading.innerHTML = `<span>📍</span> <span>スポット情景・ロケーション解説</span>`;
+        }
       } else {
         modalMonumentHeader.style.display = 'none';
-        badge.innerText = getCircleName(circleKey);
+        badge.innerText = `🎨 ${getCircleName(circleKey)}`;
         badge.className = `popup-badge badge-${circleKey}`;
-        document.getElementById('modalAuthor').innerText = work.author ? `作者: ${work.author}` : '';
+        document.getElementById('modalTitle').innerText = work.title;
+        document.getElementById('modalAuthor').innerText = work.author ? `作者: ${work.author} （${getCircleName(circleKey)}）` : `サークル: ${getCircleName(circleKey)}`;
+
+        if (monumentProfileCard) {
+          monumentProfileCard.style.display = 'none';
+        }
+        if (modalBodyHeading) {
+          modalBodyHeading.style.display = 'flex';
+          let bodyHeadingText = '作品本編・鑑賞';
+          if (circleKey === 'literature') bodyHeadingText = '小説・文芸 本編';
+          else if (circleKey === 'photo' || circleKey === 'art') bodyHeadingText = '作品解説・コンセプト';
+          else if (circleKey === 'calligraphy') bodyHeadingText = '揮毫作品・書道解説';
+          else if (circleKey === 'manga') bodyHeadingText = 'マンガ本編・作品解説';
+          modalBodyHeading.innerHTML = `<span>📖</span> <span>${bodyHeadingText}</span>`;
+        }
       }
 
-      document.getElementById('modalTitle').innerText = work.title;
-      // 情景や種別は固定枠を作らず、言葉（説明文）で豊かに表現
-      document.getElementById('modalBody').innerText = work.fullContent || work.shortDesc;
+      document.getElementById('modalBody').innerText = work.fullContent || work.shortDesc || "（作品解説はありません）";
 
       // 地理研フィールドノート / 街の伝承・噂（アコーディオン）
       const modalLoreAccordion = document.getElementById('modalLoreAccordion');
@@ -1769,9 +2035,13 @@
           const wId = w.timestamp || w.id;
           const isCurrent = String(wId) === String(currentWorkId);
 
+          const wIsMon = isMonumentWork(w);
           const pill = document.createElement('button');
           pill.className = `spot-pill-btn ${isCurrent ? 'active' : ''}`;
-          pill.innerHTML = `<span class="popup-badge badge-${wKey}" style="font-size: 9px; padding: 1px 5px;">${wName}</span> ${w.title}`;
+          const badgeHtml = wIsMon
+            ? `<span class="popup-badge badge-monument" style="font-size: 9px; padding: 1px 5px;">🏛️ ランドマーク</span>`
+            : `<span class="popup-badge badge-${wKey}" style="font-size: 9px; padding: 1px 5px;">${wName}</span>`;
+          pill.innerHTML = `${badgeHtml} ${escapeHtml(w.title || '無題')}`;
           pill.addEventListener('click', () => {
             openModal(wId, group.id);
           });
@@ -1797,15 +2067,20 @@
             const wImg = (w.imageUrl || "").split(',')[0].trim();
             const thumbUrl = wImg ? formatImageUrl(wImg) : "";
 
+            const wIsMon = isMonumentWork(w);
             const card = document.createElement('div');
             card.className = 'spot-gallery-card';
+            const badgeHtml = wIsMon
+              ? `<span class="popup-badge badge-monument" style="font-size: 9px; padding: 1px 5px; margin: 0;">🏛️ ランドマーク</span>`
+              : `<span class="popup-badge badge-${wKey}" style="font-size: 9px; padding: 1px 5px; margin: 0;">${wName}</span>`;
+
             card.innerHTML = `
-              ${thumbUrl ? `<img src="${thumbUrl}" class="spot-card-thumb" alt="${w.title}">` : `<div class="spot-card-thumb-placeholder">🎨</div>`}
+              ${thumbUrl ? `<img src="${thumbUrl}" class="spot-card-thumb" alt="${escapeHtml(w.title || '')}">` : `<div class="spot-card-thumb-placeholder">${wIsMon ? '🏛️' : '🎨'}</div>`}
               <div class="spot-card-info">
-                <div class="spot-card-title">${w.title}</div>
+                <div class="spot-card-title">${escapeHtml(w.title || '無題')}</div>
                 <div class="spot-card-meta">
-                  <span class="popup-badge badge-${wKey}" style="font-size: 9px; padding: 1px 5px; margin: 0;">${wName}</span>
-                  <span>by ${w.author}</span>
+                  ${badgeHtml}
+                  <span>${wIsMon ? (w.author || '駒洋市') : 'by ' + (w.author || '匿名')}</span>
                 </div>
               </div>
             `;
@@ -1829,7 +2104,8 @@
       const fullText = work.fullContent || work.shortDesc || "";
       const textLength = fullText.length;
 
-      if (circleKey === 'literature' || textLength > 250) {
+      // モニュメント閲覧時は小説サポートバーや作者あとがきは非表示（作品のみ表示）
+      if (!isMonument && !isLocalSpot && (circleKey === 'literature' || textLength > 250)) {
         modalReadingBar.style.display = 'flex';
         const readMins = Math.max(1, Math.ceil(textLength / 450));
         readingTimeInfo.innerText = `📖 読了目安：約${readMins}分（${textLength}字）`;
@@ -1855,7 +2131,7 @@
       const modalAfterwordText = document.getElementById('modalAfterwordText');
       const afterwordText = work.afterword || work.comment || work.authorComment || "";
 
-      if (afterwordText) {
+      if (!isMonument && afterwordText) {
         modalAfterwordBox.style.display = 'block';
         modalAfterwordText.innerText = afterwordText;
       } else {
@@ -1873,14 +2149,18 @@
       const userClaps = parseInt(localStorage.getItem(userClapKey) || '0', 10);
 
       if (modalClapBtn) {
+        const clapIcon = isMonument ? '🌟' : '👏';
+        const clapActionText = isMonument ? 'この名所を応援' : 'スキ・拍手を送る';
+        const clapDoneText = isMonument ? '応援送信済み' : '拍手送信済み';
+
         if (userClaps >= MAX_CLAPS_PER_WORK) {
           modalClapBtn.classList.add('maxed');
-          modalClapBtn.innerHTML = `<span>👏</span> <span>拍手送信済み</span> (<span id="modalClapCount">${displayCount}</span>)`;
-          if (modalClapFeedback) modalClapFeedback.innerText = "たくさんの拍手をありがとうございます！🌸";
+          modalClapBtn.innerHTML = `<span>${clapIcon}</span> <span>${clapDoneText}</span> (<span id="modalClapCount">${displayCount}</span>)`;
+          if (modalClapFeedback) modalClapFeedback.innerText = "たくさんの応援をありがとうございます！🌸";
         } else {
           modalClapBtn.classList.remove('maxed');
-          modalClapBtn.innerHTML = `<span>👏</span> <span>スキ・拍手を送る</span> (<span id="modalClapCount">${displayCount}</span>)`;
-          if (modalClapFeedback) modalClapFeedback.innerText = "🌸 拍手を届けました！";
+          modalClapBtn.innerHTML = `<span>${clapIcon}</span> <span>${clapActionText}</span> (<span id="modalClapCount">${displayCount}</span>)`;
+          if (modalClapFeedback) modalClapFeedback.innerText = "🌸 応援・拍手を届けました！";
         }
       }
 
