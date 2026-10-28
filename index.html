@@ -1510,6 +1510,21 @@
       let timelineHtml = "";
       let specialtyHtml = "";
 
+      const defaultStatLabels = {
+        stat_population: "推定人口",
+        stat_pop: "推定人口",
+        stat_area: "市域面積",
+        stat_flower: "市の花",
+        stat_tree: "市の木",
+        stat_bird: "市の鳥",
+        stat_symbol: "市のシンボル",
+        stat_mascot: "マスコット",
+        stat_density: "人口密度",
+        stat_climate: "気候"
+      };
+
+      const statCards = [];
+
       data.forEach(row => {
         const rawKey = (row.key || row['列 1'] || Object.values(row)[0] || "").trim();
         const key = rawKey.toLowerCase();
@@ -1520,17 +1535,12 @@
 
         if (key === "overview" && val) {
           prologue = val;
-        } else if (key === "stat_population" && val) {
-          const el = document.getElementById('statPop');
-          if (el) el.innerText = val;
-        } else if (key === "stat_area" && val) {
-          const el = document.getElementById('statArea');
-          if (el) el.innerText = val;
-        } else if (key === "stat_flower" && val) {
-          const el = document.getElementById('statFlower');
-          if (el) el.innerText = val;
         } else if (key === "stat_specialty" && val) {
           specialtyHtml = val;
+        } else if (key.startsWith("stat_") && val) {
+          // 補足説明（列3）があればラベル名として優先使用、なければ辞書またはキー名から自動生成
+          let label = (note && note !== '列 3') ? note : (defaultStatLabels[key] || rawKey.replace(/^stat_/i, ''));
+          statCards.push({ key, label, val });
         } else if (key.startsWith("hist") || key.startsWith("year") || key.startsWith("沿革")) {
           if (val && note && note !== '列 3') {
             timelineHtml += `
@@ -1554,6 +1564,19 @@
       if (prologue) document.getElementById('aboutPrologueText').innerText = prologue;
       if (timelineHtml) document.getElementById('aboutTimeline').innerHTML = timelineHtml;
       if (specialtyHtml) document.getElementById('aboutSpecialty').innerHTML = specialtyHtml;
+
+      // 都市データカード（人口、面積、花、鳥など）を動的に描画
+      if (statCards.length > 0) {
+        const statsGridEl = document.getElementById('aboutStatsGrid');
+        if (statsGridEl) {
+          statsGridEl.innerHTML = statCards.map(s => `
+            <div class="stat-card">
+              <div class="stat-label">${escapeHtml(s.label)}</div>
+              <div class="stat-value">${escapeHtml(s.val)}</div>
+            </div>
+          `).join('');
+        }
+      }
 
       renderAboutMonuments();
     }
@@ -2463,20 +2486,22 @@
             }).catch(e => console.log('Discord direct send error:', e));
           }
 
-          // 2. Google Apps Scriptへも送信（スプレッドシートへの記録用）
+          // 2. Google Apps Scriptへ送信（スプレッドシートへの記録 ＆ Discordへの自動通知）
           if (GAS_LIKE_API_URL && GAS_LIKE_API_URL.startsWith('http')) {
+            const payload = JSON.stringify({
+              workId: targetId,
+              title: workToSend.title || '無題',
+              author: workToSend.author || '匿名',
+              circle: circleName,
+              count: countToSend,
+              url: shareUrl
+            });
+
+            // text/plain形式で送信（ブラウザのCORSプリフライト制約を回避し、確実にGASへ到達させる）
             fetch(GAS_LIKE_API_URL, {
               method: 'POST',
-              mode: 'no-cors',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                workId: targetId,
-                title: workToSend.title || '無題',
-                author: workToSend.author || '匿名',
-                circle: circleName,
-                count: countToSend,
-                url: shareUrl
-              })
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: payload
             }).catch(e => console.log('GAS send error:', e));
           }
         }, 1500); // 1.5秒間クリックが途切れたら送信
