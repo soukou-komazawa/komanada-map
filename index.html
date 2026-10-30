@@ -737,6 +737,106 @@
     .city-tab-content { display: none; }
     .city-tab-content.active { display: block; }
 
+    /* 企画概要スタイル */
+    .project-overview-box {
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(245, 158, 11, 0.25);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
+    }
+    .project-badge-tag {
+      font-size: 11px;
+      font-weight: 700;
+      color: #f59e0b;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+      font-family: 'Cormorant Garamond', serif;
+    }
+    .project-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      margin: 0 0 14px 0;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .project-content-text {
+      font-size: 14px;
+      line-height: 1.85;
+      color: #f1f5f9;
+      word-break: break-word;
+    }
+    .project-meta-box {
+      margin-top: 18px;
+      padding-top: 14px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.15);
+    }
+    .project-meta-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .project-meta-item {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12px;
+      color: #cbd5e1;
+    }
+    .project-meta-item strong {
+      color: #fcd34d;
+      margin-right: 4px;
+    }
+
+    /* 各セクション直接リンクボタン */
+    .section-link-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      color: #cbd5e1;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+    }
+    .section-link-btn:hover {
+      background: rgba(245, 158, 11, 0.2);
+      border-color: rgba(245, 158, 11, 0.5);
+      color: #fcd34d;
+    }
+
+    /* サイドバークイックナビ */
+    .sidebar-quick-nav {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 10px 16px 4px 16px;
+    }
+    .sidebar-quick-btn {
+      background: rgba(245, 158, 11, 0.12);
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      color: #fcd34d;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 8px 6px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .sidebar-quick-btn:hover {
+      background: rgba(245, 158, 11, 0.22);
+      border-color: rgba(245, 158, 11, 0.5);
+      transform: translateY(-1px);
+    }
+
     .about-prologue { background: rgba(15, 23, 42, 0.6); border-left: 4px solid var(--accent-gold); padding: 16px; border-radius: 0 14px 14px 0; font-size: 15px; line-height: 1.8; color: #f3f4f6; margin-bottom: 24px; }
 
     .timeline-container { position: relative; padding-left: 20px; margin-top: 16px; }
@@ -952,6 +1052,7 @@
   <header class="top-nav-bar">
     <div class="app-title" id="homeBtn" title="全体表示に戻る">駒洋市</div>
     <div class="top-nav-actions">
+      <button class="nav-action-btn" id="projectOverviewBtn" title="企画概要・コンセプトを見る">📋 企画概要</button>
       <button class="nav-action-btn city-hall" id="cityHallBtn" title="市役所へジャンプして市政資料室を開く">🏛️ 市役所</button>
       <button class="nav-action-btn" id="circleListBtn" title="参加サークル一覧">🎨 サークル</button>
       <button class="nav-action-btn" id="termsBtn" title="利用規約">⚖️ 規約</button>
@@ -978,6 +1079,10 @@
 
     <div class="sidebar-search">
       <input type="text" id="sidebarSearchInput" placeholder="タイトルや作者名で検索...">
+    </div>
+    <div class="sidebar-quick-nav">
+      <button class="sidebar-quick-btn" id="sidebarProjectBtn">📋 企画概要</button>
+      <button class="sidebar-quick-btn" id="sidebarCityBtn">🏛️ 市政資料室</button>
     </div>
     <div class="sidebar-content" id="sidebarListContent"></div>
   </aside>
@@ -1133,26 +1238,62 @@
   <!-- 駒洋市 概要モーダル -->
   <div class="modal-overlay" id="cityAboutModal">
     <div class="modal-card">
-      <button class="modal-close" id="cityAboutClose">&times;</button>
-      <div style="font-family: 'Cormorant Garamond', serif; font-size: 13px; color: #f59e0b; font-weight: 700; letter-spacing: 1.5px; margin-bottom: 2px;">KOMANADA CITY HALL ARCHIVE</div>
+      <div class="modal-top-bar">
+        <div style="font-family: 'Cormorant Garamond', serif; font-size: 13px; color: #f59e0b; font-weight: 700; letter-spacing: 1.5px;">KOMANADA ARCHIVE & CONCEPT</div>
+        <div class="modal-top-controls">
+          <button class="modal-icon-btn" id="cityAboutShareBtn" title="市政資料室のURLをコピー">🔗 共有</button>
+          <button class="modal-icon-btn x-btn" id="cityAboutXShareBtn" title="X（Twitter）でシェア">𝕏 ポスト</button>
+          <button class="modal-close-btn" id="cityAboutClose" title="閉じる">&times;</button>
+        </div>
+      </div>
       <h2 style="font-size: 22px; color: #fff; margin: 0 0 16px 0; display: flex; align-items: center; gap: 8px;">
         <span>🏛️</span> 駒洋市役所 市政資料室
       </h2>
       
       <div class="city-about-nav">
-        <button class="city-tab-btn active" data-tab="tab-overview">🗺️ 都市概要・歴史沿革</button>
+        <button class="city-tab-btn active" data-tab="tab-project">📋 企画概要</button>
+        <button class="city-tab-btn" data-tab="tab-overview">🗺️ 都市概要・歴史沿革</button>
         <button class="city-tab-btn" data-tab="tab-stats">📊 人口・特産・風土</button>
         <button class="city-tab-btn" data-tab="tab-monuments">🏛️ スポット・モニュメント</button>
       </div>
 
-      <div class="city-tab-content active" id="tab-overview">
+      <!-- 企画概要タブ -->
+      <div class="city-tab-content active" id="tab-project">
+        <div class="project-overview-box">
+          <div class="project-badge-tag">EXHIBITION OVERVIEW & STATEMENT</div>
+          <h3 class="project-title" id="aboutProjectTitle">空想都市「駒洋市」合同創作企画 概要</h3>
+          
+          <div class="project-content-text" id="aboutProjectOverviewText">
+            （読み込み中...）
+          </div>
+
+          <div class="project-meta-box" id="projectMetaBox" style="display: none;">
+            <div class="project-meta-grid" id="projectMetaGrid"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 都市概要・歴史沿革タブ -->
+      <div class="city-tab-content" id="tab-overview">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <h4 style="font-size: 15px; color: #fcd34d; margin: 0;">🗺️ 駒洋市 都市概要</h4>
+          <button class="section-link-btn" id="copyOverviewLinkBtn" title="都市概要のURLをコピー">🔗 都市概要URL</button>
+        </div>
         <div class="about-prologue" id="aboutPrologueText">（読み込み中...）</div>
-        <h4 style="font-size: 16px; color: #fcd34d; margin: 20px 0 12px 0;">駒洋市の歩み（歴史・沿革）</h4>
+        
+        <div style="display: flex; justify-content: space-between; align-items: center; margin: 24px 0 12px 0;">
+          <h4 style="font-size: 16px; color: #fcd34d; margin: 0;">駒洋市の歩み（歴史・沿革）</h4>
+          <button class="section-link-btn" id="copyHistoryLinkBtn" title="歴史・沿革のURLをコピー">🔗 歴史URL</button>
+        </div>
         <div class="timeline-container" id="aboutTimeline"></div>
       </div>
 
+      <!-- 都市データタブ -->
       <div class="city-tab-content" id="tab-stats">
-        <h4 style="font-size: 16px; color: #fcd34d; margin: 0 0 12px 0;">都市データ</h4>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h4 style="font-size: 16px; color: #fcd34d; margin: 0;">都市データ</h4>
+          <button class="section-link-btn" id="copyStatsLinkBtn" title="都市データのURLをコピー">🔗 データURL</button>
+        </div>
         <div class="stats-grid" id="aboutStatsGrid">
           <div class="stat-card"><div class="stat-label">推定人口</div><div class="stat-value" id="statPop">約 12.8 万人</div></div>
           <div class="stat-card"><div class="stat-label">市域面積</div><div class="stat-value" id="statArea">42.15 km²</div></div>
@@ -1163,7 +1304,12 @@
         <div class="specialty-box" id="aboutSpecialty">（読み込み中...）</div>
       </div>
 
+      <!-- モニュメントタブ -->
       <div class="city-tab-content" id="tab-monuments">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <h4 style="font-size: 16px; color: #fcd34d; margin: 0;">市内登録モニュメント・小スポット</h4>
+          <button class="section-link-btn" id="copyMonumentsLinkBtn" title="モニュメント一覧のURLをコピー">🔗 スポットURL</button>
+        </div>
         <div class="monument-grid" id="aboutMonuments"></div>
       </div>
     </div>
@@ -1480,15 +1626,44 @@
     function checkUrlParamAndOpenWork() {
       const urlParams = new URLSearchParams(window.location.search);
       const targetId = urlParams.get('id');
-      if (!targetId) return;
+      if (targetId) {
+        const work = globalWorksData.find((w, idx) => String(w.timestamp || w.id || (idx + 1)) === String(targetId));
+        if (work) {
+          setTimeout(() => { focusAndOpenWork(work, targetId); }, 500);
+        }
+        return;
+      }
 
-      const work = globalWorksData.find((w, idx) => String(w.timestamp || w.id || (idx + 1)) === String(targetId));
-      if (work) {
-        setTimeout(() => { focusAndOpenWork(work, targetId); }, 500);
+      // 市政資料室・企画概要・歴史等のディープリンク判定 (?about=..., ?tab=..., ?city=...)
+      const aboutParam = urlParams.get('about') || urlParams.get('tab') || urlParams.get('city');
+      if (aboutParam !== null || urlParams.has('about') || urlParams.has('city')) {
+        const targetTab = aboutParam || 'tab-overview';
+        setTimeout(() => {
+          openCityAboutModal(targetTab);
+        }, 400);
       }
     }
 
+    function formatProjectText(text) {
+      if (!text) return "";
+      const escaped = escapeHtml(text);
+      const bolded = escaped.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      return bolded.split('\n').join('<br>');
+    }
+
     function renderDemoAboutData() {
+      const projectTextEl = document.getElementById('aboutProjectOverviewText');
+      if (projectTextEl) {
+        projectTextEl.innerHTML = `
+          <p style="margin-bottom: 12px;"><strong>【空想都市「駒洋市」合同創作プロジェクト】</strong><br>
+          本企画は、架空の都市「駒洋市（こまなだし）」を舞台に、地理・美術・書道・写真・文芸・漫画などの各サークルが協同してひとつの都市の世界観を創り上げる合同創作企画です。</p>
+          <p style="margin-bottom: 14px;">街の地図上に散りばめられたそれぞれの作品を巡り、歴史や人々の生活の息づかいを感じながら、自由にご鑑賞・散策をお楽しみください。</p>
+          <div style="background: rgba(245, 158, 11, 0.1); border: 1px dashed rgba(245, 158, 11, 0.4); border-radius: 10px; padding: 12px 14px; font-size: 12px; color: #cbd5e1; line-height: 1.6;">
+            💡 <b>企画概要の書き方：</b><br>
+            Googleスプレッドシート（aboutシート）の A列に <code>project_overview</code>、B列に企画概要文を入力すると、リアルタイムでここに反映されます。（<code>project_theme</code> や <code>project_period</code>、<code>project_organizer</code> も登録可能です）
+          </div>
+        `;
+      }
       document.getElementById('aboutPrologueText').innerText = "駒洋市（こまなだし）は、旧市街の重厚な歴史と、川沿いの穏やかな自然、そして近代的な駅前風景が共存する架空の都市です。地理学研究会が設定したこの都市を舞台に、各文化系サークルが作品を展開しています。";
       document.getElementById('aboutTimeline').innerHTML = `
         <div class="timeline-item"><div class="timeline-text"><b>【1920年】駒洋電鉄の開通</b><br>駅周辺の開発が進み、商業の都市として発展を始める。</div></div>
@@ -1506,6 +1681,9 @@
     }
 
     function parseAndRenderAboutData(data) {
+      let projectOverview = "";
+      let projectTitle = "";
+      const projectMeta = [];
       let prologue = "";
       let timelineHtml = "";
       let specialtyHtml = "";
@@ -1533,12 +1711,27 @@
 
         if (!key || key === 'key' || key === '列 1' || (!val && !note)) return;
 
-        if (key === "overview" && val) {
+        // 企画概要（project_overview / concept / 企画概要など）
+        if (key === "project_overview" || key === "project" || key === "concept" || key === "企画概要" || key === "企画" || key === "statement") {
+          projectOverview = val;
+          if (note && note !== '補足説明' && note !== '列 3') {
+            projectTitle = note;
+          }
+        } else if (key === "project_title" || key === "企画タイトル" || key === "企画名") {
+          projectTitle = val;
+        } else if (key === "project_theme" || key === "theme" || key === "テーマ" || key === "企画テーマ") {
+          projectMeta.push({ label: "テーマ", val: val });
+        } else if (key === "project_period" || key === "period" || key === "会期" || key === "開催期間" || key === "期間") {
+          projectMeta.push({ label: "会期", val: val });
+        } else if (key === "project_organizer" || key === "organizer" || key === "主催" || key === "企画運営" || key === "運営") {
+          projectMeta.push({ label: "主催・運営", val: val });
+        } else if (key === "project_rules" || key === "rules" || key === "参加方法" || key === "諸注意" || key === "注意事項") {
+          projectMeta.push({ label: "諸注意", val: val });
+        } else if (key === "overview" && val) {
           prologue = val;
         } else if (key === "stat_specialty" && val) {
           specialtyHtml = val;
         } else if (key.startsWith("stat_") && val) {
-          // 補足説明（列3）があればラベル名として優先使用、なければ辞書またはキー名から自動生成
           let label = (note && note !== '列 3') ? note : (defaultStatLabels[key] || rawKey.replace(/^stat_/i, ''));
           statCards.push({ key, label, val });
         } else if (key.startsWith("hist") || key.startsWith("year") || key.startsWith("沿革")) {
@@ -1560,6 +1753,39 @@
           }
         }
       });
+
+      // 企画概要の描画
+      const projectTextEl = document.getElementById('aboutProjectOverviewText');
+      const projectTitleEl = document.getElementById('aboutProjectTitle');
+      const projectMetaBox = document.getElementById('projectMetaBox');
+      const projectMetaGrid = document.getElementById('projectMetaGrid');
+
+      if (projectTitle && projectTitleEl) {
+        projectTitleEl.innerText = projectTitle;
+      }
+
+      if (projectOverview && projectTextEl) {
+        projectTextEl.innerHTML = formatProjectText(projectOverview);
+      } else if (projectTextEl) {
+        projectTextEl.innerHTML = `
+          <p style="margin-bottom: 12px;"><strong>【空想都市「駒洋市」合同創作プロジェクト】</strong><br>
+          本企画は、架空の都市「駒洋市（こまなだし）」を舞台に、地理・美術・書道・写真・文芸・漫画などの各サークルが協同してひとつの都市の世界観を創り上げる合同創作企画です。</p>
+          <p style="margin-bottom: 14px;">街の地図上に散りばめられたそれぞれの作品を巡り、歴史や人々の生活の息づかいを感じながら、自由にご鑑賞・散策をお楽しみください。</p>
+          <div style="background: rgba(245, 158, 11, 0.1); border: 1px dashed rgba(245, 158, 11, 0.4); border-radius: 10px; padding: 12px 14px; font-size: 12px; color: #cbd5e1; line-height: 1.6;">
+            💡 <b>企画概要の書き方：</b><br>
+            Googleスプレッドシート（aboutシート）の A列に <code>project_overview</code>、B列に企画概要文を入力すると、リアルタイムでここに反映されます。（<code>project_theme</code> や <code>project_period</code>、<code>project_organizer</code> も登録可能です）
+          </div>
+        `;
+      }
+
+      if (projectMeta.length > 0 && projectMetaBox && projectMetaGrid) {
+        projectMetaBox.style.display = 'block';
+        projectMetaGrid.innerHTML = projectMeta.map(m => `
+          <div class="project-meta-item">
+            <strong>${escapeHtml(m.label)}:</strong> ${escapeHtml(m.val)}
+          </div>
+        `).join('');
+      }
 
       if (prologue) document.getElementById('aboutPrologueText').innerText = prologue;
       if (timelineHtml) document.getElementById('aboutTimeline').innerHTML = timelineHtml;
@@ -2551,14 +2777,220 @@
 
     lightboxOverlay.addEventListener('click', () => { lightboxOverlay.classList.remove('open'); });
 
-    // 市政資料室（旧駒洋市ガイド）モーダル制御
+    // 市政資料室（企画概要・都市概要・歴史・データ）モーダル制御 ＆ URLディープリンク
     const cityAboutModal = document.getElementById('cityAboutModal');
-    function openCityAboutModal() {
-      renderAboutMonuments();
-      if (cityAboutModal) cityAboutModal.classList.add('open');
+
+    function showCopyToast(msg) {
+      let toast = document.getElementById('copyToastNotification');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'copyToastNotification';
+        toast.style.cssText = 'position: fixed; bottom: 70px; left: 50%; transform: translateX(-50%) translateY(20px); background: rgba(15, 23, 42, 0.95); border: 1px solid #f59e0b; color: #fcd34d; padding: 10px 20px; border-radius: 20px; font-size: 13px; font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,0.5); z-index: 999999; opacity: 0; pointer-events: none; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);';
+        document.body.appendChild(toast);
+      }
+      toast.innerText = msg;
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0)';
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(20px)';
+      }, 2200);
     }
-    document.getElementById('cityAboutClose').addEventListener('click', () => cityAboutModal.classList.remove('open'));
-    cityAboutModal.addEventListener('click', (e) => { if (e.target === cityAboutModal) cityAboutModal.classList.remove('open'); });
+
+    function copyTextWithToast(text, msg, triggerBtn) {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+          if (triggerBtn) {
+            const orig = triggerBtn.innerText;
+            triggerBtn.innerText = "✅ コピー完了";
+            setTimeout(() => { triggerBtn.innerText = orig; }, 2000);
+          }
+          showCopyToast(msg);
+        }).catch(() => {
+          prompt("以下のURLをコピーしてください:", text);
+        });
+      } else {
+        prompt("以下のURLをコピーしてください:", text);
+      }
+    }
+
+    function normalizeCityAboutTab(param) {
+      if (!param) return 'tab-project';
+      const p = String(param).toLowerCase().trim();
+      if (p === 'tab-project' || p === 'project' || p === 'concept' || p.includes('企画') || p === 'about_project') {
+        return 'tab-project';
+      }
+      if (p === 'tab-stats' || p === 'stats' || p === 'data' || p.includes('人口') || p.includes('特産')) {
+        return 'tab-stats';
+      }
+      if (p === 'tab-monuments' || p === 'monuments' || p === 'monument' || p === 'spots' || p.includes('スポット') || p.includes('モニュメント')) {
+        return 'tab-monuments';
+      }
+      if (p === 'tab-history' || p === 'history' || p === 'timeline' || p.includes('歴史') || p.includes('沿革')) {
+        return 'tab-history';
+      }
+      if (p === 'tab-overview' || p === 'overview' || p.includes('都市') || p.includes('概要')) {
+        return 'tab-overview';
+      }
+      return 'tab-overview';
+    }
+
+    function switchCityAboutTab(targetTabId, updateUrl = true) {
+      let actualTabId = targetTabId;
+      let shouldScrollHistory = false;
+      if (targetTabId === 'tab-history' || targetTabId === 'history' || targetTabId === 'timeline') {
+        actualTabId = 'tab-overview';
+        shouldScrollHistory = true;
+      } else {
+        actualTabId = normalizeCityAboutTab(targetTabId);
+      }
+
+      document.querySelectorAll('.city-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.city-tab-content').forEach(c => c.classList.remove('active'));
+
+      const targetBtn = document.querySelector(`.city-tab-btn[data-tab="${actualTabId}"]`);
+      const targetContent = document.getElementById(actualTabId);
+      if (targetBtn) targetBtn.classList.add('active');
+      if (targetContent) targetContent.classList.add('active');
+
+      if (shouldScrollHistory) {
+        setTimeout(() => {
+          const histEl = document.getElementById('aboutTimeline');
+          if (histEl) histEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 200);
+      }
+
+      if (updateUrl && window.history && window.history.replaceState) {
+        let slug = 'project';
+        if (shouldScrollHistory) slug = 'history';
+        else if (actualTabId === 'tab-overview') slug = 'overview';
+        else if (actualTabId === 'tab-stats') slug = 'stats';
+        else if (actualTabId === 'tab-monuments') slug = 'monuments';
+
+        const newUrl = `${window.location.pathname}?about=${slug}`;
+        window.history.replaceState(null, '', newUrl);
+      }
+    }
+
+    function openCityAboutModal(initialTab = null) {
+      renderAboutMonuments();
+      if (cityAboutModal) {
+        cityAboutModal.classList.add('open');
+        if (initialTab) {
+          switchCityAboutTab(initialTab, true);
+        } else {
+          const activeBtn = document.querySelector('.city-tab-btn.active');
+          const currentTab = activeBtn ? activeBtn.getAttribute('data-tab') : 'tab-project';
+          switchCityAboutTab(currentTab, true);
+        }
+      }
+    }
+
+    function closeCityAboutModal() {
+      if (cityAboutModal) cityAboutModal.classList.remove('open');
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.has('about') || urlParams.has('tab') || urlParams.has('city')) {
+        if (window.history && window.history.replaceState) {
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+      }
+    }
+
+    document.getElementById('cityAboutClose').addEventListener('click', closeCityAboutModal);
+    cityAboutModal.addEventListener('click', (e) => { if (e.target === cityAboutModal) closeCityAboutModal(); });
+
+    // 市政資料室タブ切り替えクリック
+    document.querySelectorAll('.city-tab-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const tabId = btn.getAttribute('data-tab');
+        switchCityAboutTab(tabId, true);
+      });
+    });
+
+    // 市政資料室 共有ボタン（アクティブなタブのURLをコピー）
+    const cityAboutShareBtn = document.getElementById('cityAboutShareBtn');
+    if (cityAboutShareBtn) {
+      cityAboutShareBtn.addEventListener('click', () => {
+        const activeBtn = document.querySelector('.city-tab-btn.active');
+        const tabId = activeBtn ? activeBtn.getAttribute('data-tab') : 'tab-project';
+        const slugMap = { 'tab-project': 'project', 'tab-overview': 'overview', 'tab-stats': 'stats', 'tab-monuments': 'monuments' };
+        const nameMap = { 'tab-project': '企画概要', 'tab-overview': '都市概要・歴史沿革', 'tab-stats': '都市データ', 'tab-monuments': 'モニュメント一覧' };
+        const slug = slugMap[tabId] || 'project';
+        const name = nameMap[tabId] || '市政資料室';
+        const baseUrl = window.location.origin + window.location.pathname;
+        const shareUrl = `${baseUrl}?about=${slug}`;
+        copyTextWithToast(shareUrl, `「${name}」のURLをコピーしました！`, cityAboutShareBtn);
+      });
+    }
+
+    // 市政資料室 𝕏（Twitter）シェアボタン
+    const cityAboutXShareBtn = document.getElementById('cityAboutXShareBtn');
+    if (cityAboutXShareBtn) {
+      cityAboutXShareBtn.addEventListener('click', () => {
+        const activeBtn = document.querySelector('.city-tab-btn.active');
+        const tabId = activeBtn ? activeBtn.getAttribute('data-tab') : 'tab-project';
+        const titleMap = { 'tab-project': '企画概要・コンセプト', 'tab-overview': '都市概要・歴史沿革', 'tab-stats': '人口・特産・都市データ', 'tab-monuments': '名所・モニュメント一覧' };
+        const slugMap = { 'tab-project': 'project', 'tab-overview': 'overview', 'tab-stats': 'stats', 'tab-monuments': 'monuments' };
+        const title = titleMap[tabId] || '市政資料室';
+        const slug = slugMap[tabId] || 'project';
+        const baseUrl = window.location.origin + window.location.pathname;
+        const shareUrl = `${baseUrl}?about=${slug}`;
+        const tweetText = `【駒洋市 市政資料室】「${title}」をチェック！ #駒洋市 #空想地図`;
+        const xUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(shareUrl)}`;
+        window.open(xUrl, '_blank', 'noopener,noreferrer');
+      });
+    }
+
+    // 各セクション直接リンクコピーボタン
+    const copyOverviewLinkBtn = document.getElementById('copyOverviewLinkBtn');
+    if (copyOverviewLinkBtn) {
+      copyOverviewLinkBtn.addEventListener('click', () => {
+        const url = `${window.location.origin}${window.location.pathname}?about=overview`;
+        copyTextWithToast(url, '「都市概要」のURLをコピーしました！', copyOverviewLinkBtn);
+      });
+    }
+    const copyHistoryLinkBtn = document.getElementById('copyHistoryLinkBtn');
+    if (copyHistoryLinkBtn) {
+      copyHistoryLinkBtn.addEventListener('click', () => {
+        const url = `${window.location.origin}${window.location.pathname}?about=history`;
+        copyTextWithToast(url, '「歴史・沿革」のURLをコピーしました！', copyHistoryLinkBtn);
+      });
+    }
+    const copyStatsLinkBtn = document.getElementById('copyStatsLinkBtn');
+    if (copyStatsLinkBtn) {
+      copyStatsLinkBtn.addEventListener('click', () => {
+        const url = `${window.location.origin}${window.location.pathname}?about=stats`;
+        copyTextWithToast(url, '「都市データ」のURLをコピーしました！', copyStatsLinkBtn);
+      });
+    }
+    const copyMonumentsLinkBtn = document.getElementById('copyMonumentsLinkBtn');
+    if (copyMonumentsLinkBtn) {
+      copyMonumentsLinkBtn.addEventListener('click', () => {
+        const url = `${window.location.origin}${window.location.pathname}?about=monuments`;
+        copyTextWithToast(url, '「モニュメント一覧」のURLをコピーしました！', copyMonumentsLinkBtn);
+      });
+    }
+
+    // 上部ナビ ＆ サイドバーの企画概要ボタン
+    const projectOverviewBtn = document.getElementById('projectOverviewBtn');
+    if (projectOverviewBtn) {
+      projectOverviewBtn.addEventListener('click', () => openCityAboutModal('tab-project'));
+    }
+    const sidebarProjectBtn = document.getElementById('sidebarProjectBtn');
+    if (sidebarProjectBtn) {
+      sidebarProjectBtn.addEventListener('click', () => {
+        if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+        openCityAboutModal('tab-project');
+      });
+    }
+    const sidebarCityBtn = document.getElementById('sidebarCityBtn');
+    if (sidebarCityBtn) {
+      sidebarCityBtn.addEventListener('click', () => {
+        if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+        openCityAboutModal('tab-overview');
+      });
+    }
 
     // 市役所へジャンプ＆市政資料室を開く関数
     function focusCityHall() {
@@ -2571,7 +3003,7 @@
         }
       }
       setTimeout(() => {
-        openCityAboutModal();
+        openCityAboutModal('tab-overview');
       }, 400);
       if (window.innerWidth <= 768) {
         document.getElementById('sidebar').classList.remove('open');
@@ -2585,7 +3017,7 @@
     const modalOpenCityHallArchiveBtn = document.getElementById('modalOpenCityHallArchiveBtn');
     if (modalOpenCityHallArchiveBtn) modalOpenCityHallArchiveBtn.addEventListener('click', () => {
       modal.classList.remove('open');
-      openCityAboutModal();
+      openCityAboutModal('tab-overview');
     });
 
     // タイトルロゴをクリックで初期全体表示にリセット
@@ -2609,17 +3041,6 @@
     document.getElementById('termsBtn').addEventListener('click', () => termsModal.classList.add('open'));
     document.getElementById('termsClose').addEventListener('click', () => termsModal.classList.remove('open'));
     termsModal.addEventListener('click', (e) => { if (e.target === termsModal) termsModal.classList.remove('open'); });
-
-    document.querySelectorAll('.city-tab-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        document.querySelectorAll('.city-tab-btn').forEach(b => b.classList.remove('active'));
-        document.querySelectorAll('.city-tab-content').forEach(c => c.classList.remove('active'));
-
-        e.target.classList.add('active');
-        const tabId = e.target.getAttribute('data-tab');
-        document.getElementById(tabId).classList.add('active');
-      });
-    });
 
     // サイドバー制御
     const sidebar = document.getElementById('sidebar');
