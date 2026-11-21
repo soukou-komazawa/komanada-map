@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>架空都市「駒洋市」作品アーカイブマップ</title>
 
-  <!-- Google Fonts -->
+  <!-- Google Fonts & Preload -->
+  <link rel="preload" as="image" href="komanada-map.jpg" fetchpriority="high">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
@@ -49,26 +50,76 @@
 
     #map { width: 100%; height: 100%; background-color: #111827; }
 
-    /* 集まったピン（クラスタ）スタイル */
-    .marker-cluster-small, .marker-cluster-medium, .marker-cluster-large {
-      background: rgba(245, 158, 11, 0.3) !important;
-      border: 2px solid #fcd34d !important;
-      border-radius: 50% !important;
-      box-shadow: 0 0 16px rgba(245, 158, 11, 0.6) !important;
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+    /* 初回読み込みインジケーター（非ブロッキング・軽量トースト） */
+    .map-loading-pill {
+      position: fixed;
+      top: calc(68px + var(--safe-area-top));
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1200;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      color: #fcd34d;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 7px 16px;
+      border-radius: 24px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      pointer-events: none;
+      transition: opacity 0.3s ease, transform 0.3s ease;
     }
-    .marker-cluster-small div, .marker-cluster-medium div, .marker-cluster-large div {
-      background: rgba(15, 23, 42, 0.9) !important;
-      color: #fff !important;
-      font-weight: 700 !important;
-      font-size: 13px !important;
-      border-radius: 50% !important;
-      width: 30px !important;
-      height: 30px !important;
-      line-height: 30px !important;
-      text-align: center !important;
-      margin: 3px auto !important;
+    .map-loading-pill.hidden {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-8px);
+    }
+    .loading-spinner {
+      width: 13px;
+      height: 13px;
+      border: 2px solid rgba(252, 211, 77, 0.3);
+      border-top-color: #fcd34d;
+      border-radius: 50%;
+      animation: spinLoader 0.75s linear infinite;
+    }
+    @keyframes spinLoader {
+      to { transform: rotate(360deg); }
+    }
+
+    /* 遠景ズームアウト時に集まったピン（クラスタ）の洗練スタイル */
+    .custom-cluster-icon {
+      background: transparent !important;
+      border: none !important;
+    }
+    .cluster-pill-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      min-width: 44px;
+      height: 36px;
+      padding: 0 11px;
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.95));
+      border: 2px solid #f59e0b;
+      border-radius: 20px;
+      color: #fff;
+      font-family: var(--font-family);
+      font-size: 12.5px;
+      font-weight: 800;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.65), 0 0 0 4px rgba(245, 158, 11, 0.22);
+      white-space: nowrap;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .cluster-pill-badge:hover {
+      transform: scale(1.08);
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.5), 0 0 0 6px rgba(245, 158, 11, 0.3);
+    }
+    .cluster-pill-icon {
+      font-size: 13px;
+    }
+    .cluster-pill-count {
+      color: #fcd34d;
     }
 
     /* 上部ナビゲーションバー */
@@ -78,15 +129,15 @@
       transform: translateX(-50%);
       z-index: 1000;
       width: calc(100% - 28px);
-      max-width: 860px;
+      max-width: 720px;
       background: var(--bg-dark);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border: 1px solid var(--border-light);
       border-radius: 40px;
-      padding: 6px 14px;
+      padding: 6px 12px 6px 18px;
       display: flex; align-items: center; justify-content: space-between;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
     }
 
     .app-title {
@@ -96,9 +147,17 @@
       white-space: nowrap; color: #fff;
       cursor: pointer; user-select: none;
       transition: color 0.2s;
-      padding-left: 4px;
+      display: inline-flex; align-items: center; gap: 6px;
     }
     .app-title:hover { color: var(--accent-gold); }
+    .app-title-sub {
+      font-family: var(--font-family);
+      font-size: 10px; font-weight: 600;
+      color: var(--text-sub);
+      letter-spacing: 0.5px;
+      border-left: 1px solid rgba(255,255,255,0.2);
+      padding-left: 8px;
+    }
 
     .top-nav-actions {
       display: flex; gap: 6px; align-items: center;
@@ -106,27 +165,28 @@
 
     .nav-action-btn {
       border: 1px solid var(--border-light);
-      padding: 7px 13px; border-radius: 20px;
-      cursor: pointer; font-size: 13px; font-weight: 600;
+      padding: 7px 14px; border-radius: 20px;
+      cursor: pointer; font-size: 12.5px; font-weight: 600;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       background: rgba(255, 255, 255, 0.08);
-      color: #fff; white-space: nowrap;
+      color: #f1f5f9; white-space: nowrap;
       min-height: 36px; display: inline-flex; align-items: center; justify-content: center;
-      gap: 4px;
+      gap: 5px;
     }
     .nav-action-btn:hover, .nav-action-btn:active {
       background: rgba(255, 255, 255, 0.2);
+      color: #fff;
     }
 
     .nav-action-btn.city-hall {
-      background: rgba(245, 158, 11, 0.2);
+      background: rgba(245, 158, 11, 0.18);
       color: #fcd34d;
-      border-color: rgba(245, 158, 11, 0.45);
+      border-color: rgba(245, 158, 11, 0.42);
       font-weight: 700;
     }
     .nav-action-btn.city-hall:hover, .nav-action-btn.city-hall:active {
-      background: rgba(245, 158, 11, 0.35);
-      box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
+      background: rgba(245, 158, 11, 0.32);
+      box-shadow: 0 0 12px rgba(245, 158, 11, 0.28);
     }
 
     /* 下部フローティングフィルターバー */
@@ -137,13 +197,13 @@
       z-index: 1000;
       max-width: calc(100vw - 28px);
       background: var(--bg-dark);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border: 1px solid var(--border-light);
       border-radius: 36px;
       padding: 6px 10px;
       display: flex; align-items: center; gap: 6px;
-      box-shadow: 0 10px 35px rgba(0, 0, 0, 0.55);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.55);
       overflow-x: auto;
       scrollbar-width: none;
     }
@@ -151,23 +211,44 @@
 
     .filter-btn {
       border: 1px solid transparent;
-      padding: 7px 13px; border-radius: 20px;
-      cursor: pointer; font-size: 13px; font-weight: 600;
+      padding: 6px 13px; border-radius: 20px;
+      cursor: pointer; font-size: 12.5px; font-weight: 600;
       transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.07);
       color: var(--text-sub); white-space: nowrap;
-      min-height: 36px; display: inline-flex; align-items: center; justify-content: center;
+      min-height: 34px; display: inline-flex; align-items: center; justify-content: center;
+      gap: 5px;
     }
+    .filter-btn:hover { background: rgba(255, 255, 255, 0.14); color: #e2e8f0; }
     .filter-btn:active { transform: scale(0.95); }
-    .filter-btn.active { color: #fff; border-color: rgba(255, 255, 255, 0.3); }
+    .filter-btn.active { color: #fff; border-color: rgba(255, 255, 255, 0.35); box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+    .filter-count-pill {
+      font-size: 10.5px; font-weight: 700;
+      background: rgba(0, 0, 0, 0.28);
+      color: rgba(255, 255, 255, 0.85);
+      padding: 1px 6px; border-radius: 10px;
+      line-height: 1.3;
+    }
 
     .filter-btn[data-circle="all"].active { background: #334155; }
-    .filter-btn[data-circle="geography"].active { background: #d97706; }
+    .filter-btn[data-circle="geography"].active { background: #ea580c; }
     .filter-btn[data-circle="art"].active { background: #e11d48; }
     .filter-btn[data-circle="calligraphy"].active { background: #475569; }
     .filter-btn[data-circle="photo"].active { background: #0284c7; }
     .filter-btn[data-circle="literature"].active { background: #059669; }
-    .filter-btn[data-circle="manga"].active { background: #8b5cf6; }
+    .filter-btn[data-circle="manga"].active { background: #c026d3; }
+    .filter-btn[data-circle="game"].active { background: #4f46e5; }
+
+    .nav-action-btn.game-nav {
+      background: rgba(99, 102, 241, 0.25);
+      color: #c7d2fe;
+      border-color: rgba(99, 102, 241, 0.55);
+      font-weight: 700;
+    }
+    .nav-action-btn.game-nav:hover, .nav-action-btn.game-nav:active {
+      background: rgba(99, 102, 241, 0.42);
+      box-shadow: 0 0 14px rgba(99, 102, 241, 0.4);
+    }
 
     /* サイドバー */
     .sidebar {
@@ -221,18 +302,22 @@
     .work-item-title { font-size: 15px; font-weight: 700; color: #fff; margin-bottom: 3px; }
     .work-item-author { font-size: 12px; color: var(--text-sub); margin-bottom: 6px; }
 
-    /* 座標インフォ */
+    /* 座標インフォ（マップタップ時のみ控えめに表示） */
     .coord-info {
       position: absolute;
-      top: calc(72px + var(--safe-area-top)); left: 16px;
+      bottom: calc(68px + var(--safe-area-bottom)); right: 16px;
       z-index: 999;
-      background: rgba(15, 23, 42, 0.75);
+      background: rgba(15, 23, 42, 0.82);
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       border: 1px solid var(--border-light);
-      color: var(--text-sub); padding: 5px 12px; border-radius: 20px;
+      color: var(--text-sub); padding: 4px 11px; border-radius: 16px;
       font-family: monospace; font-size: 11px; pointer-events: none;
-      transition: all 0.2s ease;
+      opacity: 0; transform: translateY(6px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .coord-info.visible {
+      opacity: 1; transform: translateY(0);
     }
 
     /* モーダル */
@@ -250,7 +335,73 @@
       border-radius: 24px; overflow-y: auto; padding: 28px;
       position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
       -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(245, 158, 11, 0.45) rgba(15, 23, 42, 0.35);
     }
+
+    /* ダーク＆アンティーク調に統一したカスタムスクロールバー（モーダル・サイドバー・ポップアップ内リスト共通） */
+    .modal-card::-webkit-scrollbar,
+    .sidebar-content::-webkit-scrollbar,
+    .popup-works-list::-webkit-scrollbar,
+    .spot-works-pills::-webkit-scrollbar,
+    .manga-thumbs-row::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    .modal-card::-webkit-scrollbar-track,
+    .sidebar-content::-webkit-scrollbar-track,
+    .popup-works-list::-webkit-scrollbar-track,
+    .spot-works-pills::-webkit-scrollbar-track,
+    .manga-thumbs-row::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.35);
+      border-radius: 10px;
+      margin: 14px 0;
+    }
+    .modal-card::-webkit-scrollbar-thumb,
+    .sidebar-content::-webkit-scrollbar-thumb,
+    .popup-works-list::-webkit-scrollbar-thumb,
+    .spot-works-pills::-webkit-scrollbar-thumb,
+    .manga-thumbs-row::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.35);
+      border-radius: 10px;
+      border: 1.5px solid transparent;
+      background-clip: padding-box;
+      transition: background 0.2s ease;
+    }
+    .modal-card::-webkit-scrollbar-thumb:hover,
+    .sidebar-content::-webkit-scrollbar-thumb:hover,
+    .popup-works-list::-webkit-scrollbar-thumb:hover,
+    .spot-works-pills::-webkit-scrollbar-thumb:hover,
+    .manga-thumbs-row::-webkit-scrollbar-thumb:hover {
+      background: rgba(245, 158, 11, 0.65);
+      border: 1.5px solid transparent;
+      background-clip: padding-box;
+    }
+
+    /* サークル・ジャンル別モーダルテーマに合わせたスクロールバーのアクセントカラー連動 */
+    .modal-card.theme-literature { scrollbar-color: rgba(34, 197, 94, 0.45) rgba(15, 23, 20, 0.4); }
+    .modal-card.theme-literature::-webkit-scrollbar-thumb { background: rgba(34, 197, 94, 0.38); }
+    .modal-card.theme-literature::-webkit-scrollbar-thumb:hover { background: rgba(74, 222, 128, 0.72); }
+
+    .modal-card.theme-monument { scrollbar-color: rgba(245, 158, 11, 0.5) rgba(20, 16, 10, 0.4); }
+    .modal-card.theme-monument::-webkit-scrollbar-thumb { background: rgba(245, 158, 11, 0.45); }
+    .modal-card.theme-monument::-webkit-scrollbar-thumb:hover { background: rgba(251, 191, 36, 0.8); }
+
+    .modal-card.theme-spot { scrollbar-color: rgba(34, 211, 238, 0.45) rgba(15, 25, 32, 0.4); }
+    .modal-card.theme-spot::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.42); }
+    .modal-card.theme-spot::-webkit-scrollbar-thumb:hover { background: rgba(34, 211, 238, 0.78); }
+
+    .modal-card.theme-manga { scrollbar-color: rgba(217, 70, 239, 0.45) rgba(25, 15, 32, 0.4); }
+    .modal-card.theme-manga::-webkit-scrollbar-thumb { background: rgba(217, 70, 239, 0.4); }
+    .modal-card.theme-manga::-webkit-scrollbar-thumb:hover { background: rgba(232, 121, 249, 0.78); }
+
+    .modal-card.theme-game { scrollbar-color: rgba(129, 140, 248, 0.48) rgba(15, 18, 38, 0.4); }
+    .modal-card.theme-game::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.45); }
+    .modal-card.theme-game::-webkit-scrollbar-thumb:hover { background: rgba(129, 140, 248, 0.8); }
+
+    .modal-card.theme-art { scrollbar-color: rgba(244, 63, 94, 0.45) rgba(18, 21, 31, 0.4); }
+    .modal-card.theme-art::-webkit-scrollbar-thumb { background: rgba(244, 63, 94, 0.38); }
+    .modal-card.theme-art::-webkit-scrollbar-thumb:hover { background: rgba(251, 113, 133, 0.75); }
 
     .modal-close {
       position: absolute; top: 18px; right: 18px; border: none;
@@ -338,6 +489,9 @@
       vertical-align: middle; transition: transform 0.2s ease;
       border-radius: 6px;
     }
+    .modal-image-wrapper.manga-reader-mode img {
+      max-height: 60vh;
+    }
     .image-zoom-hint {
       position: absolute; bottom: 10px; right: 12px;
       background: rgba(0,0,0,0.7); color: #fff; font-size: 11px; font-weight: 500;
@@ -348,19 +502,47 @@
       margin: 4px 6px 10px 0; font-style: italic;
     }
 
-    /* マンガナビゲーションバー */
+    /* マンガナビゲーションバー＆サムネイル一覧 */
     .manga-nav-bar {
-      display: flex; align-items: center; justify-content: space-between;
-      background: rgba(15, 23, 42, 0.8); border: 1px solid var(--border-light);
-      border-radius: 14px; padding: 6px 12px; margin-bottom: 16px;
+      display: flex; flex-direction: column; gap: 10px;
+      background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(192, 38, 211, 0.35);
+      border-radius: 14px; padding: 10px 14px; margin-bottom: 16px;
+    }
+    .manga-nav-controls {
+      display: flex; align-items: center; justify-content: space-between; width: 100%;
     }
     .manga-nav-btn {
-      background: rgba(255, 255, 255, 0.1); border: none; color: #fff;
-      font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 10px;
+      background: rgba(192, 38, 211, 0.22); border: 1px solid rgba(232, 121, 249, 0.45); color: #fae8ff;
+      font-size: 12.5px; font-weight: 700; padding: 6px 14px; border-radius: 10px;
       cursor: pointer; transition: all 0.2s; min-height: 36px;
     }
-    .manga-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; }
-    .manga-page-info { font-size: 13px; font-weight: 700; color: #fcd34d; font-family: monospace; }
+    .manga-nav-btn:hover:not(:disabled) {
+      background: rgba(192, 38, 211, 0.4); color: #fff;
+    }
+    .manga-nav-btn:disabled { opacity: 0.3; cursor: not-allowed; background: rgba(255,255,255,0.06); border-color: transparent; }
+    .manga-page-info { font-size: 13px; font-weight: 700; color: #f0abfc; font-family: monospace; }
+    .manga-thumbs-row {
+      display: flex; gap: 8px; overflow-x: auto; padding: 2px 0; justify-content: center;
+      scrollbar-width: thin;
+    }
+    .manga-thumb-item {
+      width: 46px; height: 62px; border-radius: 6px; overflow: hidden;
+      border: 2px solid rgba(255, 255, 255, 0.15); cursor: pointer;
+      opacity: 0.55; transition: all 0.15s ease; flex-shrink: 0; position: relative;
+      background: #0f172a;
+    }
+    .manga-thumb-item img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .manga-thumb-item.active {
+      border-color: #e879f9; opacity: 1; transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(192, 38, 211, 0.45);
+    }
+    .manga-thumb-num {
+      position: absolute; bottom: 2px; right: 3px;
+      background: rgba(0,0,0,0.75); color: #fff; font-size: 9px; font-weight: 700;
+      padding: 0 4px; border-radius: 4px; line-height: 1.3;
+    }
 
     /* ピン設定 */
     .leaflet-marker-icon, .leaflet-marker-shadow, .custom-pin-spot, .custom-pin-official, .custom-pin-shop {
@@ -369,27 +551,39 @@
     .custom-pin-spot { width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 12px rgba(0,0,0,0.6); opacity: 1 !important; position: relative; box-sizing: border-box; margin: 0 !important; flex-shrink: 0; }
     
     .custom-pin-official {
-      width: 38px; height: 38px; background: #f59e0b; border: 2px solid #fff;
-      border-radius: 10px; transform: rotate(45px); box-shadow: 0 0 18px rgba(245, 158, 11, 0.9);
+      width: 38px; height: 38px; background: linear-gradient(135deg, #f59e0b, #b45309); border: 2px solid #fef08a;
+      border-radius: 10px; transform: rotate(45deg); box-shadow: 0 0 18px rgba(245, 158, 11, 0.9);
       display: flex; align-items: center; justify-content: center; opacity: 1 !important; position: relative; box-sizing: border-box; margin: 0 !important; flex-shrink: 0;
     }
-    .custom-pin-official::after { content: '🏛️'; font-size: 20px; transform: rotate(-45px); }
+    .custom-pin-official::after { content: '🏛️'; font-size: 20px; transform: rotate(-45deg); }
 
     .custom-pin-shop {
-      width: 32px; height: 32px; background: #059669; border: 2px solid #fff;
-      border-radius: 50%; box-shadow: 0 0 14px rgba(5, 150, 105, 0.8);
+      width: 32px; height: 32px; background: linear-gradient(135deg, #06b6d4, #0e7490); border: 2px solid #a5f3fc;
+      border-radius: 9px; box-shadow: 0 0 15px rgba(6, 182, 212, 0.85);
       display: flex; align-items: center; justify-content: center; opacity: 1 !important; position: relative; box-sizing: border-box; margin: 0 !important; flex-shrink: 0;
     }
     .custom-pin-shop::after { content: '📍'; font-size: 16px; }
 
-    .pin-geography { background: #d97706; }
-    .pin-art { background: #e11d48; }
-    .pin-calligraphy { background: #64748b; }
-    .pin-photo { background: #0284c7; }
-    .pin-literature { background: #059669; }
-    .pin-manga { background: #8b5cf6; }
+    .pin-geography { background: #ea580c; box-shadow: 0 0 12px rgba(234, 88, 12, 0.85); display: flex; align-items: center; justify-content: center; }
+    .pin-geography::after { content: '🗺️'; font-size: 13px; }
+    .pin-art { background: #e11d48; box-shadow: 0 0 12px rgba(225, 29, 72, 0.85); display: flex; align-items: center; justify-content: center; }
+    .pin-art::after { content: '🎨'; font-size: 13px; }
+    .pin-calligraphy { background: #475569; box-shadow: 0 0 12px rgba(71, 85, 105, 0.85); display: flex; align-items: center; justify-content: center; }
+    .pin-calligraphy::after { content: '🖌️'; font-size: 13px; }
+    .pin-photo { background: #0284c7; box-shadow: 0 0 12px rgba(2, 132, 199, 0.85); display: flex; align-items: center; justify-content: center; }
+    .pin-photo::after { content: '📷'; font-size: 13px; }
+    .pin-literature { background: #16a34a; box-shadow: 0 0 12px rgba(22, 163, 74, 0.85); display: flex; align-items: center; justify-content: center; }
+    .pin-literature::after { content: '📚'; font-size: 13px; }
+    .pin-manga { background: #c026d3; box-shadow: 0 0 12px rgba(192, 38, 211, 0.85); display: flex; align-items: center; justify-content: center; }
+    .pin-manga::after { content: '💬'; font-size: 13px; }
+    .pin-game {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      box-shadow: 0 0 14px rgba(79, 70, 229, 0.9);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .pin-game::after { content: '🎮'; font-size: 14px; }
 
-    /* ピン右上の付随作品数バッジ */
+    /* ピン右上の付随作品数バッジ ＆ 複合スポットの洗練された2重リング演出 */
     .custom-pin-container {
       background: transparent !important;
       border: none !important;
@@ -397,76 +591,162 @@
       align-items: center;
       justify-content: center;
     }
+    .has-multiple-works.custom-pin-spot,
+    .has-multiple-works.custom-pin-shop {
+      box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.9), 0 0 0 5px rgba(252, 211, 77, 0.85), 0 6px 16px rgba(0, 0, 0, 0.7) !important;
+    }
+    .has-multiple-works.custom-pin-official {
+      box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.9), 0 0 0 5px #ffffff, 0 0 22px rgba(245, 158, 11, 0.95) !important;
+    }
     .pin-count-badge {
       position: absolute;
-      top: -6px; right: -6px;
-      background: #ef4444;
-      color: #fff;
+      top: -9px; right: -12px;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: #fcd34d;
+      font-family: var(--font-family);
       font-size: 10px; font-weight: 800;
-      border-radius: 10px;
-      padding: 1px 5px;
-      border: 1.5px solid #fff;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
-      z-index: 20;
+      border-radius: 12px;
+      padding: 1.5px 6px;
+      border: 1.5px solid #f59e0b;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.75);
+      z-index: 25;
       pointer-events: none;
       line-height: 1.2;
+      white-space: nowrap;
+      letter-spacing: 0.2px;
     }
     .custom-pin-official .pin-count-badge {
       transform: rotate(-45deg);
-      top: -8px; right: -8px;
+      top: -11px; right: -14px;
     }
 
-    /* モーダル内：スポット内関連作品バー */
+    /* 統合ピンをクリックした時に実際の作品座標へ展開されるサテライトピン（実座標マーカー） */
+    @keyframes satellitePopIn {
+      0% { transform: scale(0.2); opacity: 0; }
+      70% { transform: scale(1.12); opacity: 1; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+    .satellite-work-pin {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 2px solid #fef08a;
+      box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.9), 0 0 16px rgba(250, 204, 21, 1);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; position: relative;
+      animation: satellitePopIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      transition: transform 0.15s ease;
+    }
+    .satellite-work-pin:hover {
+      transform: scale(1.18);
+      border-color: #ffffff;
+    }
+    .satellite-work-pin::after {
+      font-size: 13px !important;
+    }
+    .satellite-pin-label {
+      position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
+      background: rgba(15, 23, 42, 0.96); border: 1.5px solid rgba(250, 204, 21, 0.75);
+      color: #fef08a; font-family: var(--font-family); font-size: 10.5px; font-weight: 700;
+      padding: 2px 8px; border-radius: 10px; white-space: nowrap;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+      cursor: pointer; pointer-events: auto;
+      max-width: 170px; overflow: hidden; text-overflow: ellipsis;
+      transition: all 0.15s ease;
+    }
+    .satellite-pin-label:hover {
+      background: #f59e0b; color: #0f172a; border-color: #fff;
+    }
+
+    /* モーダル内：スポット（親）と展示作品（子）の明確な階層ナビバー */
     .spot-works-bar {
-      margin: 14px 0 16px 0;
+      margin: 12px 0 16px 0;
       padding: 12px 14px;
-      background: rgba(15, 23, 42, 0.75);
-      border: 1px solid rgba(245, 158, 11, 0.35);
+      background: rgba(15, 23, 42, 0.78);
+      border: 1px solid rgba(255, 255, 255, 0.14);
       border-radius: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .spot-parent-stage-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      padding: 8px 12px;
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(15, 23, 42, 0.85));
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .spot-parent-stage-row.is-spot-type {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(15, 23, 42, 0.85));
+      border-color: rgba(6, 182, 212, 0.42);
+    }
+    .spot-parent-stage-row:hover {
+      border-color: #fcd34d;
+      background: rgba(245, 158, 11, 0.24);
+    }
+    .spot-parent-stage-row.is-spot-type:hover {
+      border-color: #22d3ee;
+      background: rgba(6, 182, 212, 0.24);
+    }
+    .spot-parent-stage-row.active {
+      box-shadow: 0 0 0 1.5px #fcd34d;
+    }
+    .spot-parent-stage-row.is-spot-type.active {
+      box-shadow: 0 0 0 1.5px #22d3ee;
     }
     .spot-works-header {
-      font-size: 12px; font-weight: 700; color: #fcd34d;
-      margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;
+      font-size: 11.5px; font-weight: 700; color: #cbd5e1;
+      display: flex; align-items: center; justify-content: space-between;
     }
     .spot-works-pills {
-      display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none;
-      padding-bottom: 2px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(195px, 1fr));
+      gap: 6px;
+      max-height: 155px;
+      overflow-y: auto;
+      padding-right: 4px;
+      scrollbar-width: thin;
     }
-    .spot-works-pills::-webkit-scrollbar { display: none; }
     .spot-pill-btn {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      color: #cbd5e1;
-      padding: 6px 12px; border-radius: 20px;
-      font-size: 11px; font-weight: 600; cursor: pointer;
-      white-space: nowrap; transition: all 0.15s ease;
-      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #e2e8f0;
+      padding: 7px 10px; border-radius: 10px;
+      font-size: 11.5px; font-weight: 600; cursor: pointer;
+      transition: all 0.15s ease;
+      display: flex; align-items: center; gap: 6px;
+      text-align: left; min-width: 0;
     }
-    .spot-pill-btn:hover { background: rgba(255, 255, 255, 0.18); color: #fff; }
+    .spot-pill-btn-title {
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;
+    }
+    .spot-pill-btn:hover { background: rgba(255, 255, 255, 0.15); color: #fff; border-color: rgba(255,255,255,0.3); }
     .spot-pill-btn.active {
-      background: var(--accent-gold);
-      color: #0f172a;
-      border-color: var(--accent-gold);
+      background: rgba(245, 158, 11, 0.22);
+      color: #fff;
+      border-color: #f59e0b;
+      box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.4);
       font-weight: 700;
     }
 
     /* バッジ */
     .popup-badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; color: #fff; margin-bottom: 4px; }
-    .badge-geography { background: #d97706; }
+    .badge-geography { background: #ea580c; }
     .badge-art { background: #e11d48; }
-    .badge-calligraphy { background: #64748b; }
+    .badge-calligraphy { background: #475569; }
     .badge-photo { background: #0284c7; }
-    .badge-literature { background: #059669; }
-    .badge-manga { background: #8b5cf6; }
+    .badge-literature { background: #16a34a; }
+    .badge-manga { background: #c026d3; }
+    .badge-game { background: linear-gradient(135deg, #4f46e5, #7c3aed); }
     .badge-monument {
-      background: linear-gradient(135deg, #d97706, #b45309);
-      color: #fef3c7; border: 1px solid rgba(253, 224, 71, 0.4);
+      background: linear-gradient(135deg, #f59e0b, #b45309);
+      color: #fef3c7; border: 1px solid rgba(253, 224, 71, 0.5);
       box-shadow: 0 0 10px rgba(245, 158, 11, 0.25);
     }
     .badge-spot-location {
-      background: linear-gradient(135deg, #059669, #047857);
-      color: #ecfdf5; border: 1px solid rgba(110, 231, 183, 0.45);
-      box-shadow: 0 0 10px rgba(5, 150, 105, 0.3);
+      background: linear-gradient(135deg, #0891b2, #0e7490);
+      color: #cffafe; border: 1px solid rgba(103, 232, 249, 0.5);
+      box-shadow: 0 0 10px rgba(6, 182, 212, 0.3);
     }
 
     /* Leaflet ポップアップ全体 ダークテーマ＆グラスモーフィズム */
@@ -517,15 +797,15 @@
     }
 
     .popup-works-section {
-      margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.12);
+      margin-top: 10px; padding-top: 9px; border-top: 1px dashed rgba(255, 255, 255, 0.18);
     }
     .popup-works-section-title {
       font-size: 11px; color: #fcd34d; font-weight: 700; margin-bottom: 6px;
-      display: flex; align-items: center; gap: 4px;
+      display: flex; align-items: center; justify-content: space-between; gap: 4px;
     }
     .popup-works-list {
-      display: flex; flex-direction: column; gap: 4px; max-height: 140px; overflow-y: auto;
-      padding-right: 2px;
+      display: flex; flex-direction: column; gap: 5px; max-height: 156px; overflow-y: auto;
+      padding-right: 4px; scrollbar-width: thin;
     }
     .popup-work-row {
       font-size: 11.5px; cursor: pointer; padding: 6px 8px; border-radius: 8px;
@@ -579,40 +859,216 @@
     .popup-btn-gold:hover {
       background: linear-gradient(135deg, rgba(245, 158, 11, 0.5), rgba(217, 119, 6, 0.6));
     }
+    .popup-btn-cyan {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.32), rgba(14, 116, 144, 0.48));
+      border: 1px solid #22d3ee;
+      color: #ecfeff; font-weight: 700;
+    }
+    .popup-btn-cyan:hover {
+      background: linear-gradient(135deg, rgba(6, 182, 212, 0.5), rgba(14, 116, 144, 0.65));
+      border-color: #a5f3fc;
+    }
 
-    /* モニュメント公認アーカイブ用プロフィールカード */
-    .monument-profile-card {
-      background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.9));
-      border: 1px solid rgba(245, 158, 11, 0.4);
+    /* 複合スポット（統合ピン）のポップアップ内ミニサムネイル付きリスト */
+    .popup-work-thumb {
+      width: 30px; height: 30px; border-radius: 6px; object-fit: cover;
+      flex-shrink: 0; border: 1px solid rgba(255, 255, 255, 0.2);
+      background: #0f172a;
+    }
+    .popup-work-thumb-icon {
+      width: 30px; height: 30px; border-radius: 6px;
+      flex-shrink: 0; border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(15, 23, 42, 0.8);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+
+    /* ③ ポップアップ内 サムネイルバナー ＆ 小説冒頭プレビュー */
+    .popup-thumb-banner {
+      width: 100%; height: 126px; border-radius: 10px; overflow: hidden;
+      margin: 6px 0 8px 0; position: relative; background: #090d16;
+      border: 1px solid rgba(255, 255, 255, 0.14); cursor: pointer;
+    }
+    .popup-thumb-banner img {
+      width: 100%; height: 100%; object-fit: cover;
+      transition: transform 0.25s ease;
+    }
+    .popup-thumb-banner:hover img {
+      transform: scale(1.04);
+    }
+    .popup-thumb-page-tag {
+      position: absolute; bottom: 6px; right: 6px;
+      background: rgba(15, 23, 42, 0.85); color: #f0abfc;
+      font-size: 10px; font-weight: 700; padding: 2px 7px;
+      border-radius: 8px; border: 1px solid rgba(232, 121, 249, 0.4);
+    }
+    .popup-novel-excerpt {
+      margin: 6px 0 8px 0; padding: 9px 11px;
+      background: linear-gradient(135deg, rgba(20, 35, 28, 0.85), rgba(15, 23, 42, 0.9));
+      border-left: 3px solid #22c55e; border-radius: 0 10px 10px 0;
+      font-family: 'Noto Serif JP', 'Yu Mincho', 'Hiragino Mincho ProN', serif;
+      font-size: 11.5px; line-height: 1.75; color: #e2e8f0;
+      cursor: pointer; transition: background 0.15s ease;
+    }
+    .popup-novel-excerpt:hover {
+      background: rgba(22, 101, 52, 0.35);
+    }
+    .popup-novel-excerpt-label {
+      font-family: var(--font-family); font-size: 9.5px; font-weight: 700;
+      color: #4ade80; margin-bottom: 3px; display: flex; align-items: center; gap: 4px;
+    }
+
+    /* ④ ピンの波紋（パルス）エフェクト ＆ ホバーツールチップ */
+    @keyframes pinPulseGold {
+      0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.75), 0 0 18px rgba(245, 158, 11, 0.9); }
+      70% { box-shadow: 0 0 0 14px rgba(245, 158, 11, 0), 0 0 18px rgba(245, 158, 11, 0.9); }
+      100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0), 0 0 18px rgba(245, 158, 11, 0.9); }
+    }
+    @keyframes pinPulseIndigo {
+      0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.75), 0 0 14px rgba(79, 70, 229, 0.9); }
+      70% { box-shadow: 0 0 0 13px rgba(99, 102, 241, 0), 0 0 14px rgba(79, 70, 229, 0.9); }
+      100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0), 0 0 14px rgba(79, 70, 229, 0.9); }
+    }
+    .custom-pin-official {
+      animation: pinPulseGold 2.8s infinite;
+    }
+    .pin-game {
+      animation: pinPulseIndigo 2.8s infinite;
+    }
+    .leaflet-tooltip.komanada-pin-tooltip {
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(245, 158, 11, 0.45);
+      color: #f8fafc;
+      font-family: var(--font-family);
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 10px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.55);
+    }
+    .leaflet-tooltip.komanada-pin-tooltip::before {
+      border-top-color: rgba(245, 158, 11, 0.45);
+    }
+
+    /* ⑤ サークル・ジャンル別のモーダル背景テーマ自動変化 */
+    .modal-card {
+      transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .modal-card.theme-literature {
+      background: linear-gradient(160deg, #1b2420, #131c27);
+      border-color: rgba(34, 197, 94, 0.38);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), inset 0 0 40px rgba(22, 163, 74, 0.06);
+    }
+    .modal-card.theme-literature .modal-body-text {
+      font-family: 'Noto Serif JP', 'Yu Mincho', 'Hiragino Mincho ProN', serif;
+      background: rgba(15, 23, 20, 0.55);
+      padding: 18px 20px;
       border-radius: 14px;
-      padding: 14px 16px;
-      margin: 10px 0 16px 0;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      color: #f1f5f9;
+    }
+    .modal-card.theme-art, .modal-card.theme-photo {
+      background: linear-gradient(160deg, #12151f, #090b10);
+      border-color: rgba(244, 63, 94, 0.35);
+    }
+    .modal-card.theme-manga {
+      background: linear-gradient(160deg, #21152b, #131826);
+      border-color: rgba(217, 70, 239, 0.45);
+    }
+    .modal-card.theme-game {
+      background: linear-gradient(160deg, #171836, #0f1526);
+      border-color: rgba(129, 140, 248, 0.5);
+    }
+    .modal-card.theme-monument {
+      background: linear-gradient(160deg, #241e14, #141c2b);
+      border-color: rgba(245, 158, 11, 0.5);
+    }
+    .modal-card.theme-spot {
+      background: linear-gradient(160deg, #11242b, #131c2b);
+      border-color: rgba(34, 211, 238, 0.48);
+    }
+
+    /* ⑦ 訪問済みスタンプ（鑑賞済チェックバッジ ＆ 散策達成度バー） */
+    .pin-visited-check {
+      position: absolute;
+      bottom: -5px; left: -5px;
+      background: #10b981;
+      color: #fff;
+      font-size: 9px; font-weight: 900;
+      width: 15px; height: 15px;
+      border-radius: 50%;
+      border: 1.5px solid #fff;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.6);
+      z-index: 21;
+      pointer-events: none;
+      line-height: 1;
+    }
+    .custom-pin-official .pin-visited-check {
+      transform: rotate(-45deg);
+      bottom: -7px; left: -7px;
+    }
+    .visited-pill-badge {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 10px; font-weight: 700;
+      background: rgba(16, 185, 129, 0.18);
+      border: 1px solid rgba(16, 185, 129, 0.45);
+      color: #6ee7b7;
+      padding: 1px 7px; border-radius: 10px;
+    }
+    .sidebar-progress-box {
+      margin: 10px 16px 4px 16px;
+      padding: 10px 14px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      border-radius: 12px;
+    }
+    .sidebar-progress-header {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11.5px; font-weight: 700; color: #fcd34d; margin-bottom: 6px;
+    }
+    .sidebar-progress-bar-bg {
+      width: 100%; height: 7px; background: rgba(255, 255, 255, 0.1);
+      border-radius: 6px; overflow: hidden;
+    }
+    .sidebar-progress-bar-fill {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #f59e0b, #10b981);
+      border-radius: 6px; transition: width 0.35s ease;
+    }
+
+    /* モニュメント公認アーカイブ用プロフィールカード（解説の下に控えめに配置） */
+    .monument-profile-card {
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(245, 158, 11, 0.28);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin: 18px 0 12px 0;
     }
     .monument-profile-header {
       display: flex; justify-content: space-between; align-items: center;
-      border-bottom: 1px solid rgba(245, 158, 11, 0.2);
-      padding-bottom: 8px; margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 6px; margin-bottom: 8px;
     }
     .monument-profile-tag {
-      font-size: 13px; font-weight: 700; color: #fcd34d;
-      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11.5px; font-weight: 700; color: #fcd34d;
+      display: inline-flex; align-items: center; gap: 5px;
     }
     .monument-profile-sub {
-      font-size: 10px; color: #94a3b8; font-family: 'Cormorant Garamond', serif;
+      font-size: 9.5px; color: #64748b; font-family: 'Cormorant Garamond', serif;
       letter-spacing: 0.5px;
     }
     .monument-profile-meta-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px 12px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 6px 12px;
     }
     .monument-meta-item {
-      display: flex; flex-direction: column; gap: 2px;
+      display: flex; flex-direction: column; gap: 1px;
     }
     .monument-meta-label {
-      font-size: 10.5px; color: #94a3b8; font-weight: 600;
+      font-size: 10px; color: #94a3b8; font-weight: 500;
     }
     .monument-meta-val {
-      font-size: 12.5px; color: #f8fafc; font-weight: 700;
+      font-size: 12px; color: #e2e8f0; font-weight: 700;
     }
 
     /* 作品モーダル専用見出し */
@@ -815,26 +1271,38 @@
     .sidebar-quick-nav {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      padding: 10px 16px 4px 16px;
+      gap: 7px;
+      padding: 12px 16px 6px 16px;
+      border-bottom: 1px solid var(--border-light);
     }
     .sidebar-quick-btn {
-      background: rgba(245, 158, 11, 0.12);
-      border: 1px solid rgba(245, 158, 11, 0.28);
-      color: #fcd34d;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #e2e8f0;
       font-size: 12px;
-      font-weight: 700;
-      padding: 8px 6px;
+      font-weight: 600;
+      padding: 8px 8px;
       border-radius: 10px;
       cursor: pointer;
       transition: all 0.15s ease;
       white-space: nowrap;
       text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
     }
     .sidebar-quick-btn:hover {
-      background: rgba(245, 158, 11, 0.22);
-      border-color: rgba(245, 158, 11, 0.5);
+      background: rgba(245, 158, 11, 0.18);
+      border-color: rgba(245, 158, 11, 0.45);
+      color: #fcd34d;
       transform: translateY(-1px);
+    }
+    .sidebar-quick-btn.highlight-gold {
+      background: rgba(245, 158, 11, 0.12);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #fcd34d;
+      font-weight: 700;
     }
 
     .about-prologue { background: rgba(15, 23, 42, 0.6); border-left: 4px solid var(--accent-gold); padding: 16px; border-radius: 0 14px 14px 0; font-size: 15px; line-height: 1.8; color: #f3f4f6; margin-bottom: 24px; }
@@ -998,6 +1466,125 @@
     .work-nav-arrow-btn:hover { background: rgba(255, 255, 255, 0.18); color: #fff; }
     .work-nav-arrow-btn:disabled { opacity: 0.3; cursor: not-allowed; }
 
+    /* ゲームハイブリッドランチャー＆画面内埋め込みプレイヤー */
+    .game-launcher-card {
+      margin: 16px 0;
+      padding: 18px 20px;
+      background: linear-gradient(145deg, rgba(49, 46, 129, 0.45), rgba(15, 23, 42, 0.9));
+      border: 1px solid rgba(129, 140, 248, 0.45);
+      border-radius: 16px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
+    }
+    .game-launcher-header {
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      margin-bottom: 10px; flex-wrap: wrap;
+    }
+    .game-launcher-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 11px; font-weight: 800; color: #e0e7ff;
+      background: rgba(99, 102, 241, 0.35); border: 1px solid rgba(165, 180, 252, 0.5);
+      padding: 3px 10px; border-radius: 20px; letter-spacing: 0.5px;
+    }
+    .game-launcher-status {
+      font-size: 11px; color: #a5b4fc; font-weight: 600;
+    }
+    .game-launcher-desc {
+      font-size: 13px; color: #cbd5e1; line-height: 1.65; margin-bottom: 14px;
+    }
+    .game-launcher-actions {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px;
+    }
+    .game-play-btn {
+      padding: 12px 16px; border-radius: 14px; cursor: pointer;
+      font-size: 13.5px; font-weight: 700; text-decoration: none;
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      border: 1px solid transparent; text-align: center;
+    }
+    .game-play-btn.primary-newtab {
+      background: linear-gradient(135deg, #6366f1, #9333ea);
+      color: #fff; border-color: rgba(199, 210, 254, 0.45);
+      box-shadow: 0 4px 18px rgba(99, 102, 241, 0.45);
+    }
+    .game-play-btn.primary-newtab:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(147, 51, 234, 0.6);
+    }
+    .game-play-btn.secondary-embed {
+      background: rgba(255, 255, 255, 0.1);
+      color: #e2e8f0; border-color: rgba(255, 255, 255, 0.25);
+    }
+    .game-play-btn.secondary-embed:hover {
+      background: rgba(255, 255, 255, 0.18); color: #fff;
+      border-color: rgba(165, 180, 252, 0.6);
+    }
+    .game-launcher-sub-actions {
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+      gap: 8px; margin-top: 12px; padding-top: 10px;
+      border-top: 1px dashed rgba(255, 255, 255, 0.15);
+      font-size: 11.5px; color: #94a3b8;
+    }
+    .game-url-copy-btn {
+      background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(165, 180, 252, 0.35);
+      color: #c7d2fe; font-size: 11.5px; font-weight: 600;
+      padding: 5px 12px; border-radius: 10px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 5px; transition: all 0.15s ease;
+    }
+    .game-url-copy-btn:hover {
+      background: rgba(99, 102, 241, 0.25); color: #fff;
+    }
+
+    /* ページ内埋め込みゲームプレイヤー（パターンA：オーバーレイタブ） */
+    .game-embed-overlay {
+      display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(5, 8, 17, 0.96); backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      z-index: 3500; flex-direction: column;
+    }
+    .game-embed-overlay.open { display: flex; }
+    .game-embed-topbar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: calc(10px + var(--safe-area-top)) 18px 10px 18px;
+      background: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid rgba(129, 140, 248, 0.3);
+      gap: 10px; flex-wrap: wrap;
+    }
+    .game-embed-title-area {
+      display: flex; align-items: center; gap: 10px; min-width: 0;
+    }
+    .game-embed-title {
+      font-size: 15px; font-weight: 700; color: #fff;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .game-embed-controls {
+      display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+    }
+    .game-embed-ctrl-btn {
+      background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #e2e8f0; font-size: 12px; font-weight: 600;
+      padding: 6px 13px; border-radius: 18px; cursor: pointer;
+      display: inline-flex; align-items: center; gap: 5px;
+      text-decoration: none; transition: all 0.15s ease;
+    }
+    .game-embed-ctrl-btn:hover {
+      background: rgba(255, 255, 255, 0.22); color: #fff;
+    }
+    .game-embed-ctrl-btn.back-map {
+      background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.5);
+      color: #fcd34d; font-weight: 700;
+    }
+    .game-embed-ctrl-btn.back-map:hover {
+      background: rgba(245, 158, 11, 0.35);
+    }
+    .game-embed-frame-container {
+      flex: 1; width: 100%; height: 100%; position: relative;
+      background: #000; display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .game-embed-iframe {
+      width: 100%; height: 100%; border: none; background: #000;
+    }
+
     @media (max-width: 768px) {
       .modal-top-bar { margin-bottom: 10px; gap: 8px; }
       .modal-top-controls { gap: 4px; }
@@ -1006,12 +1593,13 @@
       .top-nav-bar {
         top: calc(8px + var(--safe-area-top));
         width: calc(100% - 16px);
-        padding: 5px 8px;
+        padding: 5px 10px 5px 14px;
         border-radius: 30px;
       }
       .app-title { font-size: 16px; letter-spacing: 1px; }
+      .app-title-sub { display: none; }
       .top-nav-actions { gap: 4px; }
-      .nav-action-btn { font-size: 11px; padding: 5px 8px; min-height: 32px; border-radius: 16px; gap: 3px; }
+      .nav-action-btn { font-size: 11px; padding: 5px 10px; min-height: 32px; border-radius: 16px; gap: 3px; }
 
       .bottom-filter-bar {
         bottom: calc(12px + var(--safe-area-bottom));
@@ -1023,8 +1611,8 @@
       .filter-btn { font-size: 11px; padding: 5px 10px; min-height: 32px; border-radius: 16px; }
 
       .coord-info {
-        top: calc(56px + var(--safe-area-top));
-        left: 10px;
+        bottom: calc(58px + var(--safe-area-bottom));
+        right: 10px;
         font-size: 10px;
         padding: 3px 8px;
       }
@@ -1048,46 +1636,64 @@
 </head>
 <body>
 
-  <!-- 上部ナビゲーションバー（案内・機能） -->
+  <!-- 上部ナビゲーションバー（よく使う主要機能のみに厳選） -->
   <header class="top-nav-bar">
-    <div class="app-title" id="homeBtn" title="全体表示に戻る">駒洋市</div>
+    <div class="app-title" id="homeBtn" title="全体表示に戻る">
+      <span>駒洋市</span>
+      <span class="app-title-sub">ARCHIVE MAP</span>
+    </div>
     <div class="top-nav-actions">
-      <button class="nav-action-btn" id="projectOverviewBtn" title="企画概要・コンセプトを見る">📋 企画概要</button>
-      <button class="nav-action-btn city-hall" id="cityHallBtn" title="市役所へジャンプして市政資料室を開く">🏛️ 市役所</button>
-      <button class="nav-action-btn" id="circleListBtn" title="参加サークル一覧">🎨 サークル</button>
-      <button class="nav-action-btn" id="termsBtn" title="利用規約">⚖️ 規約</button>
-      <button class="nav-action-btn" id="sidebarToggleBtn" title="目次・作品一覧を開く">📋 目次</button>
+      <button class="nav-action-btn city-hall" id="cityHallBtn" title="市政資料室（企画概要・都市設定・歴史）を開く">🏛️ 市政資料室</button>
+      <button class="nav-action-btn game-nav" id="topGameBtn" title="ゲームサークルの作品をプレイ・詳細を見る">🎮 ゲーム</button>
+      <button class="nav-action-btn" id="termsBtn" title="権利・二次利用規約">⚖️ 利用規約</button>
+      <button class="nav-action-btn" id="sidebarToggleBtn" title="目次・作品検索・サークル一覧を開く">📋 目次・メニュー</button>
     </div>
   </header>
 
-  <!-- 下部フィルターバー（作品ジャンル絞り込み） -->
-  <nav class="bottom-filter-bar" aria-label="サークル作品絞り込み">
-    <button class="filter-btn active" data-circle="all">すべて</button>
-    <button class="filter-btn" data-circle="geography">🗺️ 地理研</button>
-    <button class="filter-btn" data-circle="art">🎨 美術</button>
-    <button class="filter-btn" data-circle="calligraphy">🖌️ 書道</button>
-    <button class="filter-btn" data-circle="photo">📷 写真</button>
-    <button class="filter-btn" data-circle="literature">📚 文芸</button>
-    <button class="filter-btn" data-circle="manga">🎨 漫画</button>
+  <!-- 下部フィルターバー（作品が投稿されているサークルのみ自動表示） -->
+  <nav class="bottom-filter-bar" id="bottomFilterBar" aria-label="サークル作品絞り込み">
+    <button class="filter-btn active" data-circle="all" data-label="すべて">すべて</button>
+    <button class="filter-btn" data-circle="geography" data-label="🗺️ 地理研" style="display: none;">🗺️ 地理研</button>
+    <button class="filter-btn" data-circle="art" data-label="🎨 美術" style="display: none;">🎨 美術</button>
+    <button class="filter-btn" data-circle="calligraphy" data-label="🖌️ 書道" style="display: none;">🖌️ 書道</button>
+    <button class="filter-btn" data-circle="photo" data-label="📷 写真" style="display: none;">📷 写真</button>
+    <button class="filter-btn" data-circle="literature" data-label="📚 文芸" style="display: none;">📚 文芸</button>
+    <button class="filter-btn" data-circle="manga" data-label="🎨 漫画" style="display: none;">🎨 漫画</button>
+    <button class="filter-btn" data-circle="game" data-label="🎮 ゲーム" style="display: none;">🎮 ゲーム</button>
   </nav>
 
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
-      <h3 class="sidebar-title">目次・作品検索</h3>
+      <h3 class="sidebar-title">目次・メニュー</h3>
       <button class="sidebar-close" id="sidebarCloseBtn">&times;</button>
     </div>
 
-    <div class="sidebar-search">
-      <input type="text" id="sidebarSearchInput" placeholder="タイトルや作者名で検索...">
-    </div>
     <div class="sidebar-quick-nav">
-      <button class="sidebar-quick-btn" id="sidebarProjectBtn">📋 企画概要</button>
-      <button class="sidebar-quick-btn" id="sidebarCityBtn">🏛️ 市政資料室</button>
+      <button class="sidebar-quick-btn highlight-gold" id="sidebarProjectBtn">📋 企画概要</button>
+      <button class="sidebar-quick-btn highlight-gold" id="sidebarCityBtn">🏛️ 市政資料室</button>
+      <button class="sidebar-quick-btn" id="circleListBtn">🎨 参加サークル</button>
+      <button class="sidebar-quick-btn" id="sidebarTermsBtn">⚖️ 利用規約</button>
+    </div>
+    <div class="sidebar-progress-box" id="sidebarProgressBox">
+      <div class="sidebar-progress-header">
+        <span>💮 駒洋市 散策・鑑賞達成度</span>
+        <span id="sidebarProgressText">0 / 0 作品 (0%)</span>
+      </div>
+      <div class="sidebar-progress-bar-bg">
+        <div class="sidebar-progress-bar-fill" id="sidebarProgressFill"></div>
+      </div>
+    </div>
+    <div class="sidebar-search">
+      <input type="text" id="sidebarSearchInput" placeholder="作品タイトルや作者名で検索...">
     </div>
     <div class="sidebar-content" id="sidebarListContent"></div>
   </aside>
 
-  <div class="coord-info" id="coordDisplay">タップ位置の座標</div>
+  <div class="map-loading-pill" id="mapLoadingPill">
+    <span class="loading-spinner"></span>
+    <span id="mapLoadingText">マップを読み込み中...</span>
+  </div>
+  <div class="coord-info" id="coordDisplay"></div>
   <div id="map"></div>
 
   <!-- 作品詳細モーダル -->
@@ -1117,36 +1723,6 @@
         <div id="modalAuthor" style="font-size: 13px; color: var(--text-sub); margin-bottom: 8px;">作者名</div>
       </div>
 
-      <!-- モニュメント専用 銘板・登録情報カード（モニュメント閲覧時のみ表示） -->
-      <div id="monumentProfileCard" class="monument-profile-card" style="display: none;">
-        <div class="monument-profile-header">
-          <div class="monument-profile-tag">🏛️ 駒洋市 公認ランドマーク・歴史建造物</div>
-          <div class="monument-profile-sub">KOMANADA CIVIC HERITAGE & LANDMARK</div>
-        </div>
-        <div class="monument-profile-meta-grid">
-          <div class="monument-meta-item">
-            <span class="monument-meta-label">🏷️ 施設・モニュメント区分</span>
-            <span class="monument-meta-val" id="monumentMetaType">公式モニュメント</span>
-          </div>
-          <div class="monument-meta-item">
-            <span class="monument-meta-label">🛡️ 管理・維持組織</span>
-            <span class="monument-meta-val" id="monumentMetaAuthor">駒洋市</span>
-          </div>
-          <div class="monument-meta-item">
-            <span class="monument-meta-label">📍 市内地図座標</span>
-            <span class="monument-meta-val" id="monumentMetaCoords">Y: -, X: -</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- 同一スポットの付随作品切り替えバー（コンパクトピル） -->
-      <div class="spot-works-bar" id="spotWorksBar" style="display: none;">
-        <div class="spot-works-header">
-          <span id="spotWorksHeaderTitle">📍 このスポットの展示作品（全1件）</span>
-        </div>
-        <div class="spot-works-pills" id="spotWorksPills"></div>
-      </div>
-
       <div class="modal-image-wrapper" id="modalImageWrapper" style="display: none;">
         <img id="modalImage" src="" alt="作品画像">
         <div class="image-zoom-hint">🔍 タップで拡大</div>
@@ -1155,9 +1731,12 @@
 
       <!-- マンガ・複数画像用ナビゲーション -->
       <div class="manga-nav-bar" id="mangaNavBar" style="display: none;">
-        <button class="manga-nav-btn" id="mangaPrevBtn">◀ 前のページ</button>
-        <span class="manga-page-info" id="mangaPageInfo">1 / 1</span>
-        <button class="manga-nav-btn" id="mangaNextBtn">次のページ ▶</button>
+        <div class="manga-nav-controls">
+          <button class="manga-nav-btn" id="mangaPrevBtn">◀ 前のページ</button>
+          <span class="manga-page-info" id="mangaPageInfo">1 / 1 ページ</span>
+          <button class="manga-nav-btn" id="mangaNextBtn">次のページ ▶</button>
+        </div>
+        <div class="manga-thumbs-row" id="mangaThumbsRow"></div>
       </div>
 
       <!-- 文芸・長文用読書サポートバー -->
@@ -1200,6 +1779,37 @@
         <div class="lore-accordion-content" id="loreAccordionContent"></div>
       </div>
 
+      <!-- モニュメント専用 銘板・登録情報カード（解説を読み終わった後に控えめに表示） -->
+      <div id="monumentProfileCard" class="monument-profile-card" style="display: none;">
+        <div class="monument-profile-header">
+          <div class="monument-profile-tag" id="monumentProfileTag">🏛️ 駒洋市 公認ランドマーク・登録情報</div>
+          <div class="monument-profile-sub">CIVIC ARCHIVE DATA</div>
+        </div>
+        <div class="monument-profile-meta-grid">
+          <div class="monument-meta-item">
+            <span class="monument-meta-label">🏷️ 施設・スポット区分</span>
+            <span class="monument-meta-val" id="monumentMetaType">公式モニュメント</span>
+          </div>
+          <div class="monument-meta-item">
+            <span class="monument-meta-label">🛡️ 管理・維持組織</span>
+            <span class="monument-meta-val" id="monumentMetaAuthor">駒洋市</span>
+          </div>
+          <div class="monument-meta-item">
+            <span class="monument-meta-label">📍 市内地図座標</span>
+            <span class="monument-meta-val" id="monumentMetaCoords">Y: -, X: -</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 同一スポットの舞台（ランドマーク/スポット）＆ 展示作品の階層切り替えバー（本編を読んだ後に下部で案内） -->
+      <div class="spot-works-bar" id="spotWorksBar" style="display: none; margin-top: 20px;">
+        <div id="spotParentStageBox" style="display: none;"></div>
+        <div class="spot-works-header">
+          <span id="spotWorksHeaderTitle">🎨 この場所に展示されている作品（全1件）</span>
+        </div>
+        <div class="spot-works-pills" id="spotWorksPills"></div>
+      </div>
+
       <!-- この場所を舞台にした作品ギャラリー（カード一覧） -->
       <div class="spot-gallery-container" id="modalSpotGallery" style="display: none;">
         <div class="spot-gallery-title">
@@ -1213,6 +1823,29 @@
         <div style="font-size: 13px; font-weight: 700; color: #fcd34d; margin-bottom: 6px;">🏛️ 駒洋市役所 公開アーカイブ</div>
         <p style="font-size: 12px; color: #cbd5e1; margin: 0 0 12px 0; line-height: 1.6;">本庁舎には、駒洋市の都市概要・歴史年表・統計・名物・モニュメント群などをまとめた「市政資料室」が設置されています。</p>
         <button class="header-action-btn city-hall-btn" id="modalOpenCityHallArchiveBtn" style="width: 100%; border-radius: 12px; font-size: 13px;">🏛️ 市政資料室（市勢要覧）を閲覧する</button>
+      </div>
+
+      <!-- ゲームサークル専用ハイブリッドランチャーカード（ゲーム作品のときのみ表示） -->
+      <div id="modalGameLauncherCard" class="game-launcher-card" style="display: none;">
+        <div class="game-launcher-header">
+          <span class="game-launcher-badge">🎮 BROWSER GAME LAUNCHER</span>
+          <span class="game-launcher-status" id="modalGameStatusText">PC・スマホ ブラウザ対応</span>
+        </div>
+        <div class="game-launcher-desc" id="modalGameLauncherDesc">
+          駒洋市を舞台にしたブラウザゲーム作品です。「別タブでフル画面起動（推奨）」または「このマップ画面内で埋め込みプレイ」の好きな方法で遊べます。
+        </div>
+        <div class="game-launcher-actions">
+          <a href="./www/index.html" target="_blank" rel="noopener noreferrer" class="game-play-btn primary-newtab" id="modalGameNewTabBtn">
+            <span>🚀</span> <span>別タブでゲームを起動（推奨）</span>
+          </a>
+          <button type="button" class="game-play-btn secondary-embed" id="modalGameEmbedBtn">
+            <span>🖥️</span> <span>マップ画面内でプレイ</span>
+          </button>
+        </div>
+        <div class="game-launcher-sub-actions">
+          <span>💡 あとから `www` フォルダを上書きするだけでゲーム内容を更新できます</span>
+          <button type="button" class="game-url-copy-btn" id="modalGameCopyUrlBtn">🔗 ゲーム直リンクURLをコピー</button>
+        </div>
       </div>
 
       <!-- 読後アクション：Web拍手 & 前後の作品ナビ -->
@@ -1233,6 +1866,24 @@
 
   <div class="lightbox-overlay" id="lightboxOverlay">
     <img class="lightbox-image" id="lightboxImage" src="" alt="作品拡大画像">
+  </div>
+
+  <!-- 画面内埋め込みゲームプレイヤー（パターンA：タブ切り替えオーバーレイ） -->
+  <div class="game-embed-overlay" id="gameEmbedOverlay">
+    <div class="game-embed-topbar">
+      <div class="game-embed-title-area">
+        <span class="game-launcher-badge">🎮 PLAYING</span>
+        <span class="game-embed-title" id="gameEmbedTitle">駒洋市 ゲームサークル作品</span>
+      </div>
+      <div class="game-embed-controls">
+        <button type="button" class="game-embed-ctrl-btn" id="gameEmbedCopyUrlBtn" title="ゲームのURLをコピー">🔗 ゲームURL</button>
+        <a href="./www/index.html" target="_blank" rel="noopener noreferrer" class="game-embed-ctrl-btn" id="gameEmbedOpenTabBtn" title="新しいタブで大きく開く">🚀 別タブで開く</a>
+        <button type="button" class="game-embed-ctrl-btn back-map" id="gameEmbedCloseBtn" title="ゲームを終了してマップに戻る">🗺️ マップに戻る</button>
+      </div>
+    </div>
+    <div class="game-embed-frame-container">
+      <iframe class="game-embed-iframe" id="gameEmbedIframe" src="about:blank" allow="autoplay; fullscreen; gamepad"></iframe>
+    </div>
   </div>
 
   <!-- 駒洋市 概要モーダル -->
@@ -1363,24 +2014,153 @@
       crs: L.CRS.Simple, minZoom: -2, maxZoom: 2, zoomControl: false, tap: true
     });
 
-    L.imageOverlay('komanada-map.jpg', bounds).addTo(map);
+    const mapLoadingPill = document.getElementById('mapLoadingPill');
+    const mapLoadingText = document.getElementById('mapLoadingText');
+    let isMapImageLoaded = false;
+    let isWorksDataLoaded = false;
+
+    function checkAndHideLoadingPill() {
+      if (isMapImageLoaded && isWorksDataLoaded) {
+        if (mapLoadingPill) mapLoadingPill.classList.add('hidden');
+      } else if (isWorksDataLoaded && !isMapImageLoaded) {
+        if (mapLoadingText) mapLoadingText.innerText = '高解像度マップを描画中...';
+      }
+    }
+
+    const mapOverlay = L.imageOverlay('komanada-map.jpg', bounds).addTo(map);
+    mapOverlay.on('load', () => {
+      isMapImageLoaded = true;
+      checkAndHideLoadingPill();
+    });
+    mapOverlay.on('error', () => {
+      isMapImageLoaded = true;
+      checkAndHideLoadingPill();
+    });
+    // 万一キャッシュ済み等でloadイベントが発火しなかった場合のセーフティタイマー
+    setTimeout(() => {
+      isMapImageLoaded = true;
+      checkAndHideLoadingPill();
+    }, 3500);
+
     map.fitBounds(bounds);
 
     const markersClusterGroup = L.markerClusterGroup({
-      disableClusteringAtZoom: 0,
+      disableClusteringAtZoom: 1,
       spiderfyOnMaxZoom: false, // ★ スパイダー状の拡散を無効化（座標ズレを防止）
       showCoverageOnHover: false,
-      maxClusterRadius: 30,
-      animate: false
+      maxClusterRadius: 42,
+      animate: false,
+      iconCreateFunction: function(cluster) {
+        const childMarkers = cluster.getAllChildMarkers();
+        let totalWorks = 0;
+        childMarkers.forEach(m => {
+          totalWorks += (m.groupWorks ? m.groupWorks.length : 1);
+        });
+        return L.divIcon({
+          html: `<div class="cluster-pill-badge" title="クリックしてこのエリアを拡大（全${totalWorks}作品）"><span class="cluster-pill-icon">📍</span><span class="cluster-pill-count">${totalWorks}</span><span style="font-size:10px; color:#cbd5e1; font-weight:600;">件</span></div>`,
+          className: 'custom-cluster-icon',
+          iconSize: [58, 36],
+          iconAnchor: [29, 18]
+        });
+      }
     });
     map.addLayer(markersClusterGroup);
 
-    let globalWorksData = [];
+    // 統合ピンをクリックした際、まとめられている各作品の「実際の座標」にサテライトピンと破線を表示するレイヤー
+    const satelliteLayerGroup = L.layerGroup().addTo(map);
+
+    function clearSatellitePins() {
+      satelliteLayerGroup.clearLayers();
+    }
+
+    function showSatellitePinsForGroup(group) {
+      clearSatellitePins();
+      if (!group || !group.works || group.works.length <= 1) return;
+
+      const centerLat = group.posY;
+      const centerLng = group.posX;
+
+      // 統合範囲（エリア）を淡いゴールドの破線サークルで可視化
+      const areaCircle = L.circle([centerLat, centerLng], {
+        radius: SPOT_CLUSTER_DISTANCE,
+        color: '#f59e0b',
+        weight: 1.2,
+        opacity: 0.45,
+        fillColor: '#f59e0b',
+        fillOpacity: 0.06,
+        dashArray: '5, 6',
+        interactive: false
+      });
+      satelliteLayerGroup.addLayer(areaCircle);
+
+      // 親ピンと全く同じ座標（距離2px未満）にある子作品をカウントし、重ならないよう小さな円周上にオフセット配置
+      const exactOverlapWorks = group.works.filter(w => {
+        if (w === group.primary) return false;
+        const wy = parseFloat(w.posY);
+        const wx = parseFloat(w.posX);
+        return Math.hypot(wy - centerLat, wx - centerLng) < 3;
+      });
+
+      let overlapIdx = 0;
+      group.works.forEach(w => {
+        if (w === group.primary) return;
+        let wy = parseFloat(w.posY);
+        let wx = parseFloat(w.posX);
+        if (isNaN(wy) || isNaN(wx)) return;
+
+        const dist = Math.hypot(wy - centerLat, wx - centerLng);
+        if (dist < 3) {
+          // 完全に同一座標の場合は半径22pxの円周上に綺麗に展開して存在を示す
+          const angle = (overlapIdx / Math.max(1, exactOverlapWorks.length)) * Math.PI * 2 - (Math.PI / 4);
+          wy = centerLat + Math.sin(angle) * 22;
+          wx = centerLng + Math.cos(angle) * 22;
+          overlapIdx++;
+        }
+
+        // 親ピン（ランドマーク/スポット）から作品の実際の座標へ光の破線（コネクタ）を引く
+        const connectorLine = L.polyline([[centerLat, centerLng], [wy, wx]], {
+          color: '#fcd34d',
+          weight: 2,
+          opacity: 0.85,
+          dashArray: '4, 5',
+          interactive: false
+        });
+        satelliteLayerGroup.addLayer(connectorLine);
+
+        // 作品の実際の座標にサークル別のミニサテライトピンとタイトルラベルを表示（HTML直接onclick＋Leafletイベント両対応で確実に作品本編を開く）
+        const wCircleKey = normalizeCircle(w.circle);
+        const wId = w.timestamp || w.id;
+        const safeSatWId = encodeURIComponent(String(wId));
+        const shortTitle = (w.title || '作品').length > 13 ? (w.title || '作品').slice(0, 13) + '…' : (w.title || '作品');
+
+        const satIcon = L.divIcon({
+          className: 'custom-pin-container',
+          html: `
+            <div class="satellite-work-pin pin-${wCircleKey}" onclick="event.stopPropagation(); openModal(decodeURIComponent('${safeSatWId}'), '${group.id}');" title="クリックして『${escapeHtml(w.title || '')}』の本編を読む（実座標 X:${w.posX}, Y:${w.posY}）">
+              <span class="satellite-pin-label" onclick="event.stopPropagation(); openModal(decodeURIComponent('${safeSatWId}'), '${group.id}');">📖 ${escapeHtml(shortTitle)}</span>
+            </div>
+          `,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14]
+        });
+
+        const satMarker = L.marker([wy, wx], {
+          icon: satIcon,
+          zIndexOffset: 2500,
+          bubblingMouseEvents: false
+        });
+        satMarker.on('click', () => {
+          openModal(wId, group.id);
+        });
+        satelliteLayerGroup.addLayer(satMarker);
+      });
+    }
     let currentFilterCircle = "all";
     let currentWorkId = null;
 
-    // 距離判定の閾値（px）: 35px以内にある作品は同一モニュメント・スポットに統合
-    const SPOT_CLUSTER_DISTANCE = 35;
+    // 距離判定の閾値（マップ座標px）: 95px以内にある近接ピンは同一スポット・複合展示ピンとして自動統合
+    // （従来35pxだと初期表示ズームで画面上12pxしかなく、隣り合って重なるピンが統合されなかった問題を解消）
+    const SPOT_CLUSTER_DISTANCE = 95;
     let globalSpotGroups = [];
 
     // マンガビューアー用グローバル変数
@@ -1438,7 +2218,23 @@
       if (str.includes("写真")) return "photo";
       if (str.includes("文芸")) return "literature";
       if (str.includes("漫画") || str.includes("マンガ")) return "manga";
+      if (str.includes("ゲーム") || str.toLowerCase().includes("game")) return "game";
       return "geography";
+    }
+
+    function isGameWork(work) {
+      if (!work) return false;
+      if (normalizeCircle(work.circle) === "game") return true;
+      const fType = (work.facilityType || "").toLowerCase();
+      const title = (work.title || "").toLowerCase();
+      return fType.includes("ゲーム") || fType.includes("game") || Boolean(work.gameUrl);
+    }
+
+    function getWorkGameUrl(work) {
+      if (work && work.gameUrl && String(work.gameUrl).trim() !== "") {
+        return String(work.gameUrl).trim();
+      }
+      return "./www/index.html";
     }
 
     function formatImageUrl(url) {
@@ -1463,32 +2259,94 @@
         .replace(/'/g, '&#039;');
     }
 
-    function createCustomIcon(circleKey, facilityType, count = 1) {
+    // ⑦ 鑑賞済み（訪問済み）スタンプ状態管理
+    const VISITED_STORAGE_KEY = 'komanada_visited_works_v1';
+    let visitedWorksSet = new Set();
+    try {
+      const savedVisited = localStorage.getItem(VISITED_STORAGE_KEY);
+      if (savedVisited) {
+        const parsed = JSON.parse(savedVisited);
+        if (Array.isArray(parsed)) visitedWorksSet = new Set(parsed.map(String));
+      }
+    } catch (e) {}
+
+    function isWorkVisited(workId) {
+      if (!workId) return false;
+      return visitedWorksSet.has(String(workId));
+    }
+
+    function markWorkAsVisited(workId) {
+      if (!workId) return;
+      const idStr = String(workId);
+      if (!visitedWorksSet.has(idStr)) {
+        visitedWorksSet.add(idStr);
+        try {
+          localStorage.setItem(VISITED_STORAGE_KEY, JSON.stringify([...visitedWorksSet]));
+        } catch (e) {}
+        updateVisitedProgressUI();
+        updateSidebarList();
+        // ピンのチェックマークも即時反映
+        markersClusterGroup.eachLayer(m => {
+          if (m.groupWorks && m.groupWorks.some(w => String(w.timestamp || w.id) === idStr)) {
+            const primary = m.activePrimaryWork || m.groupWorks[0];
+            const cKey = normalizeCircle(primary.circle);
+            const allVisited = m.groupWorks.every(w => isWorkVisited(w.timestamp || w.id));
+            const anyVisited = m.groupWorks.some(w => isWorkVisited(w.timestamp || w.id));
+            m.setIcon(createCustomIcon(cKey, primary.facilityType, m.groupWorks.length, allVisited || anyVisited));
+          }
+        });
+      }
+    }
+
+    function updateVisitedProgressUI() {
+      const progressText = document.getElementById('sidebarProgressText');
+      const progressFill = document.getElementById('sidebarProgressFill');
+      if (!progressText || !progressFill) return;
+
+      const total = globalWorksData.length;
+      if (total === 0) {
+        progressText.innerText = '0 / 0 作品 (0%)';
+        progressFill.style.width = '0%';
+        return;
+      }
+      let visitedCount = 0;
+      globalWorksData.forEach((w, idx) => {
+        const wId = w.timestamp || w.id || (idx + 1);
+        if (isWorkVisited(wId)) visitedCount++;
+      });
+      const pct = Math.min(100, Math.round((visitedCount / total) * 100));
+      progressText.innerText = `${visitedCount} / ${total} 作品 (${pct}%)`;
+      progressFill.style.width = `${pct}%`;
+    }
+
+    function createCustomIcon(circleKey, facilityType, count = 1, isVisited = false) {
       const typeStr = (facilityType || "").toString().toLowerCase();
-      const countBadgeHtml = count > 1 ? `<span class="pin-count-badge">+${count - 1}</span>` : '';
+      const hasMultiClass = count > 1 ? ' has-multiple-works' : '';
+      const countBadgeHtml = count > 1 ? `<span class="pin-count-badge" title="このスポットに${count}件の展示があります">📚 ${count}件</span>` : '';
+      const visitedCheckHtml = isVisited ? `<span class="pin-visited-check" title="鑑賞済み">✓</span>` : '';
 
       if (isMonumentWork({ facilityType })) {
         return L.divIcon({
           className: 'custom-pin-container',
-          html: `<div class="custom-pin-official" title="市の公式施設・ランドマーク">${countBadgeHtml}</div>`,
+          html: `<div class="custom-pin-official${hasMultiClass}" title="市の公式施設・ランドマーク">${countBadgeHtml}${visitedCheckHtml}</div>`,
           iconSize: [38, 38], iconAnchor: [19, 19], popupAnchor: [0, -28]
         });
       } else if (isLocalSpotWork({ facilityType })) {
         return L.divIcon({
           className: 'custom-pin-container',
-          html: `<div class="custom-pin-shop" title="まちの舞台・小スポット">${countBadgeHtml}</div>`,
+          html: `<div class="custom-pin-shop${hasMultiClass}" title="まちの舞台・小スポット">${countBadgeHtml}${visitedCheckHtml}</div>`,
           iconSize: [32, 32], iconAnchor: [16, 16], popupAnchor: [0, -17]
         });
       } else {
         return L.divIcon({
           className: 'custom-pin-container',
-          html: `<div class="custom-pin-spot pin-${circleKey}" title="サークル作品">${countBadgeHtml}</div>`,
+          html: `<div class="custom-pin-spot pin-${circleKey}${hasMultiClass}" title="サークル作品">${countBadgeHtml}${visitedCheckHtml}</div>`,
           iconSize: [28, 28], iconAnchor: [14, 14], popupAnchor: [0, -15]
         });
       }
     }
 
-    // 自動距離判定により近接する作品をモニュメント・スポットに統合する関数
+    // 自動距離判定 ＆ スポット名の一致により近接する作品をモニュメント・スポットに統合する関数
     function groupWorksByLocation(worksList) {
       const validWorks = worksList.filter(w => {
         const y = parseFloat(w.posY);
@@ -1518,15 +2376,32 @@
       sortedWorks.forEach((work, idx) => {
         const y = parseFloat(work.posY);
         const x = parseFloat(work.posX);
+        const workIsAnchor = isAnchor(work);
+        const workTitleClean = (work.title || '').replace(/[\s　『』「」()（）]/g, '');
 
         let matched = null;
+        let minDist = Infinity;
         for (const g of groups) {
+          const groupHasAnchor = g.works.some(w => isAnchor(w));
+
+          // ★重要ルール：ランドマーク（🏛️）と小スポット（📍）はそれぞれ独立した場所なので、お互いに絶対統合しない
+          if (workIsAnchor && groupHasAnchor) {
+            continue;
+          }
+
           const dy = y - g.posY;
           const dx = x - g.posX;
           const dist = Math.sqrt(dy * dy + dx * dx);
-          if (dist <= SPOT_CLUSTER_DISTANCE) {
-            matched = g;
-            break;
+          const gTitleClean = (g.primary.title || '').replace(/[\s　『』「」()（）]/g, '');
+          const isRelatedName = (workTitleClean.length >= 3 && gTitleClean.length >= 3) &&
+                                (workTitleClean.includes(gTitleClean) || gTitleClean.includes(workTitleClean));
+
+          // 距離がSPOT_CLUSTER_DISTANCE（95px）以内、または同じ地名・施設名を含み160px以内なら、そのランドマーク/スポットに一般作品を統合
+          if (dist <= SPOT_CLUSTER_DISTANCE || (isRelatedName && dist <= 160)) {
+            if (dist < minDist) {
+              minDist = dist;
+              matched = g;
+            }
           }
         }
 
@@ -1551,6 +2426,92 @@
       return groups;
     }
 
+    const DEFAULT_GAME_WORK = {
+      timestamp: "game_project1",
+      id: "game_project1",
+      circle: "ゲームサークル",
+      title: "駒洋市 探索RPG『宮浜駅前の物語（仮）』",
+      author: "ゲームサークル",
+      posY: 650,
+      posX: 1120,
+      facilityType: "ゲーム作品",
+      shortDesc: "駒洋市・宮浜駅前などを舞台にしたブラウザRPG作品（開発中デモ版）。PC・スマホから別タブまたはマップ内でプレイ可能！",
+      imageUrl: "./www/img/titles1/Castle.png",
+      fullContent: "ゲームサークルが制作中の、架空都市「駒洋市（宮浜駅前など）」を舞台にしたブラウザRPGです。\n\n【プレイ方法（ハイブリッド対応）】\n・🚀 別タブでゲームを起動（推奨）：ブラウザの新しいタブでフル画面起動します。スマホやPCでの操作が最も快適で、マップと行き来してもゲームがリセットされません。\n・🖥️ マップ画面内でプレイ：このページを離れずに、画面内タブ（オーバーレイ）でそのままゲームを起動します。\n\n※現在開発中のバージョンです。今後ゲームデータを更新する際は、`www` フォルダの中身を差し替えるだけで自動的に最新版へ反映されます！",
+      afterword: "タイトルや座標（posY, posX）、説明文はGoogleスプレッドシートに「ゲームサークル」の作品行を追加するか、後からいつでも自由に変更できます！",
+      gameUrl: "./www/index.html"
+    };
+
+    function createDemoMangaPageDataUri(pageNum, subtitle, panel1Text, panel2Text, accentColor) {
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 840" width="600" height="840">
+        <rect width="600" height="840" fill="#f8fafc"/>
+        <rect x="24" y="24" width="552" height="792" fill="#ffffff" stroke="#0f172a" stroke-width="5"/>
+        <!-- ヘッダータイトル枠 -->
+        <rect x="44" y="44" width="512" height="72" fill="#0f172a"/>
+        <text x="64" y="75" fill="#f0abfc" font-family="sans-serif" font-size="14" font-weight="bold">💬 漫画倶楽部 デモ作品（全3ページ・スワイプ＆ボタン対応）</text>
+        <text x="64" y="102" fill="#ffffff" font-family="sans-serif" font-size="22" font-weight="bold">『駒洋市あやかし日常記』 - ${subtitle}</text>
+        <rect x="470" y="56" width="72" height="48" rx="8" fill="${accentColor}"/>
+        <text x="506" y="87" fill="#ffffff" font-family="monospace" font-size="22" font-weight="bold" text-anchor="middle">${pageNum}/3</text>
+        <!-- 1コマ目 -->
+        <rect x="44" y="136" width="512" height="310" fill="#f1f5f9" stroke="#0f172a" stroke-width="4"/>
+        <line x1="44" y1="136" x2="556" y2="446" stroke="#e2e8f0" stroke-width="2"/>
+        <circle cx="430" cy="290" r="85" fill="${accentColor}" opacity="0.18"/>
+        <!-- フキダシ1 -->
+        <ellipse cx="195" cy="235" rx="130" ry="62" fill="#ffffff" stroke="#0f172a" stroke-width="3.5"/>
+        <polygon points="240,292 275,335 215,296" fill="#ffffff" stroke="#0f172a" stroke-width="3"/>
+        <text x="195" y="230" fill="#0f172a" font-family="sans-serif" font-size="18" font-weight="bold" text-anchor="middle">${panel1Text[0]}</text>
+        <text x="195" y="256" fill="#334155" font-family="sans-serif" font-size="15" font-weight="bold" text-anchor="middle">${panel1Text[1]}</text>
+        <text x="430" y="385" fill="#475569" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">【1コマ目：駒洋市内の風景】</text>
+        <!-- 2コマ目 -->
+        <rect x="44" y="468" width="246" height="310" fill="#fffbeb" stroke="#0f172a" stroke-width="4"/>
+        <text x="167" y="610" fill="#b45309" font-family="sans-serif" font-size="28" font-weight="bold" text-anchor="middle">ドーン!!</text>
+        <text x="167" y="650" fill="#78350f" font-family="sans-serif" font-size="14" font-weight="bold" text-anchor="middle">（効果音・演出コマ）</text>
+        <!-- 3コマ目 -->
+        <rect x="310" y="468" width="246" height="310" fill="#fdf4ff" stroke="#0f172a" stroke-width="4"/>
+        <rect x="330" y="495" width="206" height="110" rx="16" fill="#ffffff" stroke="#0f172a" stroke-width="3"/>
+        <text x="433" y="542" fill="#0f172a" font-family="sans-serif" font-size="16" font-weight="bold" text-anchor="middle">${panel2Text[0]}</text>
+        <text x="433" y="570" fill="#86198f" font-family="sans-serif" font-size="15" font-weight="bold" text-anchor="middle">${panel2Text[1]}</text>
+        <text x="433" y="735" fill="#64748b" font-family="sans-serif" font-size="13" font-weight="bold" text-anchor="middle">Page ${pageNum} （タップで拡大表示）</text>
+      </svg>`;
+      return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
+    }
+
+    const DEFAULT_MANGA_WORK = {
+      timestamp: "manga_demo_1",
+      id: "manga_demo_1",
+      circle: "漫画倶楽部",
+      title: "【デモ】駒洋市あやかし日常記（第1話・全3P）",
+      author: "漫画倶楽部（デモ表示）",
+      posY: 590,
+      posX: 980,
+      facilityType: "漫画作品",
+      shortDesc: "【複数ページ漫画デモ】旧市街と路面電車を舞台にした3ページのショート漫画サンプルです！ページめくりやサムネイル切り替えをお試しいただけます。",
+      imageUrl: [
+        createDemoMangaPageDataUri(1, "第1ページ：宮浜駅前の待ち合わせ", ["ここが駒洋市の", "旧市街エリアか〜！"], ["路面電車の音が", "レトロでいい感じ！"], "#c026d3"),
+        createDemoMangaPageDataUri(2, "第2ページ：路地裏の純喫茶へ", ["噂の純喫茶を", "発見したぞ！"], ["名物の駒草ブレンドと", "せんべいを頼もう！"], "#0284c7"),
+        createDemoMangaPageDataUri(3, "第3ページ：夕暮れの駒洋川", ["川沿いの風が", "気持ちいいね！"], ["次回・第2話へ", "つづく…！！"], "#ea580c")
+      ].join(", "),
+      fullContent: "漫画倶楽部がこれから投稿する作品の表示イメージ（デモデータ）です！\n\n【💡 漫画ビューアーの便利機能】\n1. 上部の「◀ 前のページ」「次のページ ▶」ボタン、または下の「ページサムネイル（1・2・3）」をタップして自在にページをめくれます。\n2. スマホ・タブレットでは、マンガ画像を左右にスワイプしてもページをめくれます。\n3. マンガ画像自体をタップすると、全画面ライトボックスで大きく拡大して細かいセリフまで読めます。\n\n※Googleスプレッドシートで漫画倶楽部の作品を投稿する際は、「画像URL」の欄に複数の画像URLをカンマ（,）区切りで入れるだけで、自動的にこの複数ページ漫画リーダーになります！（本物の漫画がスプレッドシートに投稿されると、このデモは自動で本番データに切り替わります）",
+      afterword: "デジタル作画（CLIP STUDIO PAINT）で制作。スプレッドシートに漫画倶楽部の作品が1件以上登録されると、このデモピンは自動的に本物の投稿作品へ置き換わります！",
+      credit: "デジタルコミック / 全3ページ（デモサンプル）"
+    };
+
+    function ensureGameWorkExists() {
+      const hasGame = globalWorksData.some(w => isGameWork(w));
+      if (!hasGame) {
+        globalWorksData.push({ ...DEFAULT_GAME_WORK });
+      }
+      const hasManga = globalWorksData.some(w => normalizeCircle(w.circle) === "manga");
+      if (!hasManga) {
+        globalWorksData.push({ ...DEFAULT_MANGA_WORK });
+      }
+    }
+
+    const CACHE_KEY_WORKS = 'komanada_cache_works_v2';
+    const CACHE_KEY_ABOUT = 'komanada_cache_about_v2';
+    const CACHE_KEY_CIRCLES = 'komanada_cache_circles_v2';
+    let hasHandledInitialUrlParam = false;
+
     function loadDataFromSpreadsheet() {
       if (!SPREADSHEET_WORKS_CSV_URL || SPREADSHEET_WORKS_CSV_URL.includes("ここに")) {
         console.warn("スプレッドシートURL未設定のためデモデータで動作中");
@@ -1558,8 +2519,11 @@
           { timestamp: "1", circle: "地理学研究会", title: "駒洋市役所 本庁舎", author: "地理学研究会", posY: 750, posX: 1000, facilityType: "公式", shortDesc: "歴史的近代建築。", imageUrl: "", fullContent: "駒洋市の行政の中心地。" },
           { timestamp: "2", circle: "美術部", title: "市役所前広場『駒草』", author: "駒沢 太郎", posY: 750, posX: 1000, facilityType: "作品", shortDesc: "市役所前広場の銅像を描いた油彩画。", imageUrl: "https://picsum.photos/id/1015/1200/800", fullContent: "旧本庁舎前広場にある駒草のモニュメントを描いた作品。同じ座標に置かれた付随作品テストです。" },
           { timestamp: "3", circle: "文芸部", title: "純喫茶「駒草」", author: "文芸 太郎", posY: 740, posX: 980, facilityType: "店舗", shortDesc: "昭和レトロなネルドリップ珈琲の店。", imageUrl: "", fullContent: "旧市街の路地裏にひっそりと佇む喫茶店。" },
-          { timestamp: "4", circle: "漫画倶楽部", title: "駒洋市あやかし日常記（1話）", author: "漫画 花子", posY: 730, posX: 960, facilityType: "作品", shortDesc: "旧市街が舞台のショートギャグ漫画です！", imageUrl: "https://picsum.photos/id/1025/1200/800, https://picsum.photos/id/1015/1200/800", fullContent: "複数ページの漫画作品テストです。" }
+          { timestamp: "4", circle: "漫画倶楽部", title: "駒洋市あやかし日常記（1話）", author: "漫画 花子", posY: 730, posX: 960, facilityType: "作品", shortDesc: "旧市街が舞台のショートギャグ漫画です！", imageUrl: "https://picsum.photos/id/1025/1200/800, https://picsum.photos/id/1015/1200/800", fullContent: "複数ページの漫画作品テストです。" },
+          { ...DEFAULT_GAME_WORK }
         ];
+        isWorksDataLoaded = true;
+        checkAndHideLoadingPill();
         renderMarkers("all");
         renderDemoAboutData();
         renderDemoCirclesData();
@@ -1567,10 +2531,46 @@
         return;
       }
 
+      // 1. キャッシュがあれば待ち時間0秒で即座にピンとデータを描画（Stale-While-Revalidate高速化）
+      try {
+        const cachedWorksStr = localStorage.getItem(CACHE_KEY_WORKS);
+        if (cachedWorksStr) {
+          const cachedWorks = JSON.parse(cachedWorksStr);
+          if (Array.isArray(cachedWorks) && cachedWorks.length > 0) {
+            globalWorksData = cachedWorks;
+            ensureGameWorkExists();
+            isWorksDataLoaded = true;
+            checkAndHideLoadingPill();
+            renderMarkers(currentFilterCircle);
+            if (!hasHandledInitialUrlParam) {
+              hasHandledInitialUrlParam = true;
+              checkUrlParamAndOpenWork();
+            }
+          }
+        }
+        const cachedAboutStr = localStorage.getItem(CACHE_KEY_ABOUT);
+        if (cachedAboutStr) {
+          const cachedAbout = JSON.parse(cachedAboutStr);
+          if (Array.isArray(cachedAbout)) {
+            setTimeout(() => parseAndRenderAboutData(cachedAbout), 50);
+          }
+        }
+        const cachedCirclesStr = localStorage.getItem(CACHE_KEY_CIRCLES);
+        if (cachedCirclesStr) {
+          const cachedCircles = JSON.parse(cachedCirclesStr);
+          if (Array.isArray(cachedCircles)) {
+            setTimeout(() => parseAndRenderCirclesData(cachedCircles), 80);
+          }
+        }
+      } catch (e) {
+        console.warn("Cache read skipped:", e);
+      }
+
+      // 2. バックグラウンドで最新のスプレッドシート作品データを取得し、変更があれば更新
       Papa.parse(SPREADSHEET_WORKS_CSV_URL, {
         download: true, header: true,
         complete: function(results) {
-          globalWorksData = results.data.map(row => {
+          const freshWorks = results.data.map(row => {
             const getVal = (aliases, fallback = '') => {
               for (const a of aliases) {
                 if (row[a] !== undefined && row[a] !== null && String(row[a]).trim() !== '') {
@@ -1595,32 +2595,59 @@
               afterword: getVal(['作者あとがき（任意）', '作者コメント', 'あとがき', 'afterword', 'comment', '制作秘話', '舞台への想い']),
               credit: getVal(['画材・撮影機材（美術・写真用）', '画材・機材', 'credit', 'medium', 'camera', '制作データ', '画材', '撮影機材']),
               translation: getVal(['釈文・読み下し・意訳（書道用）', '釈文', 'translation', 'reading', '読み下し', '現代語訳', '釈文・解説']),
-              lore: getVal(['街の伝承・噂・調査メモ', '伝承', '調査メモ', 'lore', 'memo', 'note', 'legend', '噂', 'フィールドノート'])
+              lore: getVal(['街の伝承・噂・調査メモ', '伝承', '調査メモ', 'lore', 'memo', 'note', 'legend', '噂', 'フィールドノート']),
+              gameUrl: getVal(['ゲームURL', 'gameUrl', 'game_url', 'プレイURL'])
             };
           }).filter(row => row.title);
-          renderMarkers("all");
-          checkUrlParamAndOpenWork();
+
+          globalWorksData = freshWorks;
+          ensureGameWorkExists();
+
+          const freshJson = JSON.stringify(globalWorksData);
+          const prevJson = localStorage.getItem(CACHE_KEY_WORKS);
+          isWorksDataLoaded = true;
+          checkAndHideLoadingPill();
+
+          // 初回またはデータ更新があった場合のみマーカーを再描画（余計な再計算ラグを防止）
+          if (freshJson !== prevJson || markersClusterGroup.getLayers().length === 0) {
+            try { localStorage.setItem(CACHE_KEY_WORKS, freshJson); } catch (e) {}
+            renderMarkers(currentFilterCircle);
+          }
+
+          if (!hasHandledInitialUrlParam) {
+            hasHandledInitialUrlParam = true;
+            checkUrlParamAndOpenWork();
+          }
           fetchAllLikes();
         }
       });
 
-      if (SPREADSHEET_ABOUT_CSV_URL && !SPREADSHEET_ABOUT_CSV_URL.includes("ここに")) {
-        Papa.parse(SPREADSHEET_ABOUT_CSV_URL, {
-          download: true, header: true,
-          complete: function(results) { parseAndRenderAboutData(results.data); }
-        });
-      } else {
-        renderDemoAboutData();
-      }
+      // 3. 市政資料室・サークル一覧はメインの地図＆ピン描画を邪魔しないよう少し遅らせて非同期取得
+      setTimeout(() => {
+        if (SPREADSHEET_ABOUT_CSV_URL && !SPREADSHEET_ABOUT_CSV_URL.includes("ここに")) {
+          Papa.parse(SPREADSHEET_ABOUT_CSV_URL, {
+            download: true, header: true,
+            complete: function(results) {
+              try { localStorage.setItem(CACHE_KEY_ABOUT, JSON.stringify(results.data)); } catch (e) {}
+              parseAndRenderAboutData(results.data);
+            }
+          });
+        } else {
+          renderDemoAboutData();
+        }
 
-      if (SPREADSHEET_CIRCLES_CSV_URL && !SPREADSHEET_CIRCLES_CSV_URL.includes("ここに")) {
-        Papa.parse(SPREADSHEET_CIRCLES_CSV_URL, {
-          download: true, header: true,
-          complete: function(results) { parseAndRenderCirclesData(results.data); }
-        });
-      } else {
-        renderDemoCirclesData();
-      }
+        if (SPREADSHEET_CIRCLES_CSV_URL && !SPREADSHEET_CIRCLES_CSV_URL.includes("ここに")) {
+          Papa.parse(SPREADSHEET_CIRCLES_CSV_URL, {
+            download: true, header: true,
+            complete: function(results) {
+              try { localStorage.setItem(CACHE_KEY_CIRCLES, JSON.stringify(results.data)); } catch (e) {}
+              parseAndRenderCirclesData(results.data);
+            }
+          });
+        } else {
+          renderDemoCirclesData();
+        }
+      }, 250);
     }
 
     function checkUrlParamAndOpenWork() {
@@ -1641,6 +2668,20 @@
         setTimeout(() => {
           openCityAboutModal(targetTab);
         }, 400);
+        return;
+      }
+
+      // ゲーム起動ディープリンク判定 (?game=1, ?game=play, ?mode=game)
+      const gameParam = urlParams.get('game') || urlParams.get('mode');
+      if (urlParams.has('game') || gameParam === 'game' || gameParam === 'play') {
+        const gameWork = globalWorksData.find(w => isGameWork(w)) || DEFAULT_GAME_WORK;
+        setTimeout(() => {
+          if (gameParam === 'play' || gameParam === 'embed') {
+            openGameEmbedPlayer(gameWork);
+          } else {
+            focusAndOpenWork(gameWork, gameWork.timestamp || gameWork.id);
+          }
+        }, 500);
       }
     }
 
@@ -1922,7 +2963,8 @@
         { icon: "🖌️", iconUrl: "", name: "書道部", desc: "駒洋市のモニュメントや言葉を力強い墨書表現で展開。", xUrl: "" },
         { icon: "📷", iconUrl: "", name: "写真部", desc: "光と影が交差する駒洋市の情緒溢れるフォトグラフィー。", instaUrl: "https://instagram.com" },
         { icon: "📚", iconUrl: "", name: "文芸部", desc: "駒洋市を舞台に紡がれる短編小説、詩、都市伝説集。", xUrl: "https://x.com" },
-        { icon: "🎨", iconUrl: "", name: "漫画倶楽部", desc: "駒洋市の街並みや人々を躍動感あふれるコミック形式で表現。", xUrl: "https://x.com" }
+        { icon: "🎨", iconUrl: "", name: "漫画倶楽部", desc: "駒洋市の街並みや人々を躍動感あふれるコミック形式で表現。", xUrl: "https://x.com" },
+        { icon: "🎮", iconUrl: "", name: "ゲームサークル", desc: "駒洋市を舞台にしたブラウザゲーム・RPG作品の企画・制作。", webUrl: "./www/index.html" }
       ];
       parseAndRenderCirclesData(demoCircles);
     }
@@ -1965,6 +3007,7 @@
     function renderMarkers(selectedCircle = "all") {
       currentFilterCircle = selectedCircle;
       markersClusterGroup.clearLayers();
+      clearSatellitePins();
 
       // 自動距離判定により近接する作品をスポットグループに統合
       globalSpotGroups = groupWorksByLocation(globalWorksData);
@@ -1991,19 +3034,25 @@
         const primaryId = activePrimary.timestamp || activePrimary.id;
         const safePrimaryId = encodeURIComponent(String(primaryId));
 
-        // ポップアップ内の付随作品リスト
+        // ポップアップ内の付随作品リスト（親であるランドマーク・スポット自身は上部に大きく表示済みなので除外し、純粋なサークル作品のみを一覧化）
         let worksListHtml = '';
-        if (group.works.length > 1) {
+        const childWorks = (isPrimaryMon || isPrimarySpot)
+          ? group.works.filter(w => w !== activePrimary)
+          : group.works;
+
+        if (group.works.length > 1 && childWorks.length > 0) {
           const listTitle = isPrimaryMon
-            ? `🎨 このランドマークの関連作品・展示（全${group.works.length}件）`
-            : `📍 このスポットの展示・作品（全${group.works.length}件）`;
+            ? `<span>🎨 このランドマークが舞台の創作作品</span><span style="background:rgba(245,158,11,0.2); padding:1px 7px; border-radius:10px; font-size:10px;">${childWorks.length}作品</span>`
+            : (isPrimarySpot
+              ? `<span>🎨 このスポットが舞台の創作作品</span><span style="background:rgba(6,182,212,0.2); color:#67e8f9; padding:1px 7px; border-radius:10px; font-size:10px;">${childWorks.length}作品</span>`
+              : `<span>📚 このエリアの展示作品</span><span style="background:rgba(255,255,255,0.12); padding:1px 7px; border-radius:10px; font-size:10px;">全${childWorks.length}件</span>`);
 
           worksListHtml = `
             <div class="popup-works-section">
               <div class="popup-works-section-title">${listTitle}</div>
               <div class="popup-works-list">
           `;
-          group.works.forEach(w => {
+          childWorks.forEach(w => {
             const wIsMon = isMonumentWork(w);
             const wIsSpot = isLocalSpotWork(w);
             const wCircleKey = normalizeCircle(w.circle);
@@ -2021,11 +3070,24 @@
               badgeHtml = `<span class="popup-badge badge-${wCircleKey}" style="font-size: 9px; padding: 1.5px 5px; margin: 0;">${wCircleName}</span>`;
             }
 
+            const wFirstImg = (w.imageUrl || '').split(',')[0].trim();
+            const wThumbUrl = wFirstImg ? formatImageUrl(wFirstImg) : '';
+            const wFallbackEmoji = wIsMon ? '🏛️' : (wIsSpot ? '📍' : (wCircleKey === 'game' ? '🎮' : (wCircleKey === 'manga' ? '💬' : (wCircleKey === 'literature' ? '📚' : '🎨'))));
+            const wMiniThumbHtml = wThumbUrl
+              ? `<img src="${wThumbUrl}" class="popup-work-thumb" alt="" loading="lazy">`
+              : `<div class="popup-work-thumb-icon">${wFallbackEmoji}</div>`;
+
             worksListHtml += `
               <div class="popup-work-row ${isCurrent ? 'active' : ''}" onclick="openModal(decodeURIComponent('${safeWId}'), '${group.id}')">
                 <div class="popup-work-row-left">
-                  ${badgeHtml}
-                  <span class="popup-work-row-title">${escapeHtml(w.title || '無題')}</span>
+                  ${wMiniThumbHtml}
+                  <div style="display: flex; flex-direction: column; min-width: 0; gap: 2px;">
+                    <div style="display: flex; align-items: center; gap: 4px;">
+                      ${badgeHtml}
+                      ${isWorkVisited(wId) ? `<span style="font-size: 9px; color: #6ee7b7; font-weight: 700;">✓</span>` : ''}
+                    </div>
+                    <span class="popup-work-row-title">${escapeHtml(w.title || '無題')}</span>
+                  </div>
                 </div>
                 <div class="popup-work-row-right">
                   <span class="popup-work-row-author">${escapeHtml(w.author ? (wIsMon ? w.author : 'by ' + w.author) : '')}</span>
@@ -2038,10 +3100,17 @@
         }
 
         let actionBtns = '';
+        const isPrimaryGame = isGameWork(activePrimary);
+        const primaryGameUrl = getWorkGameUrl(activePrimary);
         if (isPrimaryMon) {
-          actionBtns += `<button class="popup-btn popup-btn-gold" onclick="openModal(decodeURIComponent('${safePrimaryId}'), '${group.id}')">🏛️ ランドマーク詳細・伝承を見る</button>`;
+          actionBtns += `<button class="popup-btn popup-btn-gold" onclick="openModal(decodeURIComponent('${safePrimaryId}'), '${group.id}')">🏛️ ランドマーク解説を見る</button>`;
+        } else if (isPrimarySpot) {
+          actionBtns += `<button class="popup-btn popup-btn-cyan" onclick="openModal(decodeURIComponent('${safePrimaryId}'), '${group.id}')">📍 スポット情景・解説を見る</button>`;
+        } else if (isPrimaryGame) {
+          actionBtns += `<button class="popup-btn" style="background: rgba(99, 102, 241, 0.25); border: 1px solid #818cf8; color: #e0e7ff; font-weight: 700;" onclick="openModal(decodeURIComponent('${safePrimaryId}'), '${group.id}')">🎮 ゲーム紹介・画面内プレイ</button>`;
+          actionBtns += `<a href="${escapeHtml(primaryGameUrl)}" target="_blank" rel="noopener noreferrer" class="popup-btn" style="background: linear-gradient(135deg, #6366f1, #9333ea); border: 1px solid #c7d2fe; color: #fff; font-weight: 700; text-decoration: none;">🚀 別タブで起動</a>`;
         } else {
-          actionBtns += `<button class="popup-btn" onclick="openModal(decodeURIComponent('${safePrimaryId}'), '${group.id}')">📖 作品・解説を鑑賞</button>`;
+          actionBtns += `<button class="popup-btn" onclick="openModal(decodeURIComponent('${safePrimaryId}'), '${group.id}')">📖 作品本編を鑑賞する</button>`;
         }
         if (isCityHall) {
           actionBtns += ` <button class="popup-btn" style="background: rgba(245, 158, 11, 0.25); border: 1px solid #f59e0b; color: #fcd34d; font-weight: 700;" onclick="openCityAboutModal()">🏛️ 市政資料室を開く</button>`;
@@ -2050,26 +3119,53 @@
         let headerBadge = '';
         let titleHtml = '';
         let authorHtml = '';
+        const isPrimaryVisited = isWorkVisited(primaryId);
+        const visitedPillHtml = isPrimaryVisited ? ` <span class="visited-pill-badge">💮 鑑賞済</span>` : '';
 
         if (isPrimaryMon) {
-          headerBadge = `<span class="popup-badge badge-monument">🏛️ 駒洋市 指定ランドマーク</span>`;
+          headerBadge = `<span class="popup-badge badge-monument">🏛️ 駒洋市 指定ランドマーク</span>${visitedPillHtml}`;
           titleHtml = `<div class="popup-monument-title">🏛️ ${escapeHtml(activePrimary.title || 'ランドマーク')}</div>`;
           authorHtml = `<div class="popup-author">管理・区分: ${escapeHtml(activePrimary.author || '駒洋市 / 公式モニュメント')}</div>`;
         } else if (isPrimarySpot) {
-          headerBadge = `<span class="popup-badge badge-spot-location">📍 街の舞台・スポット</span>`;
+          headerBadge = `<span class="popup-badge badge-spot-location">📍 街の舞台・スポット</span>${visitedPillHtml}`;
           titleHtml = `<div class="popup-title">📍 ${escapeHtml(activePrimary.title || 'スポット')}</div>`;
           authorHtml = `<div class="popup-author">ロケーション: ${escapeHtml(activePrimary.author || '駒洋市内')}</div>`;
         } else {
-          headerBadge = `<span class="popup-badge badge-${circleKey}">${circleName}</span>`;
+          headerBadge = `<span class="popup-badge badge-${circleKey}">${circleName}</span>${visitedPillHtml}`;
           titleHtml = `<div class="popup-title">『${escapeHtml(activePrimary.title || '無題')}』</div>`;
           authorHtml = `<div class="popup-author">作者: ${escapeHtml(activePrimary.author || '匿名')}</div>`;
         }
 
+        // ③ ポップアップ用サムネイル画像バナー ＆ 小説冒頭プレビュー生成
+        let previewMediaHtml = '';
+        const rawPopupImgs = (activePrimary.imageUrl || '').split(',').map(u => formatImageUrl(u)).filter(u => u !== '');
+        if (rawPopupImgs.length > 0) {
+          const pageTag = rawPopupImgs.length > 1 ? `<span class="popup-thumb-page-tag">📖 全${rawPopupImgs.length}ページ</span>` : '';
+          previewMediaHtml = `
+            <div class="popup-thumb-banner" onclick="openModal(decodeURIComponent('${safePrimaryId}'), '${group.id}')" title="クリックして作品を拡大・鑑賞">
+              <img src="${rawPopupImgs[0]}" alt="${escapeHtml(activePrimary.title || '')}" loading="lazy">
+              ${pageTag}
+            </div>
+          `;
+        } else if (circleKey === 'literature' || (!isPrimaryMon && !isPrimarySpot && (activePrimary.fullContent || '').length > 60)) {
+          const rawNovelText = (activePrimary.fullContent || activePrimary.shortDesc || '').replace(/\s+/g, ' ').trim();
+          if (rawNovelText) {
+            const excerpt = rawNovelText.length > 78 ? rawNovelText.slice(0, 78) + '……' : rawNovelText;
+            previewMediaHtml = `
+              <div class="popup-novel-excerpt" onclick="openModal(decodeURIComponent('${safePrimaryId}'), '${group.id}')" title="クリックして小説本編を読む">
+                <div class="popup-novel-excerpt-label">📖 小説・本文の冒頭試し読み</div>
+                <div>「${escapeHtml(excerpt)}」</div>
+              </div>
+            `;
+          }
+        }
+
         const popupContent = `
-          <div style="padding: 2px; min-width: 210px;">
-            ${headerBadge}
+          <div style="padding: 2px; min-width: 225px;">
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">${headerBadge}</div>
             ${titleHtml}
             ${authorHtml}
+            ${previewMediaHtml}
             <div class="popup-desc">${escapeHtml(activePrimary.shortDesc || '')}</div>
             ${worksListHtml}
             <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">${actionBtns}</div>
@@ -2077,20 +3173,70 @@
         `;
 
         const isOfficial = (activePrimary.facilityType || "").includes("公式");
+        const anyGroupVisited = group.works.some(w => isWorkVisited(w.timestamp || w.id));
         const marker = L.marker([group.posY, group.posX], {
-          icon: createCustomIcon(circleKey, activePrimary.facilityType, group.works.length),
+          icon: createCustomIcon(circleKey, activePrimary.facilityType, group.works.length, anyGroupVisited),
           zIndexOffset: isOfficial ? 1000 : 0
         });
         marker.bindPopup(popupContent);
 
+        // ④ ホバー時にスポット名・作品タイトルをチラ見せするツールチップ
+        const tooltipPrefix = isPrimaryMon ? '🏛️ ' : (isPrimarySpot ? '📍 ' : (isPrimaryGame ? '🎮 ' : ''));
+        const tooltipLabel = `${tooltipPrefix}${activePrimary.title || 'スポット'}${group.works.length > 1 ? ` (+${group.works.length - 1})` : ''}`;
+        marker.bindTooltip(escapeHtml(tooltipLabel), {
+          direction: 'top',
+          offset: [0, -18],
+          className: 'komanada-pin-tooltip',
+          opacity: 0.95
+        });
+
         marker.workId = activePrimary.timestamp || activePrimary.id;
+        marker.activePrimaryWork = activePrimary;
         marker.groupWorks = group.works;
         marker.spotGroupId = group.id;
+
+        // 統合ピンをクリックしてポップアップを開いた際、実際の作品ピンの位置を地図上にサテライト展開
+        marker.on('popupopen', () => {
+          showSatellitePinsForGroup(group);
+        });
+
         markersClusterGroup.addLayer(marker);
       });
 
+      updateFilterBarVisibility();
+      updateVisitedProgressUI();
       updateSidebarList();
       renderAboutMonuments();
+    }
+
+    // 投稿作品が1件以上あるサークルのフィルターボタンのみを自動表示する関数
+    function updateFilterBarVisibility() {
+      const counts = { all: 0 };
+      globalWorksData.forEach(w => {
+        const y = parseFloat(w.posY);
+        const x = parseFloat(w.posX);
+        if (isNaN(y) || isNaN(x)) return;
+        const cKey = normalizeCircle(w.circle);
+        counts[cKey] = (counts[cKey] || 0) + 1;
+        counts.all++;
+      });
+
+      document.querySelectorAll('.bottom-filter-bar .filter-btn').forEach(btn => {
+        const circle = btn.getAttribute('data-circle');
+        const baseLabel = btn.getAttribute('data-label') || btn.innerText;
+        if (circle === 'all') {
+          btn.style.display = 'inline-flex';
+          btn.innerHTML = `${baseLabel} <span class="filter-count-pill">${counts.all}</span>`;
+        } else {
+          const count = counts[circle] || 0;
+          if (count > 0) {
+            btn.style.display = 'inline-flex';
+            btn.innerHTML = `${baseLabel} <span class="filter-count-pill">${count}</span>`;
+          } else {
+            btn.style.display = 'none';
+          }
+        }
+      });
     }
 
     function updateSidebarList() {
@@ -2123,15 +3269,17 @@
           card.style.borderColor = "rgba(245, 158, 11, 0.4)";
           card.style.background = "rgba(245, 158, 11, 0.08)";
         } else if (isSpot) {
-          card.style.borderColor = "rgba(16, 185, 129, 0.4)";
-          card.style.background = "rgba(16, 185, 129, 0.08)";
+          card.style.borderColor = "rgba(6, 182, 212, 0.4)";
+          card.style.background = "rgba(6, 182, 212, 0.08)";
         }
+        const isVisited = isWorkVisited(workId);
         card.innerHTML = `
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
             <span class="popup-badge ${isMon ? 'badge-monument' : (isSpot ? 'badge-spot-location' : `badge-${circleKey}`)}">${isMon ? 'ランドマーク' : (isSpot ? '街の舞台' : circleName)}</span>
             <div style="display: flex; gap: 4px; align-items: center;">
+              ${isVisited ? `<span class="visited-pill-badge">💮 鑑賞済</span>` : ''}
               ${hasMultiple ? `<span style="font-size: 10px; background: rgba(255,255,255,0.12); color: #cbd5e1; padding: 1px 6px; border-radius: 10px;">📍 複合</span>` : ''}
-              ${isMon ? '<span style="font-size: 10px; color: #fcd34d; font-weight: 700;">🏛️ 公式</span>' : (isSpot ? '<span style="font-size: 10px; color: #34d399; font-weight: 700;">📍 スポット</span>' : '')}
+              ${isMon ? '<span style="font-size: 10px; color: #fcd34d; font-weight: 700;">🏛️ 公式</span>' : (isSpot ? '<span style="font-size: 10px; color: #22d3ee; font-weight: 700;">📍 スポット</span>' : '')}
             </div>
           </div>
           <div class="work-item-title">${title}</div>
@@ -2153,7 +3301,7 @@
     }
 
     function getCircleName(circleKey) {
-      const names = { geography: "地理研", art: "美術部", calligraphy: "書道部", photo: "写真部", literature: "文芸部", manga: "漫画倶楽部" };
+      const names = { geography: "地理研", art: "美術部", calligraphy: "書道部", photo: "写真部", literature: "文芸部", manga: "漫画倶楽部", game: "ゲームサークル" };
       return names[circleKey] || circleKey;
     }
 
@@ -2182,23 +3330,37 @@
 
       currentWorkId = work.timestamp || work.id || (globalWorksData.indexOf(work) + 1);
 
+      // ⑦ この作品を鑑賞済みとしてスタンプ記録
+      markWorkAsVisited(currentWorkId);
+
       const circleKey = normalizeCircle(work.circle);
       const isMonument = isMonumentWork(work);
       const isLocalSpot = isLocalSpotWork(work);
+
+      // ⑤ 作品ジャンル・サークルに合わせたモーダル背景テーマの自動切り替え
+      const modalCardEl = modal ? modal.querySelector('.modal-card') : null;
+      if (modalCardEl) {
+        modalCardEl.classList.remove('theme-literature', 'theme-art', 'theme-photo', 'theme-manga', 'theme-game', 'theme-monument', 'theme-spot');
+        if (isMonument) modalCardEl.classList.add('theme-monument');
+        else if (isLocalSpot) modalCardEl.classList.add('theme-spot');
+        else if (circleKey === 'literature') modalCardEl.classList.add('theme-literature');
+        else if (circleKey === 'art' || circleKey === 'photo') modalCardEl.classList.add('theme-art');
+        else if (circleKey === 'manga') modalCardEl.classList.add('theme-manga');
+        else if (circleKey === 'game') modalCardEl.classList.add('theme-game');
+      }
 
       // モニュメント / 小スポット / サークル創作作品 の専用ヘッダー・プロフィール切り替え
       const modalMonumentHeader = document.getElementById('modalMonumentHeader');
       const badge = document.getElementById('modalBadge');
       const monumentProfileCard = document.getElementById('monumentProfileCard');
+      const monumentProfileTag = document.getElementById('monumentProfileTag');
       const modalBodyHeading = document.getElementById('modalBodyHeading');
       const monumentMetaType = document.getElementById('monumentMetaType');
       const monumentMetaAuthor = document.getElementById('monumentMetaAuthor');
       const monumentMetaCoords = document.getElementById('monumentMetaCoords');
 
       if (isMonument) {
-        modalMonumentHeader.style.display = 'block';
-        modalMonumentHeader.innerText = "KOMANADA CIVIC HERITAGE & LANDMARK";
-        modalMonumentHeader.style.color = "#f59e0b";
+        modalMonumentHeader.style.display = 'none';
         badge.innerText = "🏛️ 駒洋市 指定ランドマーク";
         badge.className = "popup-badge badge-monument";
         document.getElementById('modalTitle').innerText = `🏛️ ${work.title}`;
@@ -2206,18 +3368,17 @@
 
         if (monumentProfileCard) {
           monumentProfileCard.style.display = 'block';
+          if (monumentProfileTag) monumentProfileTag.innerText = "🏛️ 駒洋市 公認ランドマーク・登録情報";
           if (monumentMetaType) monumentMetaType.innerText = work.facilityType || "公式モニュメント・歴史建造物";
           if (monumentMetaAuthor) monumentMetaAuthor.innerText = work.author || "駒洋市 / 地理学研究会";
           if (monumentMetaCoords) monumentMetaCoords.innerText = `Y: ${work.posY || '-'}, X: ${work.posX || '-'}`;
         }
         if (modalBodyHeading) {
           modalBodyHeading.style.display = 'flex';
-          modalBodyHeading.innerHTML = `<span>📜</span> <span>施設・歴史建造物 解説（市政アーカイブ）</span>`;
+          modalBodyHeading.innerHTML = `<span>📜</span> <span>施設・歴史建造物 解説</span>`;
         }
       } else if (isLocalSpot) {
-        modalMonumentHeader.style.display = 'block';
-        modalMonumentHeader.innerText = "KOMANADA LOCAL SCENE & SPOT";
-        modalMonumentHeader.style.color = "#34d399";
+        modalMonumentHeader.style.display = 'none';
         badge.innerText = "📍 街の舞台・小スポット";
         badge.className = "popup-badge badge-spot-location";
         document.getElementById('modalTitle').innerText = `📍 ${work.title}`;
@@ -2225,6 +3386,7 @@
 
         if (monumentProfileCard) {
           monumentProfileCard.style.display = 'block';
+          if (monumentProfileTag) monumentProfileTag.innerText = "📍 街の舞台・スポット登録情報";
           if (monumentMetaType) monumentMetaType.innerText = "街の舞台・散策スポット";
           if (monumentMetaAuthor) monumentMetaAuthor.innerText = work.author || "駒洋市内";
           if (monumentMetaCoords) monumentMetaCoords.innerText = `Y: ${work.posY || '-'}, X: ${work.posX || '-'}`;
@@ -2250,7 +3412,8 @@
           else if (circleKey === 'photo' || circleKey === 'art') bodyHeadingText = '作品解説・コンセプト';
           else if (circleKey === 'calligraphy') bodyHeadingText = '揮毫作品・書道解説';
           else if (circleKey === 'manga') bodyHeadingText = 'マンガ本編・作品解説';
-          modalBodyHeading.innerHTML = `<span>📖</span> <span>${bodyHeadingText}</span>`;
+          else if (circleKey === 'game') bodyHeadingText = 'ゲーム作品紹介・操作ガイド';
+          modalBodyHeading.innerHTML = `<span>${circleKey === 'game' ? '🎮' : '📖'}</span> <span>${bodyHeadingText}</span>`;
         }
       }
 
@@ -2270,25 +3433,41 @@
           </div>
           <p style="margin: 0; line-height: 1.85; white-space: pre-wrap; color: #e2e8f0;">${escapeHtml(loreNote)}</p>
         `;
-      } else if (isMonument || isLocalSpot) {
-        modalLoreAccordion.style.display = 'block';
-        modalLoreAccordion.classList.remove('open');
-        loreContent.innerHTML = `
-          <div style="font-size: 11px; color: #fcd34d; font-weight: 700; margin-bottom: 6px;">
-            【街の伝承・噂 / 地理学研究会 調査メモ】
-          </div>
-          <p style="margin: 0; color: #94a3b8; font-size: 12px; line-height: 1.8;">
-            ※このスポットに関する伝承・噂・調査メモは現在情報収集中です。（登録フォームより調査メモを追記いただけます）
-          </p>
-        `;
       } else {
         modalLoreAccordion.style.display = 'none';
+        modalLoreAccordion.classList.remove('open');
+        loreContent.innerHTML = '';
       }
 
       const isCityHall = (work.title || "").includes("市役所") || (work.facilityType || "").includes("市役所");
       const modalCityHallCard = document.getElementById('modalCityHallCard');
       if (modalCityHallCard) {
         modalCityHallCard.style.display = isCityHall ? "block" : "none";
+      }
+
+      // ゲームサークル作品用ハイブリッドランチャーカード制御
+      const isGame = isGameWork(work);
+      const modalGameLauncherCard = document.getElementById('modalGameLauncherCard');
+      if (modalGameLauncherCard) {
+        if (isGame) {
+          modalGameLauncherCard.style.display = "block";
+          const gameTargetUrl = getWorkGameUrl(work);
+          const newTabBtn = document.getElementById('modalGameNewTabBtn');
+          if (newTabBtn) newTabBtn.href = gameTargetUrl;
+          const embedBtn = document.getElementById('modalGameEmbedBtn');
+          if (embedBtn) {
+            embedBtn.onclick = () => openGameEmbedPlayer(work);
+          }
+          const copyUrlBtn = document.getElementById('modalGameCopyUrlBtn');
+          if (copyUrlBtn) {
+            copyUrlBtn.onclick = () => {
+              const fullGameUrl = new URL(gameTargetUrl, window.location.href).href;
+              copyTextWithToast(fullGameUrl, "🎮 ゲーム直リンクURLをコピーしました！", copyUrlBtn);
+            };
+          }
+        } else {
+          modalGameLauncherCard.style.display = "none";
+        }
       }
 
       // スポットグループ情報取得
@@ -2310,77 +3489,100 @@
       if (group && group.works.length > 1) {
         const primaryId = group.primary.timestamp || group.primary.id;
         const isCurrentlyPrimary = String(primaryId) === String(currentWorkId);
+        const parentIsMon = isMonumentWork(group.primary);
+        const parentIsSpot = isLocalSpotWork(group.primary);
+        const parentIsAnchor = parentIsMon || parentIsSpot;
 
-        // 親に戻るボタン（付随作品を見ている時に表示）
-        if (!isCurrentlyPrimary && group.primary) {
-          modalParentBackBtn.style.display = 'inline-flex';
-          const parentIsMon = isMonumentWork(group.primary);
-          const parentIsSpot = isLocalSpotWork(group.primary);
-          const parentCategory = parentIsMon ? 'ランドマーク' : (parentIsSpot ? '舞台・小スポット' : 'スポット');
-          modalParentBackTitle.innerText = `${parentCategory}「${group.primary.title || '親スポット'}」`;
-          modalParentBackBtn.onclick = () => openModal(primaryId, group.id);
-        } else {
-          modalParentBackBtn.style.display = 'none';
+        // 親に戻るボタン（上部のスポット舞台バーに統合したため非表示にしてスッキリさせる）
+        modalParentBackBtn.style.display = 'none';
+
+        // 上部：舞台（ランドマーク/スポット）と展示作品（サークル作品）を明確に上下分離した階層ナビバー
+        spotWorksBar.style.display = "flex";
+        const spotParentStageBox = document.getElementById('spotParentStageBox');
+
+        if (parentIsAnchor && spotParentStageBox) {
+          spotParentStageBox.style.display = 'block';
+          const stageBadgeClass = parentIsMon ? 'badge-monument' : 'badge-spot-location';
+          const stageBadgeText = parentIsMon ? '🏛️ 舞台ランドマーク' : '📍 舞台スポット';
+          const stageRowClass = `spot-parent-stage-row ${parentIsSpot ? 'is-spot-type' : ''} ${isCurrentlyPrimary ? 'active' : ''}`;
+          const actionHint = isCurrentlyPrimary ? '<span style="font-size:10.5px; color:#fcd34d; font-weight:700;">● 現在表示中</span>' : '<span style="font-size:11px; color:#cbd5e1; font-weight:600;">施設解説を見る ▶</span>';
+
+          spotParentStageBox.innerHTML = `
+            <div class="${stageRowClass}" id="spotParentStageClickRow">
+              <div style="display:flex; align-items:center; gap:8px; min-width:0; flex:1;">
+                <span class="popup-badge ${stageBadgeClass}" style="margin:0; font-size:10px; flex-shrink:0;">${stageBadgeText}</span>
+                <span style="font-size:13px; font-weight:700; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${escapeHtml(group.primary.title || 'スポット')}</span>
+              </div>
+              <div style="flex-shrink:0;">${actionHint}</div>
+            </div>
+          `;
+          const clickRow = document.getElementById('spotParentStageClickRow');
+          if (clickRow) {
+            clickRow.onclick = () => openModal(primaryId, group.id);
+          }
+        } else if (spotParentStageBox) {
+          spotParentStageBox.style.display = 'none';
+          spotParentStageBox.innerHTML = '';
         }
 
-        // 上部コンパクトピルバー
-        spotWorksBar.style.display = "block";
-        const primaryTitle = group.primary.title || "スポット";
-        spotWorksHeaderTitle.innerText = `📍「${primaryTitle}」に付随する作品（全${group.works.length}件）`;
+        // 子作品（サークル作品）のみをグリッドピルに並べる
+        const childWorksForPills = parentIsAnchor
+          ? group.works.filter(w => String(w.timestamp || w.id) !== String(primaryId))
+          : group.works;
+
+        spotWorksHeaderTitle.innerText = parentIsAnchor
+          ? `🎨 この場所を舞台にした創作作品（全${childWorksForPills.length}作品）`
+          : `📚 このエリアの展示作品（全${childWorksForPills.length}作品）`;
         spotWorksPills.innerHTML = "";
 
-        group.works.forEach(w => {
+        childWorksForPills.forEach(w => {
           const wKey = normalizeCircle(w.circle);
           const wName = getCircleName(wKey);
           const wId = w.timestamp || w.id;
           const isCurrent = String(wId) === String(currentWorkId);
 
-          const wIsMon = isMonumentWork(w);
           const pill = document.createElement('button');
           pill.className = `spot-pill-btn ${isCurrent ? 'active' : ''}`;
-          const badgeHtml = wIsMon
-            ? `<span class="popup-badge badge-monument" style="font-size: 9px; padding: 1px 5px;">🏛️ ランドマーク</span>`
-            : `<span class="popup-badge badge-${wKey}" style="font-size: 9px; padding: 1px 5px;">${wName}</span>`;
-          pill.innerHTML = `${badgeHtml} ${escapeHtml(w.title || '無題')}`;
+          const badgeHtml = `<span class="popup-badge badge-${wKey}" style="font-size: 9px; padding: 1.5px 6px; margin: 0; flex-shrink: 0;">${wName}</span>`;
+          pill.innerHTML = `${badgeHtml}<span class="spot-pill-btn-title">${escapeHtml(w.title || '無題')}</span>`;
           pill.addEventListener('click', () => {
             openModal(wId, group.id);
           });
           spotWorksPills.appendChild(pill);
         });
 
-        // 下部リッチギャラリーカード一覧
-        modalSpotGallery.style.display = "block";
-        const otherWorks = group.works.filter(w => String(w.timestamp || w.id) !== String(currentWorkId));
+        // 親のランドマーク・スポット自身を見ている時は下部にリッチギャラリーカード（サムネイル付き）を出すため、ピル一覧は隠して重複を防ぐ
+        const spotWorksHeader = spotWorksBar.querySelector('.spot-works-header');
+        if (isCurrentlyPrimary && childWorksForPills.length > 0) {
+          if (spotWorksHeader) spotWorksHeader.style.display = "none";
+          spotWorksPills.style.display = "none";
+          // 親自身を見ている時は舞台バーも非表示にし、下部リッチギャラリーカードだけを見せてスッキリさせる
+          spotWorksBar.style.display = "none";
 
-        const parentIsMon = isMonumentWork(group.primary);
-        const galleryPrefix = parentIsMon ? "🎨 この場所を舞台にした展示作品" : "📖 この場所が登場する展示作品";
-        if (spotGalleryTitleText) {
-          spotGalleryTitleText.innerHTML = `${galleryPrefix}（全<span id="spotGalleryCount">${otherWorks.length}</span>件）`;
-        }
-
-        if (otherWorks.length > 0) {
+          modalSpotGallery.style.display = "block";
+          const galleryPrefix = parentIsMon ? "🎨 このランドマークが舞台の創作作品" : "📖 このスポットが登場する創作作品";
+          if (spotGalleryTitleText) {
+            spotGalleryTitleText.innerHTML = `${galleryPrefix}（全<span id="spotGalleryCount">${childWorksForPills.length}</span>作品）`;
+          }
           spotGalleryGrid.innerHTML = "";
-          otherWorks.forEach(w => {
+          childWorksForPills.forEach(w => {
             const wKey = normalizeCircle(w.circle);
             const wName = getCircleName(wKey);
             const wId = w.timestamp || w.id;
             const wImg = (w.imageUrl || "").split(',')[0].trim();
             const thumbUrl = wImg ? formatImageUrl(wImg) : "";
 
-            const wIsMon = isMonumentWork(w);
             const card = document.createElement('div');
             card.className = 'spot-gallery-card';
-            const badgeHtml = wIsMon
-              ? `<span class="popup-badge badge-monument" style="font-size: 9px; padding: 1px 5px; margin: 0;">🏛️ ランドマーク</span>`
-              : `<span class="popup-badge badge-${wKey}" style="font-size: 9px; padding: 1px 5px; margin: 0;">${wName}</span>`;
+            const badgeHtml = `<span class="popup-badge badge-${wKey}" style="font-size: 9px; padding: 1px 5px; margin: 0;">${wName}</span>`;
 
             card.innerHTML = `
-              ${thumbUrl ? `<img src="${thumbUrl}" class="spot-card-thumb" alt="${escapeHtml(w.title || '')}">` : `<div class="spot-card-thumb-placeholder">${wIsMon ? '🏛️' : '🎨'}</div>`}
+              ${thumbUrl ? `<img src="${thumbUrl}" class="spot-card-thumb" alt="${escapeHtml(w.title || '')}">` : `<div class="spot-card-thumb-placeholder">🎨</div>`}
               <div class="spot-card-info">
                 <div class="spot-card-title">${escapeHtml(w.title || '無題')}</div>
                 <div class="spot-card-meta">
                   ${badgeHtml}
-                  <span>${wIsMon ? (w.author || '駒洋市') : 'by ' + (w.author || '匿名')}</span>
+                  <span>by ${escapeHtml(w.author || '匿名')}</span>
                 </div>
               </div>
             `;
@@ -2390,6 +3592,8 @@
             spotGalleryGrid.appendChild(card);
           });
         } else {
+          if (spotWorksHeader) spotWorksHeader.style.display = "flex";
+          spotWorksPills.style.display = "grid";
           modalSpotGallery.style.display = "none";
         }
       } else {
@@ -2477,11 +3681,16 @@
       const rawImageStr = work.imageUrl || "";
       const modalImageCredit = document.getElementById('modalImageCredit');
 
-      // 美術・写真作品向けの額装風スタイリング
+      // 美術・写真作品向けの額装風スタイリング ＆ 漫画作品の縦長リーダーモード
       if (circleKey === 'art' || circleKey === 'photo') {
         modalImageWrapper.classList.add('gallery-framed');
+        modalImageWrapper.classList.remove('manga-reader-mode');
+      } else if (circleKey === 'manga') {
+        modalImageWrapper.classList.remove('gallery-framed');
+        modalImageWrapper.classList.add('manga-reader-mode');
       } else {
         modalImageWrapper.classList.remove('gallery-framed');
+        modalImageWrapper.classList.remove('manga-reader-mode');
       }
 
       // 画像のキャプション・制作クレジット
@@ -2506,21 +3715,41 @@
     }
 
     function updateMangaViewer() {
+      const mangaThumbsRow = document.getElementById('mangaThumbsRow');
       if (currentImageUrls.length > 0) {
         modalImage.src = currentImageUrls[currentImageIndex];
         modalImageWrapper.style.display = "block";
 
         if (currentImageUrls.length > 1) {
           mangaNavBar.style.display = "flex";
-          mangaPageInfo.innerText = `${currentImageIndex + 1} / ${currentImageUrls.length}`;
+          mangaPageInfo.innerText = `${currentImageIndex + 1} / ${currentImageUrls.length} ページ`;
           mangaPrevBtn.disabled = (currentImageIndex === 0);
           mangaNextBtn.disabled = (currentImageIndex === currentImageUrls.length - 1);
+
+          if (mangaThumbsRow) {
+            mangaThumbsRow.innerHTML = "";
+            currentImageUrls.forEach((url, idx) => {
+              const thumb = document.createElement('div');
+              thumb.className = `manga-thumb-item ${idx === currentImageIndex ? 'active' : ''}`;
+              thumb.innerHTML = `
+                <img src="${url}" alt="Page ${idx + 1}">
+                <span class="manga-thumb-num">${idx + 1}</span>
+              `;
+              thumb.addEventListener('click', () => {
+                currentImageIndex = idx;
+                updateMangaViewer();
+              });
+              mangaThumbsRow.appendChild(thumb);
+            });
+          }
         } else {
           mangaNavBar.style.display = "none";
+          if (mangaThumbsRow) mangaThumbsRow.innerHTML = "";
         }
       } else {
         modalImageWrapper.style.display = "none";
         mangaNavBar.style.display = "none";
+        if (mangaThumbsRow) mangaThumbsRow.innerHTML = "";
         modalImage.src = "";
       }
     }
@@ -3014,6 +4243,59 @@
     const cityHallBtn = document.getElementById('cityHallBtn');
     if (cityHallBtn) cityHallBtn.addEventListener('click', focusCityHall);
 
+    // 上部バー「🎮 ゲーム」ボタン＆画面内埋め込みプレイヤー制御
+    const gameEmbedOverlay = document.getElementById('gameEmbedOverlay');
+    const gameEmbedIframe = document.getElementById('gameEmbedIframe');
+    const gameEmbedTitle = document.getElementById('gameEmbedTitle');
+    const gameEmbedOpenTabBtn = document.getElementById('gameEmbedOpenTabBtn');
+    const gameEmbedCopyUrlBtn = document.getElementById('gameEmbedCopyUrlBtn');
+    const gameEmbedCloseBtn = document.getElementById('gameEmbedCloseBtn');
+
+    function openGameEmbedPlayer(work) {
+      const targetWork = work || globalWorksData.find(w => isGameWork(w)) || DEFAULT_GAME_WORK;
+      const gameUrl = getWorkGameUrl(targetWork);
+      if (gameEmbedTitle) gameEmbedTitle.innerText = targetWork.title || '駒洋市 ゲームサークル作品';
+      if (gameEmbedOpenTabBtn) gameEmbedOpenTabBtn.href = gameUrl;
+      if (gameEmbedCopyUrlBtn) {
+        gameEmbedCopyUrlBtn.onclick = () => {
+          const fullGameUrl = new URL(gameUrl, window.location.href).href;
+          copyTextWithToast(fullGameUrl, '🎮 ゲーム直リンクURLをコピーしました！', gameEmbedCopyUrlBtn);
+        };
+      }
+      if (gameEmbedIframe) {
+        gameEmbedIframe.src = gameUrl;
+        gameEmbedIframe.onload = () => {
+          try { gameEmbedIframe.contentWindow.focus(); } catch (e) {}
+        };
+      }
+      if (gameEmbedOverlay) {
+        gameEmbedOverlay.classList.add('open');
+      }
+    }
+
+    function closeGameEmbedPlayer() {
+      if (gameEmbedOverlay) gameEmbedOverlay.classList.remove('open');
+      // BGMが裏で鳴り続けないようにiframeをアンロード
+      if (gameEmbedIframe) gameEmbedIframe.src = 'about:blank';
+    }
+
+    if (gameEmbedCloseBtn) {
+      gameEmbedCloseBtn.addEventListener('click', closeGameEmbedPlayer);
+    }
+
+    function focusGameSpotAndOpenModal() {
+      const gameWork = globalWorksData.find(w => isGameWork(w)) || DEFAULT_GAME_WORK;
+      if (gameWork) {
+        const workId = gameWork.timestamp || gameWork.id;
+        focusAndOpenWork(gameWork, workId);
+      }
+    }
+
+    const topGameBtn = document.getElementById('topGameBtn');
+    if (topGameBtn) {
+      topGameBtn.addEventListener('click', focusGameSpotAndOpenModal);
+    }
+
     const modalOpenCityHallArchiveBtn = document.getElementById('modalOpenCityHallArchiveBtn');
     if (modalOpenCityHallArchiveBtn) modalOpenCityHallArchiveBtn.addEventListener('click', () => {
       modal.classList.remove('open');
@@ -3033,12 +4315,24 @@
 
     // サークル一覧・利用規約モーダル
     const circleListModal = document.getElementById('circleListModal');
-    document.getElementById('circleListBtn').addEventListener('click', () => circleListModal.classList.add('open'));
+    document.getElementById('circleListBtn').addEventListener('click', () => {
+      if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+      circleListModal.classList.add('open');
+    });
     document.getElementById('circleListClose').addEventListener('click', () => circleListModal.classList.remove('open'));
     circleListModal.addEventListener('click', (e) => { if (e.target === circleListModal) circleListModal.classList.remove('open'); });
 
     const termsModal = document.getElementById('termsModal');
-    document.getElementById('termsBtn').addEventListener('click', () => termsModal.classList.add('open'));
+    document.getElementById('termsBtn').addEventListener('click', () => {
+      termsModal.classList.add('open');
+    });
+    const sidebarTermsBtn = document.getElementById('sidebarTermsBtn');
+    if (sidebarTermsBtn) {
+      sidebarTermsBtn.addEventListener('click', () => {
+        if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+        termsModal.classList.add('open');
+      });
+    }
     document.getElementById('termsClose').addEventListener('click', () => termsModal.classList.remove('open'));
     termsModal.addEventListener('click', (e) => { if (e.target === termsModal) termsModal.classList.remove('open'); });
 
@@ -3048,17 +4342,26 @@
     document.getElementById('sidebarCloseBtn').addEventListener('click', () => sidebar.classList.remove('open'));
     document.getElementById('sidebarSearchInput').addEventListener('input', updateSidebarList);
 
+    let coordHideTimer = null;
     map.on('click', function(e) {
       const y = Math.round(e.latlng.lat);
       const x = Math.round(e.latlng.lng);
-      document.getElementById('coordDisplay').innerHTML = `posY: <b>${y}</b> / posX: <b>${x}</b>`;
+      const coordEl = document.getElementById('coordDisplay');
+      if (coordEl) {
+        coordEl.innerHTML = `posY: <b>${y}</b> / posX: <b>${x}</b>`;
+        coordEl.classList.add('visible');
+        if (coordHideTimer) clearTimeout(coordHideTimer);
+        coordHideTimer = setTimeout(() => {
+          coordEl.classList.remove('visible');
+        }, 4000);
+      }
     });
 
     document.querySelectorAll('.filter-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', () => {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        e.target.classList.add('active');
-        renderMarkers(e.target.getAttribute('data-circle'));
+        btn.classList.add('active');
+        renderMarkers(btn.getAttribute('data-circle'));
       });
     });
 
