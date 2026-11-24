@@ -1644,7 +1644,7 @@
     </div>
     <div class="top-nav-actions">
       <button class="nav-action-btn city-hall" id="cityHallBtn" title="市政資料室（企画概要・都市設定・歴史）を開く">🏛️ 市政資料室</button>
-      <button class="nav-action-btn game-nav" id="topGameBtn" title="ゲームサークルの作品をプレイ・詳細を見る">🎮 ゲーム</button>
+      <button class="nav-action-btn game-nav" id="topGameBtn" title="ゲーム制作サークルの作品をプレイ・詳細を見る">🎮 ゲーム</button>
       <button class="nav-action-btn" id="termsBtn" title="権利・二次利用規約">⚖️ 利用規約</button>
       <button class="nav-action-btn" id="sidebarToggleBtn" title="目次・作品検索・サークル一覧を開く">📋 目次・メニュー</button>
     </div>
@@ -1873,7 +1873,7 @@
     <div class="game-embed-topbar">
       <div class="game-embed-title-area">
         <span class="game-launcher-badge">🎮 PLAYING</span>
-        <span class="game-embed-title" id="gameEmbedTitle">駒洋市 ゲームサークル作品</span>
+        <span class="game-embed-title" id="gameEmbedTitle">駒洋市 ゲーム制作サークル作品</span>
       </div>
       <div class="game-embed-controls">
         <button type="button" class="game-embed-ctrl-btn" id="gameEmbedCopyUrlBtn" title="ゲームのURLをコピー">🔗 ゲームURL</button>
@@ -2429,16 +2429,16 @@
     const DEFAULT_GAME_WORK = {
       timestamp: "game_project1",
       id: "game_project1",
-      circle: "ゲームサークル",
+      circle: "ゲーム制作サークル",
       title: "駒洋市 探索RPG『宮浜駅前の物語（仮）』",
-      author: "ゲームサークル",
+      author: "ゲーム制作サークル",
       posY: 650,
       posX: 1120,
       facilityType: "ゲーム作品",
       shortDesc: "駒洋市・宮浜駅前などを舞台にしたブラウザRPG作品（開発中デモ版）。PC・スマホから別タブまたはマップ内でプレイ可能！",
       imageUrl: "./www/img/titles1/Castle.png",
-      fullContent: "ゲームサークルが制作中の、架空都市「駒洋市（宮浜駅前など）」を舞台にしたブラウザRPGです。\n\n【プレイ方法（ハイブリッド対応）】\n・🚀 別タブでゲームを起動（推奨）：ブラウザの新しいタブでフル画面起動します。スマホやPCでの操作が最も快適で、マップと行き来してもゲームがリセットされません。\n・🖥️ マップ画面内でプレイ：このページを離れずに、画面内タブ（オーバーレイ）でそのままゲームを起動します。\n\n※現在開発中のバージョンです。今後ゲームデータを更新する際は、`www` フォルダの中身を差し替えるだけで自動的に最新版へ反映されます！",
-      afterword: "タイトルや座標（posY, posX）、説明文はGoogleスプレッドシートに「ゲームサークル」の作品行を追加するか、後からいつでも自由に変更できます！",
+      fullContent: "ゲーム制作サークルが制作中の、架空都市「駒洋市（宮浜駅前など）」を舞台にしたブラウザRPGです。\n\n【プレイ方法（ハイブリッド対応）】\n・🚀 別タブでゲームを起動（推奨）：ブラウザの新しいタブでフル画面起動します。スマホやPCでの操作が最も快適で、マップと行き来してもゲームがリセットされません。\n・🖥️ マップ画面内でプレイ：このページを離れずに、画面内タブ（オーバーレイ）でそのままゲームを起動します。\n\n※現在開発中のバージョンです。今後ゲームデータを更新する際は、`www` フォルダの中身を差し替えるだけで自動的に最新版へ反映されます！",
+      afterword: "タイトルや座標（posY, posX）、説明文はGoogleスプレッドシートに「ゲーム制作サークル」の作品行を追加するか、後からいつでも自由に変更できます！",
       gameUrl: "./www/index.html"
     };
 
@@ -2964,7 +2964,7 @@
         { icon: "📷", iconUrl: "", name: "写真部", desc: "光と影が交差する駒洋市の情緒溢れるフォトグラフィー。", instaUrl: "https://instagram.com" },
         { icon: "📚", iconUrl: "", name: "文芸部", desc: "駒洋市を舞台に紡がれる短編小説、詩、都市伝説集。", xUrl: "https://x.com" },
         { icon: "🎨", iconUrl: "", name: "漫画倶楽部", desc: "駒洋市の街並みや人々を躍動感あふれるコミック形式で表現。", xUrl: "https://x.com" },
-        { icon: "🎮", iconUrl: "", name: "ゲームサークル", desc: "駒洋市を舞台にしたブラウザゲーム・RPG作品の企画・制作。", webUrl: "./www/index.html" }
+        { icon: "🎮", iconUrl: "", name: "ゲーム制作サークル", desc: "駒洋市を舞台にしたブラウザゲーム・RPG作品の企画・制作。", webUrl: "./www/index.html" }
       ];
       parseAndRenderCirclesData(demoCircles);
     }
@@ -3302,7 +3302,7 @@
     }
 
     function getCircleName(circleKey) {
-      const names = { geography: "地理研", art: "美術部", calligraphy: "書道部", photo: "写真部", literature: "文芸部", manga: "漫画倶楽部", game: "ゲームサークル" };
+      const names = { geography: "地理研", art: "美術部", calligraphy: "書道部", photo: "写真部", literature: "文芸部", manga: "漫画倶楽部", game: "ゲーム制作サークル" };
       return names[circleKey] || circleKey;
     }
 
@@ -4285,7 +4285,7 @@
     function openGameEmbedPlayer(work) {
       const targetWork = work || globalWorksData.find(w => isGameWork(w)) || DEFAULT_GAME_WORK;
       const gameUrl = getWorkGameUrl(targetWork);
-      if (gameEmbedTitle) gameEmbedTitle.innerText = targetWork.title || '駒洋市 ゲームサークル作品';
+      if (gameEmbedTitle) gameEmbedTitle.innerText = targetWork.title || '駒洋市 ゲーム制作サークル作品';
       if (gameEmbedOpenTabBtn) gameEmbedOpenTabBtn.href = gameUrl;
       if (gameEmbedCopyUrlBtn) {
         gameEmbedCopyUrlBtn.onclick = () => {
