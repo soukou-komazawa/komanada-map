@@ -1,0 +1,29 @@
+ニューゴスタイル Ver1.000 第三者著作物・ライセンス表示
+====================================================
+
+源暎エムゴ v2.0
+---------------
+使用箇所: 和文、記号、フォントの組版情報。行間調整版では全字形。
+配布元: https://okoneya.jp/font/download
+ライセンス: SIL Open Font License 1.1
+
+Copyright (c) 2020-2021, おたもん (http://okoneya.jp/font/),
+with Reserved Font Name '源暎'.
+源暎エムゴのフォント内部では 'GenEi' も予約名として表記されています。
+
+Copyright (c) 2017, M+ FONTS PROJECT.
+Copyright (c) 2014, Indian Type Foundry (info@indiantypefoundry.com).
+Copyright (c) 2017, Adobe Systems Incorporated (http://www.adobe.com/),
+with Reserved Font Name 'Source'.
+Copyright (c) 2015, 自家製フォント工房 by MM (http://jikasei.me/font/mgenplus/).
+Copyright (c) 2015, Google Inc.
+
+Console Square Beta
+-------------------
+作者: puzzylpiece (@puzzylpiece)
+使用箇所: 混植版の半角・全角英数字と対応する縦書き字形。
+作者の公開告知に付随する投稿で Open Font License の明示を確認しています。
+入手した Beta の ZIP およびフォントには、著作権年、予約フォント名、
+個別のライセンス文の記載がありません。作者名で帰属を示しています。
+
+フォントには同梱の SIL Open Font License 1.1 本文が適用されます。

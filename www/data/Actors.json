@@ -1,0 +1,7 @@
+[
+null,
+{"id":1,"battlerName":"Actor1_1","characterIndex":0,"characterName":"actor_ps01","classId":1,"equips":[1,1,2,3,0],"faceIndex":0,"faceName":"face_ps00","traits":[],"initialLevel":1,"maxLevel":99,"name":"マナト","nickname":"","note":"","profile":""},
+{"id":2,"battlerName":"Actor1_8","characterIndex":1,"characterName":"actor_ps01","classId":1,"equips":[2,1,2,3,0],"faceIndex":4,"faceName":"face_ps00","traits":[],"initialLevel":1,"maxLevel":99,"name":"ハヅキ","nickname":"","note":"","profile":""},
+{"id":3,"battlerName":"Actor3_8","characterIndex":2,"characterName":"actor_ps01","classId":1,"equips":[3,0,2,3,4],"faceIndex":0,"faceName":"face_ps01","traits":[],"initialLevel":1,"maxLevel":99,"name":"ヒマワリ","nickname":"","note":"","profile":""},
+{"id":4,"battlerName":"Actor2_7","characterIndex":6,"characterName":"Actor2","classId":4,"equips":[4,0,2,3,4],"faceIndex":6,"faceName":"Actor2","traits":[],"initialLevel":1,"maxLevel":99,"name":"ルキウス","nickname":"","note":"","profile":""}
+]

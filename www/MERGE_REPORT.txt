@@ -1,0 +1,45 @@
+=== RPGツクールMV 3-wayマージレポート ===
+生成日時: 2026/11/22 22:07:22
+
+【重要：手動コピーが必要な新規アセット一覧】
+[変更A] js/plugins/Gemini_SyncAreaBgm.js
+[変更A] js/plugins/Gemini_VerticalMessageFace.js
+[変更A] js/plugins/KMS_Minimap.js
+[変更A] js/plugins/KMS_Minimap_LICENSE.txt
+[変更A] js/plugins/KMS_Minimap_readme.txt
+[変更A] js/plugins/Lunatlazur_ActorNameWindow.js
+[変更A] js/plugins/ParallelBgs.js
+[変更A] img/system/MinimapObjectIcon.png
+[変更A] img/system/MinimapPlayerIcon.png
+[変更A] audio/bgm/8bit-Battle01_loop.m4a
+[変更A] audio/bgm/8bit-Battle01_loop.ogg
+[変更A] audio/bgm/Battle-forHonor_loop.m4a
+[変更A] audio/bgm/Battle-forHonor_loop.ogg
+[変更A] audio/bgm/イチョウの木エリア.m4a
+[変更A] audio/bgm/イチョウの木エリア.ogg
+[変更A] audio/bgm/商店街.m4a
+[変更A] audio/bgm/商店街.ogg
+[変更A] audio/bgm/母堂島.m4a
+[変更A] audio/bgm/母堂島.ogg
+[変更A] audio/bgm/駅前.m4a
+[変更A] audio/bgm/駅前.ogg
+(変更Bの新規アセットなし)
+
+【自動マージログ】
+[OK] CommonEvents.json: 3件のID変更・追加を自動マージしました。
+[OK] Items.json: 14件のID変更・追加を自動マージしました。
+[OK] Map001.json: 変更Aのタイル配置を自動適用しました。
+[OK] Map001.json: 13件のマップイベントを自動マージしました。
+[OK] Map002.json: 変更Aのタイル配置を自動適用しました。
+[OK] Map004.json: 変更Aのタイル配置を自動適用しました。
+[OK] Map004.json: 4件のマップイベントを自動マージしました。
+[OK] Map005.json: 変更Aのタイル配置を自動適用しました。
+[OK] Map005.json: 2件のマップイベントを自動マージしました。
+[OK] Map006.json: 変更Aのタイル配置を自動適用しました。
+[OK] Map006.json: 12件のマップイベントを自動マージしました。
+[OK] Map007.json: 変更Aのタイル配置を自動適用しました。
+[OK] System.json (スイッチ名): 22件の変更を自動統合しました。
+[OK] Tilesets.json ID:8 [パルスマ用]: 変更Aを自動採用しました。
+[OK] Tilesets.json ID:9 [パルスマ用2]: 変更Aを自動採用しました。
+[OK] Tilesets.json ID:10 [パルスマ用3]: 変更Aを自動採用しました。
+[OK] Tilesets.json ID:11 [母堂島灯台]: 変更Aを自動採用しました。
