@@ -2397,7 +2397,7 @@
                                 (workTitleClean.includes(gTitleClean) || gTitleClean.includes(workTitleClean));
 
           // 距離がSPOT_CLUSTER_DISTANCE（95px）以内、または同じ地名・施設名を含み160px以内なら、そのランドマーク/スポットに一般作品を統合
-          if (dist <= SPOT_CLUSTER_DISTANCE || (isRelatedName && dist <= 160)) {
+          if (!isGameWork(work) && !g.works.some(w => isGameWork(w)) && (dist <= SPOT_CLUSTER_DISTANCE || (isRelatedName && dist <= 160))) {
             if (dist < minDist) {
               minDist = dist;
               matched = g;
@@ -2507,7 +2507,7 @@
       }
     }
 
-    const CACHE_KEY_WORKS = 'komanada_cache_works_v2';
+    const CACHE_KEY_WORKS = 'komanada_cache_works_v3';
     const CACHE_KEY_ABOUT = 'komanada_cache_about_v2';
     const CACHE_KEY_CIRCLES = 'komanada_cache_circles_v2';
     let hasHandledInitialUrlParam = false;
@@ -3167,8 +3167,9 @@
             ${authorHtml}
             ${previewMediaHtml}
             <div class="popup-desc">${escapeHtml(activePrimary.shortDesc || '')}</div>
-            ${worksListHtml}
+            <!-- worksListAtBottom -->
             <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">${actionBtns}</div>
+            ${worksListHtml}
           </div>
         `;
 
@@ -3448,6 +3449,36 @@
       // ゲームサークル作品用ハイブリッドランチャーカード制御
       const isGame = isGameWork(work);
       const modalGameLauncherCard = document.getElementById('modalGameLauncherCard');
+      // モーダル内全体の表示順序を整理：
+      // 1. タイトル・作者 → 2. 画像・漫画 → 3. 本文・解説 → 4. BROWSER GAME LAUNCHER（本文の1個下）
+      // → 5. 釈文・あとがき・伝承メモ → 6. 登録情報・市政資料室 → 7. 拍手＆前後ナビ → 8. この場所を舞台にした創作作品（一番下）
+      if (modalCardEl) {
+        const orderedIds = [
+          'modalImageWrapper',
+          'modalImageCredit',
+          'mangaNavBar',
+          'modalReadingBar',
+          'modalBodyHeading',
+          'modalBody',
+          'modalGameLauncherCard',
+          'modalCalligraphyBox',
+          'modalAfterwordBox',
+          'modalLoreAccordion',
+          'monumentProfileCard',
+          'modalCityHallCard',
+          'modalFooterActions',
+          'spotWorksBar',
+          'modalSpotGallery'
+        ];
+        orderedIds.forEach(id => {
+          const el = document.getElementById(id);
+          if (el) modalCardEl.appendChild(el);
+        });
+        if (modalGameLauncherCard) {
+          modalGameLauncherCard.style.marginTop = '16px';
+          modalGameLauncherCard.style.marginBottom = '16px';
+        }
+      }
       if (modalGameLauncherCard) {
         if (isGame) {
           modalGameLauncherCard.style.display = "block";
