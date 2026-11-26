@@ -10,7 +10,7 @@
 // 6. 右上の鉛筆アイコン（編集）を押し、バージョンを「新バージョン」にして「デプロイ」を押します。
 // ===================================================================
 
-const DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1557951767231209585/OCz2glUXFlSkMOhMNl_ly5g0pTgkHbM08IwbGSXO027Ncq0fgVOxcXPVQQ3hwnsD2KYY";
+const DISCORD_WEBHOOK_URL = PropertiesService.getScriptProperties().getProperty("DISCORD_WEBHOOK_URL") || "ここにDiscordのWebhook_URLを貼り付け（GitHubには公開しないこと）";
 const SHEET_NAME = "いいね集計";
 
 // 作品ID（タイムスタンプなど）が日付型に自動変換されても一致させる正規化関数

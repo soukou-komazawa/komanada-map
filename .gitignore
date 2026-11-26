@@ -4,3 +4,6 @@ Thumbs.db
 
 # Dependencies
 node_modules/
+
+# Google Apps Script (contains private webhook config, keep local only)
+gas_code.js
