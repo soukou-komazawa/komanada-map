@@ -1,10 +1,11 @@
 [
 null,
-{"id":1,"expanded":true,"name":"こまなだ荘付近","order":1,"parentId":0,"scrollX":2174.4,"scrollY":2062.7999999999997},
-{"id":2,"expanded":true,"name":"こまなだ荘付近（イチョウ付近）","order":2,"parentId":1,"scrollX":3696,"scrollY":2857.2},
-{"id":3,"expanded":true,"name":"母堂島道中_回想","order":7,"parentId":0,"scrollX":1378,"scrollY":725},
-{"id":4,"expanded":true,"name":"母堂島道中","order":3,"parentId":0,"scrollX":1298.3999999999999,"scrollY":858},
-{"id":5,"expanded":true,"name":"母堂島 入口","order":4,"parentId":4,"scrollX":1101.6,"scrollY":877.1999999999999},
-{"id":6,"expanded":false,"name":"母堂島 灯台","order":5,"parentId":5,"scrollX":1317.6,"scrollY":1542},
-{"id":7,"expanded":true,"name":"母堂島 施設","order":6,"parentId":5,"scrollX":1317.6,"scrollY":918}
+{"id":1,"expanded":true,"name":"こまなだ荘付近","order":1,"parentId":0,"scrollX":1864,"scrollY":2628},
+{"id":2,"expanded":true,"name":"こまなだ荘付近（イチョウ付近）","order":2,"parentId":1,"scrollX":2162.6666666666665,"scrollY":2929.3333333333335},
+{"id":3,"expanded":true,"name":"母堂島道中_回想","order":8,"parentId":0,"scrollX":1226.6666666666667,"scrollY":974.6666666666666},
+{"id":4,"expanded":true,"name":"母堂島道中","order":4,"parentId":0,"scrollX":1226.6666666666667,"scrollY":974.6666666666666},
+{"id":5,"expanded":true,"name":"母堂島 入口","order":5,"parentId":4,"scrollX":1226.6666666666667,"scrollY":974.6666666666666},
+{"id":6,"expanded":false,"name":"母堂島 灯台","order":6,"parentId":5,"scrollX":1205.3333333333333,"scrollY":974.6666666666666},
+{"id":7,"expanded":true,"name":"母堂島 施設","order":7,"parentId":5,"scrollX":1226.6666666666667,"scrollY":974.6666666666666},
+{"id":8,"expanded":false,"name":"MAP008","order":3,"parentId":1,"scrollX":1226.6666666666667,"scrollY":974.6666666666666}
 ]
